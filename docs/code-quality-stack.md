@@ -8,7 +8,7 @@ The code quality tools for this app, how they're set up, and where each check ru
 |---|---|---|
 | Runtime | Node 24 LTS, pnpm | Node in `.nvmrc` and `engines`. Pin pnpm in `packageManager`; pnpm has the strongest supply-chain settings. |
 | Format | Prettier + `prettier-plugin-tailwindcss` | Owns all formatting and sorts Tailwind classes. Never run it through ESLint. Skips Markdown: docs are hand-written. |
-| Lint | ESLint (flat config) | `eslint-config-next` (core-web-vitals + typescript, jsx-a11y on), typescript-eslint `strictTypeChecked` + `stylisticTypeChecked` with `projectService`, `eslint-plugin-react-hooks` `recommended`, `@eslint-community/eslint-plugin-eslint-comments` (`require-description`, `no-unlimited-disable`). `reportUnusedDisableDirectives: "error"`. |
+| Lint | ESLint 9 (flat config) | ESLint 9 until `eslint-config-next`'s plugins support 10. `@eslint/js` recommended, `eslint-config-next` (core-web-vitals + typescript, which also turns on `react-hooks` `recommended`), the full `jsx-a11y` recommended set, typescript-eslint `strictTypeChecked` + `stylisticTypeChecked` with `projectService`, `eslint-plugin-better-tailwindcss` `recommended` (class order off: Prettier owns it), `@eslint-community/eslint-plugin-eslint-comments` (`require-description`, `no-unlimited-disable`, `no-use` except `eslint-disable-next-line`, no disabling the two core hook rules). `reportUnusedDisableDirectives: "error"`. |
 | Types | TypeScript 7 `tsc`, TypeScript 6 for ESLint | Both installed side by side, pinned with `~` (`@typescript/native` → 7, `typescript` → 6). Strict baseline in `tsconfig.base.json`, extended by `tsconfig.json`. `typedRoutes: true`. Run `next typegen` before `tsc --noEmit`. |
 | Tests | Vitest + React Testing Library | Unit, component and integration `projects` |
 | Property tests | `@fast-check/vitest` | Parsers, validators, money and date logic. |
@@ -99,7 +99,7 @@ One tool per step, in this order. After each step, `pnpm check` must pass before
 - [x] 1. GitHub security settings: secret scanning, push protection, Dependabot alerts and security updates *(human)*
 - [x] 2. Prettier
 - [x] 3. TypeScript 6 and 7, tsconfig
-- [ ] 4. ESLint
+- [x] 4. ESLint
 - [ ] 5. Vitest and React Testing Library
 - [ ] 6. Coverage: Vitest v8 floor and diff-cover
 - [ ] 7. fast-check
