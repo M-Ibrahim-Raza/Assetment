@@ -63,6 +63,14 @@ export default defineConfig(
       ],
     },
   },
+  // CommonJS config files, such as .dependency-cruiser.cjs.
+  {
+    files: ["**/*.cjs"],
+    languageOptions: {
+      sourceType: "commonjs",
+      globals: { module: "readonly", require: "readonly" },
+    },
+  },
   // Config files are plain JS outside the tsconfig, so skip type-aware rules.
   {
     files: ["**/*.{js,mjs,cjs}"],
