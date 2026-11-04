@@ -9,5 +9,7 @@ trustPolicyExclude:
   - "eslint-import-resolver-typescript@3.10.1"
 # Dependency build scripts are blocked unless listed here as true.
 allowBuilds:
+  # Hooks are installed by the `prepare` script instead.
+  lefthook: false
   sharp: false
   unrs-resolver: false
