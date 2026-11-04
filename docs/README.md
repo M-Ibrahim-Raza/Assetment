@@ -14,11 +14,6 @@ What each file here is for and what goes in it.
 
 Order: `product.md` → `journeys.md` → `features.md` → `prototype-screens/` → `specs/<feature>/spec.md`.
 
-Reference guides live in the Engineering Handbook, not here. Nothing is written into them during the build:
-
-- `/Applications/BetterStack/Best Practices/guides/feature-engineering.md`: requirements techniques (story mapping, MoSCoW, EARS, Mom Test).
-- `/Applications/BetterStack/Best Practices/guides/code-quality.md`: code quality tools and practices (linters, type checkers, SAST, supply-chain scanning, quality gates).
-
 ## product.md
 
 No features or code. Specs link to it instead of repeating it.
@@ -66,7 +61,7 @@ The 3–5 main tasks a user comes to the app to do. One section per journey:
 
 ## code-quality-stack.md
 
-This project's code quality decisions: tools and settings, scripts, CI jobs, GitHub settings, and where we differ from Best Practices. Update it whenever a tool or check changes.
+This project's code quality decisions: tools and settings, scripts, CI jobs, GitHub settings. Update it whenever a tool or check changes.
 
 ## code-quality-rules.md
 
@@ -74,9 +69,9 @@ Short rules for AI agents writing code. `CLAUDE.md` imports it, so every agent l
 
 ## adr/
 
-Architecture Decision Records: one file per project decision. They override Best Practices.
+Architecture Decision Records: one file per project decision.
 
 - **Name:** `NNNN-short-title.md`, e.g. `0001-nextjs-only.md`. Numbers are never reused.
 - **Header:** `# NNNN. Title`, then Status (`Accepted` or `Superseded by NNNN`) and Date.
-- **Sections:** Context (why a decision is needed), Decision (what we chose), Consequences (good and bad results, and any Best Practices rule it overrides).
+- **Sections:** Context (why a decision is needed), Decision (what we chose), Consequences (good and bad results, and any rule it overrides).
 - **Changing a decision:** write a new ADR and mark the old one superseded. Never delete or rewrite an accepted ADR.
