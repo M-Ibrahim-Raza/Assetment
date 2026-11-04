@@ -28,7 +28,7 @@ The code quality tools for this app, how they're set up, and where each check ru
 | Stage | Runs | Blocks merge? |
 |---|---|---|
 | Editor | Prettier on save, ESLint, TypeScript 7 extension | No, feedback only |
-| Claude Code hook | After each file edit: Prettier and `eslint --fix` on that file | No, feedback only |
+| Claude Code hook | After each Edit or Write: `eslint --fix`, then Prettier, on that file (`.claude/hooks/format-and-lint.mjs`). Problems ESLint can't fix go back to Claude. | No, feedback only |
 | pre-commit | Prettier and ESLint on staged files | No, can be skipped |
 | commit-msg | commitlint | No, can be skipped |
 | pre-push | Type check, unit tests | No, can be skipped |
@@ -120,4 +120,4 @@ One tool per step, in this order. After each step, `pnpm check` must pass before
 - [x] 15. CI workflow: all required jobs, including Semgrep CE and `pnpm audit`
 - [x] 16. Dependabot config
 - [ ] 17. After the setup PR is merged: CodeQL default setup (it needs code on `main`), then the `main` ruleset with required checks. Check that Dependabot's first run has no config errors (Insights → Dependency graph → Dependabot) *(human)*
-- [ ] 18. Claude Code hook in `.claude/settings.json`
+- [x] 18. Claude Code hook in `.claude/settings.json`
