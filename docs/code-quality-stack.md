@@ -29,11 +29,13 @@ The code quality tools for this app, how they're set up, and where each check ru
 |---|---|---|
 | Editor | Prettier on save, ESLint, TypeScript 7 extension | No, feedback only |
 | Claude Code hook | After each Edit or Write: `eslint --fix`, then Prettier, on that file (`.claude/hooks/format-and-lint.mjs`). Problems ESLint can't fix go back to Claude. | No, feedback only |
-| pre-commit | Prettier and ESLint on staged files | No, can be skipped |
-| commit-msg | commitlint | No, can be skipped |
-| pre-push | Type check, unit tests | No, can be skipped |
+| pre-commit | Prettier and ESLint on staged files | No, but never skip it |
+| commit-msg | commitlint | No, but never skip it |
+| pre-push | Type check, unit tests | No, but never skip it |
 | **CI (required)** | **The jobs below** | **Yes. This is the gate.** |
 | Nightly | Full Stryker run (`.github/workflows/nightly.yml`, 03:17 UTC, or by hand) | No. Fix findings the next day. |
+
+Feedback stages don't block the merge, but what they report isn't optional: fix it before moving on. Never skip a hook (`--no-verify`, `LEFTHOOK=0`, `LEFTHOOK_EXCLUDE`). If a hook itself is broken, stop and say so. CI runs every check again anyway.
 
 Required CI jobs (`.github/workflows/ci.yml`) run in parallel on `pull_request`, `merge_group` and `push` to `main`. Keep the whole run under 10 minutes; each job stops after 10.
 
