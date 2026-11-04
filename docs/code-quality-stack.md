@@ -12,7 +12,7 @@ The code quality tools for this app, how they're set up, and where each check ru
 | Types | TypeScript 7 `tsc`, TypeScript 6 for ESLint | Both installed side by side, pinned with `~` (`@typescript/native` → 7, `typescript` → 6). Strict baseline in `tsconfig.base.json`, extended by `tsconfig.json`. `typedRoutes: true`. Run `next typegen` before `tsc --noEmit`. |
 | Tests | Vitest + React Testing Library + MSW | Unit (`*.test.ts`), component (`*.test.tsx`, jsdom) and integration (`*.int.test.ts`) `projects`, next to the code. Random order; mocks, env and globals restored after each test. MSW fails any test that sends a request without a handler. |
 | Property tests | `@fast-check/vitest` | Parsers, validators, money and date logic. |
-| Coverage | Vitest (v8) + diff-cover | Branch coverage on. Floor: 80% lines and branches, raised by hand (no `autoUpdate`, which rewrites the config). Changed lines: at least 90%. |
+| Coverage | Vitest (v8) + diff-cover | Branch coverage on. Floor: 80% lines and branches, raised by hand (no `autoUpdate`, which rewrites the config). Changed lines: at least 90%, checked by diff-cover 10.6.0 on the Cobertura report against `origin/main`, untracked files included. diff-cover is a Python tool run with `uvx` and a 7-day cooldown, so it isn't in `package.json`. |
 | E2E | Playwright | Runs against `next build && next start`. |
 | Mutation | StrykerJS (Vitest runner) | `--incremental`, changed files only. Thresholds: `high: 80`, `low: 60`, `break: 60`. |
 | Structure | knip, dependency-cruiser, jscpd | knip: dead code and unused deps. dependency-cruiser: no `prototype/` imports, no cycles, layer rules. jscpd: duplication ≤3%. |
@@ -59,15 +59,16 @@ Required CI jobs run in parallel on `pull_request`, `merge_group` and `push` to 
     "lint": "eslint . --max-warnings 0",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --coverage",
+    "test:changed-lines": "uvx --exclude-newer \"7 days\" --from diff-cover==10.6.0 diff-cover coverage/cobertura-coverage.xml --compare-branch=origin/main --include-untracked --fail-under=90",
     "test:e2e": "playwright test",
     "test:mutation": "stryker run --incremental",
     "structure": "knip && depcruise . && jscpd .",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm structure"
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:changed-lines && pnpm structure"
   }
 }
 ```
 
-- `pnpm check` is the one command agents run before saying a task is done.
+- `pnpm check` is the one command agents run before saying a task is done. It needs `uv` installed, for diff-cover.
 - `tsc` must resolve to the TypeScript 7 binary.
 - The dependency-cruiser and jscpd configs exclude `.next/`, `node_modules/`, `coverage/` and `prototype/`.
 
@@ -101,7 +102,7 @@ One tool per step, in this order. After each step, `pnpm check` must pass before
 - [x] 3. TypeScript 6 and 7, tsconfig
 - [x] 4. ESLint
 - [x] 5. Vitest and React Testing Library
-- [ ] 6. Coverage: Vitest v8 floor and diff-cover
+- [x] 6. Coverage: Vitest v8 floor and diff-cover
 - [ ] 7. fast-check
 - [ ] 8. Playwright
 - [ ] 9. knip

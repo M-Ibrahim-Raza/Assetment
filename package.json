@@ -15,7 +15,8 @@
     "lint": "eslint . --max-warnings 0",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --coverage",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test"
+    "test:changed-lines": "uvx --exclude-newer \"7 days\" --from diff-cover==10.6.0 diff-cover coverage/cobertura-coverage.xml --compare-branch=origin/main --include-untracked --fail-under=90",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:changed-lines"
   },
   "dependencies": {
     "next": "16.4.4",
