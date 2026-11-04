@@ -15,7 +15,7 @@ The code quality tools for this app, how they're set up, and where each check ru
 | Coverage | Vitest (v8) + diff-cover | Branch coverage on. Floor: 80% lines and branches, raised by hand (no `autoUpdate`, which rewrites the config). Changed lines: at least 90%, checked by diff-cover 10.6.0 on the Cobertura report against `origin/main`, untracked files included. diff-cover is a Python tool run with `uvx` and a 7-day cooldown, so it isn't in `package.json`. |
 | E2E | Playwright | `e2e/*.spec.ts`. Runs against a fresh `next build && next start` on port 3100, never a running dev server. Chromium only. No retries; traces kept for failed tests. |
 | Mutation | StrykerJS (Vitest runner) | `--incremental`, changed files only. Thresholds: `high: 80`, `low: 60`, `break: 60`. |
-| Structure | knip, dependency-cruiser, jscpd | knip: dead code and unused deps. dependency-cruiser: no `prototype/` imports, no cycles, layer rules. jscpd: duplication ≤3%. |
+| Structure | knip, dependency-cruiser, jscpd | knip: unused files, exports and packages, and unlisted packages. Config hints are errors, so every exception in `knip.config.ts` must still be needed. Add `prototype/**` to its `ignore` once the prototype has files. dependency-cruiser: no `prototype/` imports, no cycles, layer rules. jscpd: duplication ≤3%. |
 | Secrets | GitHub secret scanning + push protection | Free on public repos. Blocks pushes with known key formats and scans the full history. |
 | Dependencies | Dependabot, `pnpm audit`, pnpm settings | Dependabot for `npm` and `github-actions`, 3-day cooldown. `pnpm audit --audit-level high` in CI. pnpm: `minimumReleaseAge: 1440`, `trustPolicy: no-downgrade`, `allowBuilds` allowlist, `--frozen-lockfile` in CI. `trustPolicyExclude` only for exact versions checked by hand, each with a reason. |
 | SAST | CodeQL + Semgrep CE | CodeQL default setup: deep cross-file checks, free on public repos. Semgrep CE: fast pattern scan on every PR. |
@@ -62,7 +62,7 @@ Required CI jobs run in parallel on `pull_request`, `merge_group` and `push` to 
     "test:changed-lines": "uvx --exclude-newer \"7 days\" --from diff-cover==10.6.0 diff-cover coverage/cobertura-coverage.xml --compare-branch=origin/main --include-untracked --fail-under=90",
     "test:e2e": "playwright test",
     "test:mutation": "stryker run --incremental",
-    "structure": "knip && depcruise . && jscpd .",
+    "structure": "knip --treat-config-hints-as-errors && depcruise . && jscpd .",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:changed-lines && pnpm structure"
   }
 }
@@ -105,7 +105,7 @@ One tool per step, in this order. After each step, `pnpm check` must pass before
 - [x] 6. Coverage: Vitest v8 floor and diff-cover
 - [x] 7. fast-check
 - [x] 8. Playwright
-- [ ] 9. knip
+- [x] 9. knip
 - [ ] 10. dependency-cruiser
 - [ ] 11. jscpd
 - [ ] 12. Stryker
