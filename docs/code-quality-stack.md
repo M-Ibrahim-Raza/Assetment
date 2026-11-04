@@ -7,7 +7,7 @@ The code quality tools for this app, how they're set up, and where each check ru
 | Layer | Pick | Setup |
 |---|---|---|
 | Runtime | Node 24 LTS, pnpm | Node in `.nvmrc` and `engines`. Pin pnpm in `packageManager`; pnpm has the strongest supply-chain settings. |
-| Format | Prettier | Owns all formatting. Never run it through ESLint. |
+| Format | Prettier + `prettier-plugin-tailwindcss` | Owns all formatting and sorts Tailwind classes. Never run it through ESLint. Skips Markdown: docs are hand-written. |
 | Lint | ESLint (flat config) | `eslint-config-next` (core-web-vitals + typescript, jsx-a11y on), typescript-eslint `strictTypeChecked` + `stylisticTypeChecked` with `projectService`, `eslint-plugin-react-hooks` `recommended`, `@eslint-community/eslint-plugin-eslint-comments` (`require-description`, `no-unlimited-disable`). `reportUnusedDisableDirectives: "error"`. |
 | Types | TypeScript 7 `tsc`, TypeScript 6 for ESLint | Both installed side by side, pinned. Strict tsconfig. `typedRoutes: true`. Run `next typegen` before `tsc --noEmit`. |
 | Tests | Vitest + React Testing Library | Unit, component and integration `projects` |
@@ -97,7 +97,7 @@ One tool per step, in this order. After each step, `pnpm check` must pass before
 
 - [x] 0. Node 24, pnpm and the Next.js app (pnpm supply-chain settings before the first install)
 - [x] 1. GitHub security settings: secret scanning, push protection, Dependabot alerts and security updates *(human)*
-- [ ] 2. Prettier
+- [x] 2. Prettier
 - [ ] 3. TypeScript 6 and 7, tsconfig
 - [ ] 4. ESLint
 - [ ] 5. Vitest and React Testing Library

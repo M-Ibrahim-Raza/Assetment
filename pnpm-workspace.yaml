@@ -6,7 +6,7 @@ trustPolicy: no-downgrade
 # Exact versions checked by hand. Keep this list short and give each a reason.
 trustPolicyExclude:
   # 3.x backport (2025-04-21, long-time maintainer) published after 4.x added provenance. Needed by eslint-config-next.
-  - 'eslint-import-resolver-typescript@3.10.1'
+  - "eslint-import-resolver-typescript@3.10.1"
 # Dependency build scripts are blocked unless listed here as true.
 allowBuilds:
   sharp: false
