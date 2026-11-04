@@ -1,0 +1,6 @@
+# Prettier also skips everything in .gitignore.
+pnpm-lock.yaml
+# Throwaway, not part of the app.
+prototype/
+# Docs are hand-written. Prettier would pad every table column.
+*.md

@@ -1,0 +1,26 @@
+# Git hooks. Feedback only: they can be skipped, so CI runs every check again (git.md §13).
+# Never use --no-verify to get past a failing check. Fix the problem.
+
+pre-commit:
+  piped: true # ESLint fixes first, then Prettier formats the same files
+  jobs:
+    - name: eslint
+      glob: "*.{js,mjs,cjs,ts,mts,tsx}"
+      run: pnpm exec eslint --fix --max-warnings 0 --no-warn-ignored {staged_files}
+      stage_fixed: true
+    - name: prettier
+      run: pnpm exec prettier --write --ignore-unknown {staged_files}
+      stage_fixed: true
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: pnpm exec commitlint --edit {1}
+
+pre-push:
+  piped: true
+  jobs:
+    - name: typecheck
+      run: pnpm typecheck
+    - name: tests
+      run: pnpm test

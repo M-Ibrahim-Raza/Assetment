@@ -1,7 +1,40 @@
-node_modules/
-dist/
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# testing
+/coverage
+/test-results
+/playwright-report
+/blob-report
+/playwright/.cache
+/.stryker-tmp
+/reports
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+/dist
+
+# misc
 .DS_Store
+*.pem
+
+# debug
 *.log
+
+# env files
 .env
 .env.*
 !.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

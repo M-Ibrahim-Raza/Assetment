@@ -1,0 +1,18 @@
+# Supply-chain settings. See docs/code-quality-stack.md.
+# Only install versions published at least 1 day ago (in minutes).
+# Semgrep wants 7 days. We keep 1: most malicious versions are live for minutes to hours,
+# and a longer wait also holds back security fixes (Next 16.4.5 in Nov 2026).
+# nosemgrep: package_managers.pnpm.pnpm-missing-minimum-release-age.pnpm-minimum-release-age
+minimumReleaseAge: 1440
+# Fail if a package version has weaker provenance than an earlier one.
+trustPolicy: no-downgrade
+# Exact versions checked by hand. Keep this list short and give each a reason.
+trustPolicyExclude:
+  # 3.x backport (2025-04-21, long-time maintainer) published after 4.x added provenance. Needed by eslint-config-next.
+  - "eslint-import-resolver-typescript@3.10.1"
+# Dependency build scripts are blocked unless listed here as true.
+allowBuilds:
+  # Hooks are installed by the `prepare` script instead.
+  lefthook: false
+  sharp: false
+  unrs-resolver: false
