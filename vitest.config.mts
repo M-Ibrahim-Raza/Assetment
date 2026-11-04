@@ -15,6 +15,22 @@ export default defineConfig({
         description: "Flaky; tracked in a ticket (testing.md §13)",
       },
     ],
+    coverage: {
+      provider: "v8", // reports branches as well as lines
+      include: ["**/*.{ts,tsx}"],
+      exclude: [
+        ...exclude,
+        "**/*.test.{ts,tsx}",
+        "**/*.int.test.ts",
+        "**/*.d.ts",
+        "*.config.{ts,mts}",
+        "test/**",
+        "coverage/**",
+      ],
+      reporter: ["text-summary", "html", "cobertura"],
+      // Raised by hand, never lowered. No thresholds.autoUpdate: it rewrites this file on every local run.
+      thresholds: { lines: 80, branches: 80 },
+    },
     projects: [
       {
         extends: true,

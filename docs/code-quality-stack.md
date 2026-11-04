@@ -12,7 +12,7 @@ The code quality tools for this app, how they're set up, and where each check ru
 | Types | TypeScript 7 `tsc`, TypeScript 6 for ESLint | Both installed side by side, pinned with `~` (`@typescript/native` → 7, `typescript` → 6). Strict baseline in `tsconfig.base.json`, extended by `tsconfig.json`. `typedRoutes: true`. Run `next typegen` before `tsc --noEmit`. |
 | Tests | Vitest + React Testing Library + MSW | Unit (`*.test.ts`), component (`*.test.tsx`, jsdom) and integration (`*.int.test.ts`) `projects`, next to the code. Random order; mocks, env and globals restored after each test. MSW fails any test that sends a request without a handler. |
 | Property tests | `@fast-check/vitest` | Parsers, validators, money and date logic. |
-| Coverage | Vitest (v8) + diff-cover | Branch coverage on. Floor: 80% lines and branches. Changed lines: at least 90%. |
+| Coverage | Vitest (v8) + diff-cover | Branch coverage on. Floor: 80% lines and branches, raised by hand (no `autoUpdate`, which rewrites the config). Changed lines: at least 90%. |
 | E2E | Playwright | Runs against `next build && next start`. |
 | Mutation | StrykerJS (Vitest runner) | `--incremental`, changed files only. Thresholds: `high: 80`, `low: 60`, `break: 60`. |
 | Structure | knip, dependency-cruiser, jscpd | knip: dead code and unused deps. dependency-cruiser: no `prototype/` imports, no cycles, layer rules. jscpd: duplication ≤3%. |
