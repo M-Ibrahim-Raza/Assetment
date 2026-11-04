@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   // Automatic memoization. Needs babel-plugin-react-compiler, pinned to an exact version.
   reactCompiler: true,
+  // Type-checks <Link href> and router.push() against real routes.
+  typedRoutes: true,
   turbopack: {
     rules: {
       "*.css": {
