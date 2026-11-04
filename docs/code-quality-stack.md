@@ -11,7 +11,7 @@ The code quality tools for this app, how they're set up, and where each check ru
 | Lint | ESLint 9 (flat config) | ESLint 9 until `eslint-config-next`'s plugins support 10. `@eslint/js` recommended, `eslint-config-next` (core-web-vitals + typescript, which also turns on `react-hooks` `recommended`), the full `jsx-a11y` recommended set, typescript-eslint `strictTypeChecked` + `stylisticTypeChecked` with `projectService`, `eslint-plugin-better-tailwindcss` `recommended` (class order off: Prettier owns it), `@eslint-community/eslint-plugin-eslint-comments` (`require-description`, `no-unlimited-disable`, `no-use` except `eslint-disable-next-line`, no disabling the two core hook rules). `reportUnusedDisableDirectives: "error"`. |
 | Types | TypeScript 7 `tsc`, TypeScript 6 for ESLint | Both installed side by side, pinned with `~` (`@typescript/native` → 7, `typescript` → 6). Strict baseline in `tsconfig.base.json`, extended by `tsconfig.json`. `typedRoutes: true`. Run `next typegen` before `tsc --noEmit`. |
 | Tests | Vitest + React Testing Library + MSW | Unit (`*.test.ts`), component (`*.test.tsx`, jsdom) and integration (`*.int.test.ts`) `projects`, next to the code. Random order; mocks, env and globals restored after each test. MSW fails any test that sends a request without a handler. |
-| Property tests | `@fast-check/vitest` | Parsers, validators, money and date logic. |
+| Property tests | `@fast-check/vitest` | Parsers, validators, money and date logic. Import `fc` and `test` from it. A failure prints the seed and the smallest failing input; add each bug it finds as a fixed `examples` case. |
 | Coverage | Vitest (v8) + diff-cover | Branch coverage on. Floor: 80% lines and branches, raised by hand (no `autoUpdate`, which rewrites the config). Changed lines: at least 90%, checked by diff-cover 10.6.0 on the Cobertura report against `origin/main`, untracked files included. diff-cover is a Python tool run with `uvx` and a 7-day cooldown, so it isn't in `package.json`. |
 | E2E | Playwright | Runs against `next build && next start`. |
 | Mutation | StrykerJS (Vitest runner) | `--incremental`, changed files only. Thresholds: `high: 80`, `low: 60`, `break: 60`. |
@@ -103,7 +103,7 @@ One tool per step, in this order. After each step, `pnpm check` must pass before
 - [x] 4. ESLint
 - [x] 5. Vitest and React Testing Library
 - [x] 6. Coverage: Vitest v8 floor and diff-cover
-- [ ] 7. fast-check
+- [x] 7. fast-check
 - [ ] 8. Playwright
 - [ ] 9. knip
 - [ ] 10. dependency-cruiser
