@@ -96,7 +96,7 @@ Required CI jobs run in parallel on `pull_request`, `merge_group` and `push` to 
 One tool per step, in this order. After each step, `pnpm check` must pass before the next one.
 
 - [x] 0. Node 24, pnpm and the Next.js app (pnpm supply-chain settings before the first install)
-- [ ] 1. GitHub security settings: secret scanning, push protection, Dependabot alerts, CodeQL *(human)*
+- [x] 1. GitHub security settings: secret scanning, push protection, Dependabot alerts and security updates *(human)*
 - [ ] 2. Prettier
 - [ ] 3. TypeScript 6 and 7, tsconfig
 - [ ] 4. ESLint
@@ -112,5 +112,5 @@ One tool per step, in this order. After each step, `pnpm check` must pass before
 - [ ] 14. commitlint
 - [ ] 15. CI workflow: all required jobs, including Semgrep CE and `pnpm audit`
 - [ ] 16. Dependabot config
-- [ ] 17. `main` ruleset with required checks, after CI has run once so the job names exist *(human)*
+- [ ] 17. After the setup PR is merged: CodeQL default setup (it needs code on `main`), then the `main` ruleset with required checks *(human)*
 - [ ] 18. Claude Code hook in `.claude/settings.json`
