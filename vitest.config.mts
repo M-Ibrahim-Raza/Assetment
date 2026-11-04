@@ -25,6 +25,7 @@ export default defineConfig({
         "**/*.d.ts",
         "*.config.{ts,mts}",
         "test/**",
+        "e2e/**",
         "coverage/**",
       ],
       reporter: ["text-summary", "html", "cobertura"],

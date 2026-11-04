@@ -13,7 +13,7 @@ The code quality tools for this app, how they're set up, and where each check ru
 | Tests | Vitest + React Testing Library + MSW | Unit (`*.test.ts`), component (`*.test.tsx`, jsdom) and integration (`*.int.test.ts`) `projects`, next to the code. Random order; mocks, env and globals restored after each test. MSW fails any test that sends a request without a handler. |
 | Property tests | `@fast-check/vitest` | Parsers, validators, money and date logic. Import `fc` and `test` from it. A failure prints the seed and the smallest failing input; add each bug it finds as a fixed `examples` case. |
 | Coverage | Vitest (v8) + diff-cover | Branch coverage on. Floor: 80% lines and branches, raised by hand (no `autoUpdate`, which rewrites the config). Changed lines: at least 90%, checked by diff-cover 10.6.0 on the Cobertura report against `origin/main`, untracked files included. diff-cover is a Python tool run with `uvx` and a 7-day cooldown, so it isn't in `package.json`. |
-| E2E | Playwright | Runs against `next build && next start`. |
+| E2E | Playwright | `e2e/*.spec.ts`. Runs against a fresh `next build && next start` on port 3100, never a running dev server. Chromium only. No retries; traces kept for failed tests. |
 | Mutation | StrykerJS (Vitest runner) | `--incremental`, changed files only. Thresholds: `high: 80`, `low: 60`, `break: 60`. |
 | Structure | knip, dependency-cruiser, jscpd | knip: dead code and unused deps. dependency-cruiser: no `prototype/` imports, no cycles, layer rules. jscpd: duplication ≤3%. |
 | Secrets | GitHub secret scanning + push protection | Free on public repos. Blocks pushes with known key formats and scans the full history. |
@@ -104,7 +104,7 @@ One tool per step, in this order. After each step, `pnpm check` must pass before
 - [x] 5. Vitest and React Testing Library
 - [x] 6. Coverage: Vitest v8 floor and diff-cover
 - [x] 7. fast-check
-- [ ] 8. Playwright
+- [x] 8. Playwright
 - [ ] 9. knip
 - [ ] 10. dependency-cruiser
 - [ ] 11. jscpd
