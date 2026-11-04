@@ -17,7 +17,7 @@
     "test": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:changed-lines": "uvx --exclude-newer \"7 days\" --from diff-cover==10.6.0 diff-cover coverage/cobertura-coverage.xml --compare-branch=origin/main --include-untracked --fail-under=90",
-    "structure": "knip --treat-config-hints-as-errors && depcruise .",
+    "structure": "knip --treat-config-hints-as-errors && depcruise . && jscpd .",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:changed-lines && pnpm structure"
   },
   "dependencies": {
@@ -46,6 +46,7 @@
     "eslint-config-next": "16.4.4",
     "eslint-plugin-better-tailwindcss": "4.10.0",
     "eslint-plugin-jsx-a11y": "6.10.2",
+    "jscpd": "5.4.2",
     "jsdom": "30.1.3",
     "knip": "6.44.1",
     "msw": "3.0.3",
