@@ -13,6 +13,8 @@ export default defineConfig(
     "out/**",
     "build/**",
     "coverage/**",
+    "reports/**",
+    ".stryker-tmp/**",
     "prototype/**",
     "next-env.d.ts",
   ]),

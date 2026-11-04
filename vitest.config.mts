@@ -1,6 +1,11 @@
 import { configDefaults, defineConfig } from "vitest/config";
 
-const exclude = [...configDefaults.exclude, ".next/**", "prototype/**"];
+const exclude = [
+  ...configDefaults.exclude,
+  ".next/**",
+  ".stryker-tmp/**",
+  "prototype/**",
+];
 
 export default defineConfig({
   resolve: { tsconfigPaths: true }, // the @/* alias from tsconfig.json

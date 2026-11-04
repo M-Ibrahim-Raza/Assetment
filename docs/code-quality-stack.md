@@ -14,7 +14,7 @@ The code quality tools for this app, how they're set up, and where each check ru
 | Property tests | `@fast-check/vitest` | Parsers, validators, money and date logic. Import `fc` and `test` from it. A failure prints the seed and the smallest failing input; add each bug it finds as a fixed `examples` case. |
 | Coverage | Vitest (v8) + diff-cover | Branch coverage on. Floor: 80% lines and branches, raised by hand (no `autoUpdate`, which rewrites the config). Changed lines: at least 90%, checked by diff-cover 10.6.0 on the Cobertura report against `origin/main`, untracked files included. diff-cover is a Python tool run with `uvx` and a 7-day cooldown, so it isn't in `package.json`. |
 | E2E | Playwright | `e2e/*.spec.ts`. Runs against a fresh `next build && next start` on port 3100, never a running dev server. Chromium only. No retries; traces kept for failed tests. |
-| Mutation | StrykerJS (Vitest runner) | `--incremental`, changed files only. Thresholds: `high: 80`, `low: 60`, `break: 60`. |
+| Mutation | StrykerJS (Vitest runner + TypeScript checker) | `--incremental`, changed files only. Thresholds: `high: 80`, `low: 60`, `break: 60`. Plugins listed by name, because pnpm hides them from auto-discovery. Skipped, with the reason in the report: code that only runs when a file loads (`ignoreStatic`), and display-only code (class names, JSX text) that unit tests must not assert (`tools/stryker/ignore-display-only.mjs`). After changing the Stryker config, delete `reports/stryker-incremental.json`: incremental mode doesn't notice config changes. |
 | Structure | knip, dependency-cruiser, jscpd | knip: unused files, exports and packages, and unlisted packages. Config hints are errors, so every exception in `knip.config.ts` must still be needed. Add `prototype/**` to its `ignore` once the prototype has files. dependency-cruiser (`.dependency-cruiser.cjs`, every rule an error): no `prototype/` imports, no cycles, no orphan files, no dev-only packages or test helpers in app code, every import resolves and is listed. Add layer rules once the layers exist (e.g. the `data/` access layer). jscpd (`.jscpd.json`): duplication ≤3% of code lines. Scans only TS, TSX, JS and CSS, so the lockfile and docs can't dilute the percentage. |
 | Secrets | GitHub secret scanning + push protection | Free on public repos. Blocks pushes with known key formats and scans the full history. |
 | Dependencies | Dependabot, `pnpm audit`, pnpm settings | Dependabot for `npm` and `github-actions`, 3-day cooldown. `pnpm audit --audit-level high` in CI. pnpm: `minimumReleaseAge: 1440`, `trustPolicy: no-downgrade`, `allowBuilds` allowlist, `--frozen-lockfile` in CI. `trustPolicyExclude` only for exact versions checked by hand, each with a reason. |
@@ -108,7 +108,7 @@ One tool per step, in this order. After each step, `pnpm check` must pass before
 - [x] 9. knip
 - [x] 10. dependency-cruiser
 - [x] 11. jscpd
-- [ ] 12. Stryker
+- [x] 12. Stryker
 - [ ] 13. lefthook
 - [ ] 14. commitlint
 - [ ] 15. CI workflow: all required jobs, including Semgrep CE and `pnpm audit`

@@ -35,6 +35,8 @@ module.exports = {
           "[.]d[.]ts$",
           "(^|/)tsconfig[.]json$",
           configFile,
+          // Tool plugins, loaded by path from a tool's config instead of imported.
+          "^tools/",
         ],
       },
       to: {},
@@ -140,7 +142,7 @@ module.exports = {
     doNotFollow: { path: ["node_modules", "^prototype/"] },
     // Build output, reports, and next-env.d.ts, which Next.js generates.
     exclude: {
-      path: "^(?:(?:\\.next|coverage|test-results|playwright-report)/|next-env[.]d[.]ts$)",
+      path: "^(?:(?:\\.next|\\.stryker-tmp|coverage|reports|test-results|playwright-report)/|next-env[.]d[.]ts$)",
     },
     tsConfig: { fileName: "tsconfig.json" },
     tsPreCompilationDeps: true,

@@ -16,6 +16,7 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:mutation": "stryker run --incremental",
     "test:changed-lines": "uvx --exclude-newer \"7 days\" --from diff-cover==10.6.0 diff-cover coverage/cobertura-coverage.xml --compare-branch=origin/main --include-untracked --fail-under=90",
     "structure": "knip --treat-config-hints-as-errors && depcruise . && jscpd .",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:changed-lines && pnpm structure"
@@ -30,6 +31,9 @@
     "@eslint/js": "9.39.5",
     "@fast-check/vitest": "0.5.0",
     "@playwright/test": "1.64.1",
+    "@stryker-mutator/core": "10.1.1",
+    "@stryker-mutator/typescript-checker": "10.1.1",
+    "@stryker-mutator/vitest-runner": "10.1.1",
     "@tailwindcss/turbopack": "^4",
     "@testing-library/dom": "10.4.2",
     "@testing-library/jest-dom": "7.0.1",
