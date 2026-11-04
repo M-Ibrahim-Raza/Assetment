@@ -10,16 +10,16 @@ The code quality tools for this app, how they're set up, and where each check ru
 | Format | Prettier + `prettier-plugin-tailwindcss` | Owns all formatting and sorts Tailwind classes. Never run it through ESLint. Skips Markdown: docs are hand-written. |
 | Lint | ESLint 9 (flat config) | ESLint 9 until `eslint-config-next`'s plugins support 10. `@eslint/js` recommended, `eslint-config-next` (core-web-vitals + typescript, which also turns on `react-hooks` `recommended`), the full `jsx-a11y` recommended set, typescript-eslint `strictTypeChecked` + `stylisticTypeChecked` with `projectService`, `eslint-plugin-better-tailwindcss` `recommended` (class order off: Prettier owns it), `@eslint-community/eslint-plugin-eslint-comments` (`require-description`, `no-unlimited-disable`, `no-use` except `eslint-disable-next-line`, no disabling the two core hook rules). `reportUnusedDisableDirectives: "error"`. |
 | Types | TypeScript 7 `tsc`, TypeScript 6 for ESLint | Both installed side by side, pinned with `~` (`@typescript/native` → 7, `typescript` → 6). Strict baseline in `tsconfig.base.json`, extended by `tsconfig.json`. `typedRoutes: true`. Run `next typegen` before `tsc --noEmit`. |
-| Tests | Vitest + React Testing Library + MSW | Unit (`*.test.ts`), component (`*.test.tsx`, jsdom) and integration (`*.int.test.ts`) `projects`, next to the code. Random order; mocks, env and globals restored after each test. MSW fails any test that sends a request without a handler. |
+| Tests | Vitest + React Testing Library + MSW | Unit (`*.test.ts`), component (`*.test.tsx`, jsdom) and integration (`*.int.test.ts`) `projects`, next to the code. Random order; mocks, env and globals restored after each test. MSW fails any test that sends a request without a handler. A flaky test gets the `quarantine` tag and a ticket: `pnpm test` skips it, and a non-required CI job keeps running it. |
 | Property tests | `@fast-check/vitest` | Parsers, validators, money and date logic. Import `fc` and `test` from it. A failure prints the seed and the smallest failing input; add each bug it finds as a fixed `examples` case. |
 | Coverage | Vitest (v8) + diff-cover | Branch coverage on. Floor: 80% lines and branches, raised by hand (no `autoUpdate`, which rewrites the config). Changed lines: at least 90%, checked by diff-cover 10.6.0 on the Cobertura report against `origin/main`, untracked files included. diff-cover is a Python tool run with `uvx` and a 7-day cooldown, so it isn't in `package.json`. |
 | E2E | Playwright | `e2e/*.spec.ts`. Runs against a fresh `next build && next start` on port 3100, never a running dev server. Chromium only. No retries; traces kept for failed tests. |
-| Mutation | StrykerJS (Vitest runner + TypeScript checker) | `--incremental`, changed files only. Thresholds: `high: 80`, `low: 60`, `break: 60`. Plugins listed by name, because pnpm hides them from auto-discovery. Skipped, with the reason in the report: code that only runs when a file loads (`ignoreStatic`), and display-only code (class names, JSX text) that unit tests must not assert (`tools/stryker/ignore-display-only.mjs`). After changing the Stryker config, delete `reports/stryker-incremental.json`: incremental mode doesn't notice config changes. |
+| Mutation | StrykerJS (Vitest runner + TypeScript checker) | Locally `--incremental`. In CI, `tools/stryker/run-changed.mjs` mutates only the files changed since `origin/main`, picked with the `mutate` patterns from the Stryker config; the nightly run tests every file. Both scripts run `next typegen` first, because the TypeScript checker needs Next's generated types. Thresholds: `high: 80`, `low: 60`, `break: 60`. Plugins listed by name, because pnpm hides them from auto-discovery. Skipped, with the reason in the report: code that only runs when a file loads (`ignoreStatic`), and display-only code (class names, JSX text) that unit tests must not assert (`tools/stryker/ignore-display-only.mjs`). After changing the Stryker config, delete `reports/stryker-incremental.json`: incremental mode doesn't notice config changes. |
 | Structure | knip, dependency-cruiser, jscpd | knip: unused files, exports and packages, and unlisted packages. Config hints are errors, so every exception in `knip.config.ts` must still be needed. Add `prototype/**` to its `ignore` once the prototype has files. dependency-cruiser (`.dependency-cruiser.cjs`, every rule an error): no `prototype/` imports, no cycles, no orphan files, no dev-only packages or test helpers in app code, every import resolves and is listed. Add layer rules once the layers exist (e.g. the `data/` access layer). jscpd (`.jscpd.json`): duplication ≤3% of code lines. Scans only TS, TSX, JS and CSS, so the lockfile and docs can't dilute the percentage. |
 | Secrets | GitHub secret scanning + push protection | Free on public repos. Blocks pushes with known key formats and scans the full history. |
-| Dependencies | Dependabot, `pnpm audit`, pnpm settings | Dependabot for `npm` and `github-actions`, 3-day cooldown. `pnpm audit --audit-level high` in CI. pnpm: `minimumReleaseAge: 1440`, `trustPolicy: no-downgrade`, `allowBuilds` allowlist, `--frozen-lockfile` in CI. `trustPolicyExclude` only for exact versions checked by hand, each with a reason. |
-| SAST | CodeQL + Semgrep CE | CodeQL default setup: deep cross-file checks, free on public repos. Semgrep CE: fast pattern scan on every PR. |
-| Workflows | Rules only, no scanner | Pin every Action by full SHA. Minimal `permissions:`. No `pull_request_target`. |
+| Dependencies | Dependabot, `pnpm audit`, pnpm settings | Dependabot for `npm` and `github-actions`, 3-day cooldown. `pnpm audit --audit-level high` in CI. pnpm: `minimumReleaseAge: 1440`, `trustPolicy: no-downgrade`, `allowBuilds` allowlist, `--frozen-lockfile` in CI. `trustPolicyExclude` only for exact versions checked by hand, each with a reason. Semgrep wants a 7-day wait, but we keep 1 day (suppressed with a reason): a longer wait holds back security fixes, and with pnpm checking the lockfile it would also have meant downgrading `next`, `vitest`, `knip` and `dependency-cruiser`. |
+| SAST | CodeQL + Semgrep CE | CodeQL default setup: deep cross-file checks, free on public repos. Semgrep CE 1.182.1: fast pattern scan on every PR, run with `uvx` and a 7-day cooldown (not in `package.json`). Rulesets: `p/default`, `p/typescript`, `p/react`, `p/nextjs`, `p/github-actions`. Metrics off. |
+| Workflows | Rules only, no scanner | Pin every Action by full SHA, with the version in a comment, at least 3 days old. Minimal `permissions:`. No `pull_request_target`. `persist-credentials: false` on checkout. Untrusted values such as the PR title go through `env:`, never straight into `run:`. Semgrep's `p/github-actions` rules catch script injection. Shared setup lives in `.github/actions/setup`. |
 | Git hooks | lefthook 2.2.1 | Config committed. Hooks install through the `prepare` script; lefthook's own install script stays blocked. pre-commit runs ESLint `--fix`, then Prettier, on staged files and re-stages the fixes. 2.2.2 was uploaded by hand without provenance, so stay on 2.2.1 until a release comes from the verified pipeline again. |
 | Commits | commitlint (`@commitlint/config-conventional`) | Conventional Commits on commits (`commit-msg` hook) and PR titles (CI). Squash merge only. Don't start a body line with `word:`: commitlint reads it as a footer. |
 
@@ -33,20 +33,22 @@ The code quality tools for this app, how they're set up, and where each check ru
 | commit-msg | commitlint | No, can be skipped |
 | pre-push | Type check, unit tests | No, can be skipped |
 | **CI (required)** | **The jobs below** | **Yes. This is the gate.** |
-| Nightly | Full Stryker run | No. Fix findings the next day. |
+| Nightly | Full Stryker run (`.github/workflows/nightly.yml`, 03:17 UTC, or by hand) | No. Fix findings the next day. |
 
-Required CI jobs run in parallel on `pull_request`, `merge_group` and `push` to `main`. Keep the whole run under 10 minutes.
+Required CI jobs (`.github/workflows/ci.yml`) run in parallel on `pull_request`, `merge_group` and `push` to `main`. Keep the whole run under 10 minutes; each job stops after 10.
 
-| Job | Runs |
+| Job (check name) | Runs |
 |---|---|
-| `lint` | `prettier --check`, `eslint --max-warnings 0`, commitlint on the PR title |
-| `typecheck` | `next typegen && tsc --noEmit` |
-| `test` | Vitest with the coverage floor, diff-cover on changed lines, under two `TZ` values |
-| `e2e` | `next build`, `next start`, Playwright |
-| `structure` | knip, dependency-cruiser, jscpd |
-| `mutation` | Stryker on changed files |
-| `security` | `pnpm audit --audit-level high`, Semgrep CE |
+| `lint` | `pnpm format:check`, `pnpm lint`, commitlint on the PR title |
+| `typecheck` | `pnpm typecheck` |
+| `test (UTC)`, `test (Pacific/Kiritimati)` | `pnpm test` (coverage floor), `pnpm test:changed-lines`. The second zone is UTC+14, so code that uses the machine's zone by accident fails. Uploads coverage and JUnit reports. |
+| `e2e` | `pnpm test:e2e` against a fresh production build. Uploads the Playwright report and traces when it fails. |
+| `structure` | `pnpm structure` |
+| `mutation` | `pnpm test:mutation:changed`. Uploads the mutation report. |
+| `security` | `pnpm security`: `pnpm audit --audit-level high`, Semgrep CE |
 | CodeQL | GitHub default setup, required through the ruleset |
+
+Not required: `quarantine` runs `pnpm test:quarantine`, the tests tagged `quarantine`.
 
 ## 3. Scripts
 
@@ -58,17 +60,21 @@ Required CI jobs run in parallel on `pull_request`, `merge_group` and `push` to 
     "format:check": "prettier --check .",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "vitest run --coverage",
+    "test": "vitest run --coverage --tagsFilter='!quarantine'",
+    "test:quarantine": "vitest run --tagsFilter=quarantine --passWithNoTests",
     "test:changed-lines": "uvx --exclude-newer \"7 days\" --from diff-cover==10.6.0 diff-cover coverage/cobertura-coverage.xml --compare-branch=origin/main --include-untracked --fail-under=90",
     "test:e2e": "playwright test",
-    "test:mutation": "stryker run --incremental",
+    "test:mutation": "next typegen && stryker run --incremental",
+    "test:mutation:changed": "next typegen && node tools/stryker/run-changed.mjs",
     "structure": "knip --treat-config-hints-as-errors && depcruise . && jscpd .",
+    "security": "pnpm audit --audit-level high && uvx --exclude-newer \"7 days\" semgrep==1.182.1 scan --config p/default --config p/typescript --config p/react --config p/nextjs --config p/github-actions --error --metrics=off",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:changed-lines && pnpm structure"
   }
 }
 ```
 
 - `pnpm check` is the one command agents run before saying a task is done. It needs `uv` installed, for diff-cover.
+- Mutation and `pnpm security` run in CI only. They're slower, and Semgrep downloads its rules on each run. Run them locally when you need to.
 - `tsc` must resolve to the TypeScript 7 binary.
 - The dependency-cruiser and jscpd configs exclude `.next/`, `node_modules/`, `coverage/` and `prototype/`.
 
@@ -111,7 +117,7 @@ One tool per step, in this order. After each step, `pnpm check` must pass before
 - [x] 12. Stryker
 - [x] 13. lefthook
 - [x] 14. commitlint
-- [ ] 15. CI workflow: all required jobs, including Semgrep CE and `pnpm audit`
+- [x] 15. CI workflow: all required jobs, including Semgrep CE and `pnpm audit`
 - [ ] 16. Dependabot config
 - [ ] 17. After the setup PR is merged: CodeQL default setup (it needs code on `main`), then the `main` ruleset with required checks *(human)*
 - [ ] 18. Claude Code hook in `.claude/settings.json`

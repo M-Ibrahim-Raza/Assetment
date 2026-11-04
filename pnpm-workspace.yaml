@@ -1,5 +1,8 @@
 # Supply-chain settings. See docs/code-quality-stack.md.
 # Only install versions published at least 1 day ago (in minutes).
+# Semgrep wants 7 days. We keep 1: most malicious versions are live for minutes to hours,
+# and a longer wait also holds back security fixes (Next 16.4.5 in Nov 2026).
+# nosemgrep: package_managers.pnpm.pnpm-missing-minimum-release-age.pnpm-minimum-release-age
 minimumReleaseAge: 1440
 # Fail if a package version has weaker provenance than an earlier one.
 trustPolicy: no-downgrade

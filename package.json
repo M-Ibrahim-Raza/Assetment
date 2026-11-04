@@ -15,11 +15,14 @@
     "format:check": "prettier --check .",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "vitest run --coverage",
+    "test": "vitest run --coverage --tagsFilter='!quarantine'",
+    "test:quarantine": "vitest run --tagsFilter=quarantine --passWithNoTests",
     "test:e2e": "playwright test",
-    "test:mutation": "stryker run --incremental",
+    "test:mutation": "next typegen && stryker run --incremental",
+    "test:mutation:changed": "next typegen && node tools/stryker/run-changed.mjs",
     "test:changed-lines": "uvx --exclude-newer \"7 days\" --from diff-cover==10.6.0 diff-cover coverage/cobertura-coverage.xml --compare-branch=origin/main --include-untracked --fail-under=90",
     "structure": "knip --treat-config-hints-as-errors && depcruise . && jscpd .",
+    "security": "pnpm audit --audit-level high && uvx --exclude-newer \"7 days\" semgrep==1.182.1 scan --config p/default --config p/typescript --config p/react --config p/nextjs --config p/github-actions --error --metrics=off",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:changed-lines && pnpm structure"
   },
   "dependencies": {
