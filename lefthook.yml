@@ -12,6 +12,11 @@ pre-commit:
       run: pnpm exec prettier --write --ignore-unknown {staged_files}
       stage_fixed: true
 
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: pnpm exec commitlint --edit {1}
+
 pre-push:
   piped: true
   jobs:

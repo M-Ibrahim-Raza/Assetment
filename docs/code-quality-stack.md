@@ -21,7 +21,7 @@ The code quality tools for this app, how they're set up, and where each check ru
 | SAST | CodeQL + Semgrep CE | CodeQL default setup: deep cross-file checks, free on public repos. Semgrep CE: fast pattern scan on every PR. |
 | Workflows | Rules only, no scanner | Pin every Action by full SHA. Minimal `permissions:`. No `pull_request_target`. |
 | Git hooks | lefthook 2.2.1 | Config committed. Hooks install through the `prepare` script; lefthook's own install script stays blocked. pre-commit runs ESLint `--fix`, then Prettier, on staged files and re-stages the fixes. 2.2.2 was uploaded by hand without provenance, so stay on 2.2.1 until a release comes from the verified pipeline again. |
-| Commits | commitlint (`@commitlint/config-conventional`) | Conventional Commits on commits and PR titles. Squash merge only. |
+| Commits | commitlint (`@commitlint/config-conventional`) | Conventional Commits on commits (`commit-msg` hook) and PR titles (CI). Squash merge only. Don't start a body line with `word:`: commitlint reads it as a footer. |
 
 ## 2. Where each check runs
 
@@ -110,7 +110,7 @@ One tool per step, in this order. After each step, `pnpm check` must pass before
 - [x] 11. jscpd
 - [x] 12. Stryker
 - [x] 13. lefthook
-- [ ] 14. commitlint
+- [x] 14. commitlint
 - [ ] 15. CI workflow: all required jobs, including Semgrep CE and `pnpm audit`
 - [ ] 16. Dependabot config
 - [ ] 17. After the setup PR is merged: CodeQL default setup (it needs code on `main`), then the `main` ruleset with required checks *(human)*
