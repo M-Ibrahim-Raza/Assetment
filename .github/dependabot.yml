@@ -1,0 +1,61 @@
+# Version updates. Security updates are switched on in the repo settings and skip the cooldown.
+# Dependabot reads this file from `main` only, so it takes effect once merged.
+version: 2
+
+updates:
+  - package-ecosystem: npm # also covers pnpm
+    directory: "/"
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3 # at least pnpm's minimumReleaseAge, so the bot's PRs can install
+    commit-message:
+      prefix: build
+      prefix-development: build
+      include: scope # "build(deps): …" and "build(deps-dev): …" pass commitlint
+    groups:
+      # Packages that must move together get one PR.
+      next:
+        patterns: [next, eslint-config-next]
+      react:
+        patterns: [react, react-dom, "@types/react", "@types/react-dom"]
+      vitest:
+        patterns: [vitest, "@vitest/*"]
+      stryker:
+        patterns: ["@stryker-mutator/*"]
+      commitlint:
+        patterns: ["@commitlint/*"]
+      tailwind:
+        patterns: [tailwindcss, "@tailwindcss/*"]
+      testing-library:
+        patterns: ["@testing-library/*"]
+    ignore:
+      # TypeScript doesn't follow semver. Upgrade both aliases by hand, on purpose (typescript.md §1).
+      - dependency-name: typescript
+      - dependency-name: "@typescript/native"
+      # ESLint 10 waits until eslint-config-next's plugins support it.
+      - dependency-name: eslint
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
+      # Types follow the Node major in .nvmrc.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      # Uploaded by hand without provenance, so pnpm's trustPolicy rejects it.
+      - dependency-name: lefthook
+        versions: ["2.2.2"]
+
+  - package-ecosystem: github-actions
+    directories:
+      - "/" # .github/workflows
+      - "/.github/actions/setup" # "/" doesn't find local composite actions
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
+    commit-message:
+      prefix: ci
+      include: scope # "ci(deps): …"
+    groups:
+      actions:
+        patterns: ["*"]
