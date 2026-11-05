@@ -84,11 +84,12 @@ Not required: `quarantine` runs `pnpm test:quarantine`, the tests tagged `quaran
 
 - **Ruleset on `main`:**
   - Pull request required, 0 approvals (section 5), conversations resolved.
-  - Required status checks: every CI job in section 2, by name. Branch must be up to date before merging.
-  - Code scanning results required (CodeQL).
-  - Force pushes and deletion blocked. Linear history. Squash merge only.
-  - Signed commits, using SSH signing.
+  - Required status checks: every required CI job in section 2, by name, from GitHub Actions. Branch must be up to date before merging.
+  - Code scanning results required (CodeQL: high or higher security alerts, and errors).
+  - Force pushes and deletion blocked. Linear history. Squash merge only. Bypass list empty.
+  - Signed commits. GitHub signs its own web merges and Dependabot's commits. Sign local commits with an SSH key: add the public key on GitHub as a **Signing key**, then run `git config --local gpg.format ssh`, `git config --local user.signingkey <path to the .pub>` and `git config --local commit.gpgsign true`. A PR with unsigned commits can't merge.
   - Merge queue only if the repo belongs to a GitHub organization.
+- **Merge settings:** squash merging only, with the PR title as the commit message. Merged branches are deleted automatically.
 - **Security:** secret scanning and push protection, Dependabot alerts, security updates and version updates, CodeQL default setup.
 - **Optional:** AI review (`claude-code-action`) on each PR. Advisory only, never a required check.
 
@@ -121,5 +122,5 @@ One tool per step, in this order. After each step, `pnpm check` must pass before
 - [x] 14. commitlint
 - [x] 15. CI workflow: all required jobs, including Semgrep CE and `pnpm audit`
 - [x] 16. Dependabot config
-- [ ] 17. After the setup PR is merged: CodeQL default setup (it needs code on `main`), then the `main` ruleset with required checks. Check that Dependabot's first run has no config errors (Insights → Dependency graph → Dependabot) *(human)*
+- [x] 17. After the setup PR is merged: CodeQL default setup (it needs code on `main`), then the `main` ruleset with required checks. Check that Dependabot's first run has no config errors (Insights → Dependency graph → Dependabot) *(human)*
 - [x] 18. Claude Code hook in `.claude/settings.json`
