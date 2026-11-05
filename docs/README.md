@@ -8,6 +8,7 @@ What each file here is for and what goes in it.
 | `journeys.md` | The main tasks users do, step by step, with the screen and features for each step |
 | `features.md` | Feature list, handoff notes, progress board |
 | `prototype-screens/` | Screenshots of the chosen prototype screens |
+| `tech-stack.md` | Every tool the app installs and uses, with its version, purpose and reason |
 | `code-quality-stack.md` | The code quality tools picked for this app, their setup and where each check runs |
 | `code-quality-rules.md` | Code quality rules every AI agent follows. `CLAUDE.md` imports it |
 | `adr/` | Project decisions, one file each, with the reasons and trade-offs |
@@ -58,6 +59,15 @@ The 3–5 main tasks a user comes to the app to do. One section per journey:
 - One PNG per chosen screen, named `<ID>-<screen>.png`.
 - Only the chosen variant, not the rejected ones.
 - Taken at 1440×900.
+
+## tech-stack.md
+
+One table per `## <Domain>` heading, one row per tool. Name headings by the need (e.g. `## Styling`), not the tool.
+
+- **Columns:** Tool, Version, Purpose, Why, Alternatives considered. Write `-` when there's no written reason or alternative.
+- **Versions:** exact, from `pnpm-lock.yaml`. Mark it as a range when there's no locked version.
+- **Only tools in use:** imported in code, or wired into config, scripts or CI. Installed but unused packages stay out.
+- Update it whenever a tool is added, removed or upgraded.
 
 ## code-quality-stack.md
 
