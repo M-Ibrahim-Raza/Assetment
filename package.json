@@ -26,7 +26,7 @@
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:changed-lines && pnpm structure"
   },
   "dependencies": {
-    "next": "16.4.4",
+    "next": "16.4.5",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },
@@ -53,7 +53,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "dependency-cruiser": "18.7.2",
     "eslint": "^9",
-    "eslint-config-next": "16.4.4",
+    "eslint-config-next": "16.4.5",
     "eslint-plugin-better-tailwindcss": "4.10.0",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "jscpd": "5.4.2",
