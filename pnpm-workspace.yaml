@@ -16,3 +16,8 @@ allowBuilds:
   lefthook: false
   sharp: false
   unrs-resolver: false
+# Security fixes for indirect dependencies whose parent pins a vulnerable version.
+# Scope each to its parent, and remove it once the parent updates.
+overrides:
+  # typed-rest-client@2.3.1 (from @stryker-mutator/core) pins qs 6.15.1: GHSA-6pq8-jhm2-2vcw, GHSA-q8mj-m7cp-5q26.
+  "typed-rest-client>qs": "6.16.2"
