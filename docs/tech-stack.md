@@ -53,6 +53,13 @@ Every tool this app uses or has chosen. Versions come from `pnpm-lock.yaml`. Set
 |---|---|---|---|---|---|
 | Zod (`zod`) | 4.6.7 | Validates tRPC inputs, forms and other untrusted data. Not wired in yet, so it's on knip's `ignoreDependencies` list | One schema checks data on the server and in the browser. Already a Better Auth dependency, and tRPC and Better Auth support it directly | Valibot (smaller bundles, but fewer integrations), ArkType (small ecosystem, mostly one maintainer) | Use `zod/mini` in Client Components if bundle size becomes a problem |
 
+## Logging
+
+| Tool | Version | Purpose | Why | Alternatives considered |
+|---|---|---|---|---|
+| Pino (`pino`) | 10.4.0 | Structured JSON logs to stdout from server code (Server Components, Server Actions, tRPC, route handlers), read in Vercel runtime logs. Built-in `redact` and per-request child loggers in `AsyncLocalStorage` for `request_id`. Chosen, not installed yet | Fastest and most used Node logger, and on Next.js 16.1+'s built-in `serverExternalPackages` list, so Turbopack needs no config. The handbook's logger for Next.js | LogTape (one maintainer), Winston (no built-in redaction, slow releases), Consola (CLI printer, no JSON logs) |
+| `pino-pretty` | 13.2.0 | Readable logs in development, piped: `next dev \| pino-pretty`. Dev dependency only, never in production. Chosen, not installed yet | Keeps production free of transports, which start worker threads that bundlers handle badly | - |
+
 ## Styling
 
 | Tool | Version | Purpose | Why | Alternatives considered | Notes |

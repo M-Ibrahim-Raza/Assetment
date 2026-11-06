@@ -65,7 +65,7 @@ The 3–5 main tasks a user comes to the app to do. One section per journey:
 
 One table per `## <Domain>` heading, one row per tool. Name headings by the need (e.g. `## Styling`), not the tool.
 
-- **Columns:** Tool, Version, Purpose, Why, Alternatives considered, Notes. Write `-` when there's nothing to say.
+- **Columns:** Tool, Version, Purpose, Why, Alternatives considered, and an optional Notes column. Write `-` when there's nothing to say.
 - **Alternatives considered:** a few words on why each one lost, e.g. `Drizzle (not 1.0 yet)`.
 - **Notes:** what to watch or do later: pins, limits, upgrade plans, when to revisit. About 15 words at most.
 - **Versions:** exact, from `pnpm-lock.yaml`. Mark it as a range when there's no locked version.
