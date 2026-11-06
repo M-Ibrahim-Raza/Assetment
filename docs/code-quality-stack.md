@@ -83,7 +83,7 @@ Not required: `quarantine` runs `pnpm test:quarantine`, the tests tagged `quaran
 ## 4. GitHub settings *(human)*
 
 - **Ruleset on `main`:**
-  - Pull request required, 0 approvals (section 5), conversations resolved.
+  - Pull request required, 0 approvals and no Code Owners review ([ADR 0003](adr/0003-solo-dev-with-ai-agents.md)), conversations resolved.
   - Required status checks: every required CI job in section 2, by name, from GitHub Actions. Branch must be up to date before merging.
   - Code scanning results required (CodeQL: high or higher security alerts, and errors).
   - Force pushes and deletion blocked. Merge commits or rebase merging ([ADR 0011](adr/0011-no-signed-commits.md)). Bypass list empty.
@@ -92,15 +92,7 @@ Not required: `quarantine` runs `pnpm test:quarantine`, the tests tagged `quaran
 - **Security:** secret scanning and push protection, Dependabot alerts, security updates and version updates, CodeQL default setup.
 - **Optional:** AI review (`claude-code-action`) on each PR. Advisory only, never a required check.
 
-## 5. Where we differ from Best Practices
-
-| Best Practices | Here | Why |
-|---|---|---|
-| 1 required approval | 0 approvals | Solo dev, and GitHub won't let you approve your own PR. Every check is required instead ([ADR 0003](adr/0003-solo-dev-with-ai-agents.md)). |
-| Code Owners review | Off | Solo dev ([ADR 0003](adr/0003-solo-dev-with-ai-agents.md)). |
-| Mutation testing SHOULD NOT be a required PR check | Required | Full strictness from day one ([ADR 0004](adr/0004-all-checks-required-from-day-one.md)). Incremental runs on changed files keep it fast. |
-
-## 6. Setup checklist
+## 5. Setup checklist
 
 One tool per step, in this order. After each step, `pnpm check` must pass before the next one.
 
