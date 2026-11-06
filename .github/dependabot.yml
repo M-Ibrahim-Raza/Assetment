@@ -32,6 +32,9 @@ updates:
       # The @trpc packages require each other's exact version.
       trpc:
         patterns: ["@trpc/*"]
+      # The Prisma CLI and client must be the same version.
+      prisma:
+        patterns: [prisma, "@prisma/*"]
     ignore:
       # TypeScript doesn't follow semver. Upgrade both aliases by hand, on purpose.
       - dependency-name: typescript
@@ -47,6 +50,11 @@ updates:
       # Uploaded by hand without provenance, so pnpm's trustPolicy rejects it.
       - dependency-name: lefthook
         versions: ["2.2.2"]
+      # Prisma 8 is a rewrite with a new CLI and query API (ADR 0008). Move to it on purpose.
+      - dependency-name: prisma
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@prisma/*"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directories:
