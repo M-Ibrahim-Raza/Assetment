@@ -1,6 +1,6 @@
 # 0010. Merge commits keep every commit
 
-**Status:** Accepted · **Date:** 2026-11-06
+**Status:** Superseded by [0011](0011-no-signed-commits.md) · **Date:** 2026-11-06
 
 **Context:** Squash merging turns a PR's commits into one commit on `main`. The small commits then exist only on the PR page, so history is hard to read, and `git blame` and `git bisect` land on large commits. Rebase and merge is not an option: GitHub rewrites the commits and can't sign them, and `main` requires signed commits.
 
