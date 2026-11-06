@@ -1,6 +1,27 @@
 ### To Do
 
-- [x] Project Name
-- [ ] Repo Setup
 - [ ] Prototype
-- [ ] Feature Engineering / Requirement Analysis / Requirement Gathering
+- [ ] Designing
+- [ ] Screen Setup
+- [ ] Tech Stack
+- [ ] TTD
+- [ ] ADR
+- [ ] Update knip dependencies after implementation to avoid errors
+
+
+
+
+To Review:
+code_quality
+tech_stack
+ADRs format
+Readme
+Git instructions
+
+## Skills
+Logging
+Code Documentation
+typing hints
+
+
+

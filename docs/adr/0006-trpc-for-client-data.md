@@ -2,12 +2,12 @@
 
 **Status:** Accepted · **Date:** 2026-11-06
 
-**Context:** Most screens are dashboards that fetch data in the browser: filters, infinite scroll, polling and optimistic updates. They need a shared client cache. Server Actions can't do this job: Next.js runs them one at a time per client, and its docs say not to use them for fetching. Only this Next.js app calls the API, and v1 needs no real-time updates. We compared tRPC, GraphQL (Yoga + Pothos), oRPC, and plain Route Handlers with TanStack Query.
+**Context:** Most screens are dashboards that need a shared client cache for filters, infinite scroll, polling and optimistic updates. Server Actions don't fit: they run one at a time and aren't meant for fetching. Only this app calls the API, and v1 needs no real-time updates. We compared tRPC, GraphQL, oRPC, and plain Route Handlers with TanStack Query.
 
-**Decision:** Use tRPC 11 with TanStack Query for data that Client Components fetch and change. tRPC runs in one Route Handler inside the Next.js app, so [0001](0001-nextjs-only.md) still holds. Why tRPC: types flow from server to client with no code generation, TanStack Query brings caching, polling and optimistic updates, and it's the most mature type-safe RPC option, with an active team and wide use in Next.js apps.
+**Decision:** Use tRPC 11 with TanStack Query for data that Client Components fetch and change. tRPC runs in one Route Handler, so [0001](0001-nextjs-only.md) still holds. It won: types reach the client with no code generation, and it's the most mature type-safe RPC option.
 
 **Consequences:**
-- Only TypeScript clients can call the API. A mobile app or public API needs a new ADR. oRPC was the runner-up for that case: it works like tRPC and can publish an OpenAPI spec, but it has one main maintainer.
-- GraphQL was rejected: it solves a multi-client problem this app doesn't have, and adds the most code and packages. Plain Route Handlers with TanStack Query were rejected: request and response types would be wired by hand and could drift.
-- New packages: `@trpc/server`, `@trpc/client`, `@trpc/tanstack-react-query`, `@tanstack/react-query` and an input validator. Each still needs a clear yes before it's installed. Add them to [tech-stack.md](../tech-stack.md) once installed.
-- Some of tRPC's Server Component helpers are marked `unstable_`. Check them on each upgrade.
+- Only TypeScript clients can call the API; a mobile app or public API needs a new ADR. oRPC came second: it adds OpenAPI but has one main maintainer.
+- GraphQL was rejected: it solves a multi-client problem we don't have, with the most code and packages. Plain Route Handlers were rejected: hand-wired types could drift.
+- New packages: `@trpc/server`, `@trpc/client`, `@trpc/tanstack-react-query`, `@tanstack/react-query` and an input validator. Each needs its own yes before install.
+- Some tRPC Server Component helpers are `unstable_`. Check them on each upgrade.

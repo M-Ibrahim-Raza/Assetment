@@ -13,7 +13,7 @@ Rules for all content Claude writes in this repo (docs, specs, plans, tasks, not
 - `docs/journeys.md`: the main user journeys, step by step, with screens and features.
 - `docs/features.md`: feature list, handoff notes and the progress board.
 - `docs/prototype-screens/`: screenshots of the chosen prototype screens.
-- `docs/adr/`: project decisions, one file each. They override Best Practices.
+- `docs/adr/`: important decisions, one file each. Tool choices go in `docs/tech-stack.md`.
 
 Read `docs/README.md` before writing or editing any file in `docs/`. It defines what goes in each one.
 
@@ -34,7 +34,7 @@ Don't restate the product in the spec. Link to `docs/product.md` instead. After 
 
 ## Git
 
-- PRs merge with a merge commit or a rebase merge ([ADR 0011](docs/adr/0011-no-signed-commits.md)), so every commit lands on `main` as it is. Keep each commit small and atomic. Squash fixups locally before opening the PR.
+@docs/git-rules.md
 
 ## Code quality
 
