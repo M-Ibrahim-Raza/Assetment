@@ -8,10 +8,10 @@ What each file here is for and what goes in it.
 | `journeys.md` | The main tasks users do, step by step, with the screen and features for each step |
 | `features.md` | Feature list, handoff notes, progress board |
 | `prototype-screens/` | Screenshots of the chosen prototype screens |
-| `tech-stack.md` | Every tool the app installs and uses, with its version, purpose and reason |
+| `tech-stack.md` | Every tool, with its version, purpose, reason, alternatives and notes. Tool choices live here, not in ADRs |
 | `code-quality-stack.md` | The code quality tools picked for this app, their setup and where each check runs |
 | `code-quality-rules.md` | Code quality rules every AI agent follows. `CLAUDE.md` imports it |
-| `adr/` | Project decisions, one file each, with the reasons and trade-offs |
+| `adr/` | Important decisions: architecture and how we work. One file each, with reasons and trade-offs |
 
 Order: `product.md` → `journeys.md` → `features.md` → `prototype-screens/` → `specs/<feature>/spec.md`.
 
@@ -64,9 +64,11 @@ The 3–5 main tasks a user comes to the app to do. One section per journey:
 
 One table per `## <Domain>` heading, one row per tool. Name headings by the need (e.g. `## Styling`), not the tool.
 
-- **Columns:** Tool, Version, Purpose, Why, Alternatives considered. Write `-` when there's no written reason or alternative.
+- **Columns:** Tool, Version, Purpose, Why, Alternatives considered, Notes. Write `-` when there's nothing to say.
+- **Alternatives considered:** a few words on why each one lost, e.g. `Drizzle (not 1.0 yet)`.
+- **Notes:** what to watch or do later: pins, limits, upgrade plans, when to revisit. About 15 words at most.
 - **Versions:** exact, from `pnpm-lock.yaml`. Mark it as a range when there's no locked version.
-- **Only tools in use:** imported in code, or wired into config, scripts or CI. Installed but unused packages stay out.
+- **Which tools get a row:** tools in use, plus tools chosen or installed but not wired in yet. Their Purpose cell says which.
 - Update it whenever a tool is added, removed or upgraded.
 
 ## code-quality-stack.md
@@ -79,7 +81,15 @@ Short rules for AI agents writing code. `CLAUDE.md` imports it, so every agent l
 
 ## adr/
 
-Architecture Decision Records: one file per project decision.
+Architecture Decision Records: one file per important decision.
+
+Write an ADR only for a decision that:
+
+- sets how the app is built: its architecture, or a pattern every feature follows (e.g. 0006, tRPC for client data),
+- sets how we work: Git, CI, reviews, repo settings,
+- or overrides a rule in another doc.
+
+Picking a tool or service is not an ADR. Add it to `tech-stack.md`. When a tool comes with a big decision, the ADR records the decision and `tech-stack.md` records the tool.
 
 - **Name:** `NNNN-short-title.md`, e.g. `0001-nextjs-only.md`. Numbers are never reused.
 - **Length:** 200 words at most for the whole file, as `wc -w` counts them. Cut words, not sections.
