@@ -90,7 +90,7 @@ Architecture Decision Records: one file per important decision.
 
 Write an ADR only for a decision that:
 
-- sets how the app is built: its architecture, or a pattern every feature follows (e.g. 0006, tRPC for client data),
+- sets how the app is built: its architecture, or a pattern every feature follows (e.g. 0005, tRPC for client data),
 - sets how we work: CI, reviews, repo settings,
 - or overrides a rule in another doc.
 

@@ -1,4 +1,4 @@
-# 0006. tRPC for client-side data
+# 0005. tRPC for client-side data
 
 **Status:** Accepted · **Date:** 2026-11-06
 
