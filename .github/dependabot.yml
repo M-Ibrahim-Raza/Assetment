@@ -33,7 +33,7 @@ updates:
       trpc:
         patterns: ["@trpc/*"]
     ignore:
-      # TypeScript doesn't follow semver. Upgrade both aliases by hand, on purpose (typescript.md §1).
+      # TypeScript doesn't follow semver. Upgrade both aliases by hand, on purpose.
       - dependency-name: typescript
       - dependency-name: "@typescript/native"
       # ESLint 10 waits until eslint-config-next's plugins support it.

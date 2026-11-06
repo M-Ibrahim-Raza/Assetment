@@ -17,7 +17,7 @@ export default defineConfig({
     tags: [
       {
         name: "quarantine",
-        description: "Flaky; tracked in a ticket (testing.md §13)",
+        description: "Flaky; tracked in a ticket",
       },
     ],
     coverage: {

@@ -9,7 +9,7 @@ import { trpcEndpoint, trpcMaxBatchSize } from "./endpoint";
 
 const { TRPCProvider } = createTRPCContext<AppRouter>();
 
-// No loggerLink, subscription or FormData links yet (trpc.md §12): no procedure needs them.
+// No loggerLink, subscription or FormData links yet: no procedure needs them.
 function makeTRPCClient() {
   return createTRPCClient<AppRouter>({
     links: [

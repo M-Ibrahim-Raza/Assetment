@@ -1,11 +1,10 @@
 // Stryker ignorer: skips mutants in display-only code that unit tests must not assert
-// (react.md §15: no assertions on class names or exact text). Logic is still mutated.
+// such as class names and exact text. Logic is still mutated.
 
 const reasons = {
-  className:
-    "Class names are display-only; unit tests must not assert them (react.md §15).",
+  className: "Class names are display-only; unit tests must not assert them.",
   jsxText:
-    "Text between JSX elements is display-only; unit tests must not assert it (react.md §15).",
+    "Text between JSX elements is display-only; unit tests must not assert it.",
 };
 
 const displayOnly = {

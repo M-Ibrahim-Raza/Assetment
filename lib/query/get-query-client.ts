@@ -15,7 +15,7 @@ function retry(failureCount: number, error: Error) {
   return failureCount < 3;
 }
 
-// No toast handlers or dehydrate options yet (tanstack-query.md §2): they need sonner and server prefetching.
+// No toast handlers or dehydrate options yet: they need sonner and server prefetching.
 function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
