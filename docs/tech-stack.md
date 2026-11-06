@@ -23,6 +23,15 @@ Every tool this app installs and uses. Versions come from `pnpm-lock.yaml`. Sett
 | React DOM | 19.3.1 | Renders React in the browser | Next.js is built on it | - |
 | React Compiler (`babel-plugin-react-compiler`) | 1.0.0 | Automatic memoization, turned on with `reactCompiler: true` | - | - |
 
+## API and data fetching
+
+| Tool | Version | Purpose | Why | Alternatives considered |
+|---|---|---|---|---|
+| tRPC server (`@trpc/server`) | 11.24.0 | Type-safe API procedures, served by one route handler at `/api/trpc` (`app/api/trpc/[trpc]/route.ts`). `trpc/init.ts` holds the one `initTRPC`, and the router in `trpc/app.router.ts` stays empty until a feature adds a procedure | Types flow from server to client with no code generation (ADR 0006) | GraphQL (Yoga + Pothos), oRPC, plain Route Handlers with TanStack Query |
+| tRPC client (`@trpc/client`) | 11.24.0 | Calls the procedures from the browser and batches requests (`httpBatchLink`) | Part of the tRPC setup (ADR 0006) | - |
+| `@trpc/tanstack-react-query` | 11.24.0 | Connects tRPC to TanStack Query. `TRPCReactProvider` in `trpc/client.tsx` uses the app's one QueryClient, inside `app/providers.tsx` | Part of the tRPC setup (ADR 0006) | - |
+| TanStack Query (`@tanstack/react-query`) | 5.106.0 | Client-side data cache: caching, polling and optimistic updates. `getQueryClient()` in `lib/query/get-query-client.ts` gives each server render a new cache and the browser one cache, with a 60-second `staleTime` | Dashboards need a shared client cache, and Server Actions run one at a time, so they can't fetch (ADR 0006) | - |
+
 ## Styling
 
 | Tool | Version | Purpose | Why | Alternatives considered |
