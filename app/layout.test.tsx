@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { QueryCacheProbe } from "@/test/query-cache-probe";
 import RootLayout from "./layout";
 
 // next/font only works inside the Next.js compiler.
@@ -28,5 +29,16 @@ describe("Root layout", () => {
     renderLayout();
 
     expect(document.body).toContainElement(screen.getByText("Page content"));
+  });
+
+  it("gives every page a query cache for tRPC", () => {
+    render(
+      <RootLayout params={Promise.resolve({})}>
+        <QueryCacheProbe queryKey="layout" />
+      </RootLayout>,
+      { container: document },
+    );
+
+    expect(screen.getByText("new")).toBeInTheDocument();
   });
 });

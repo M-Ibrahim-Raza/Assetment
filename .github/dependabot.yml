@@ -29,6 +29,9 @@ updates:
         patterns: [tailwindcss, "@tailwindcss/*"]
       testing-library:
         patterns: ["@testing-library/*"]
+      # The @trpc packages require each other's exact version.
+      trpc:
+        patterns: ["@trpc/*"]
     ignore:
       # TypeScript doesn't follow semver. Upgrade both aliases by hand, on purpose (typescript.md §1).
       - dependency-name: typescript
