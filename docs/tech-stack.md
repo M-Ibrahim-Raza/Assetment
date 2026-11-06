@@ -151,7 +151,7 @@ Every tool this app installs and uses. Versions come from `pnpm-lock.yaml`. Sett
 
 | Tool | Version | Purpose | Why | Alternatives considered |
 |---|---|---|---|---|
-| GitHub | - | Public repo. The `main` ruleset requires every CI check and allows squash merges only | Public, so CodeQL, secret scanning and push protection are free (ADR 0002) | A private repo |
+| GitHub | - | Public repo. The `main` ruleset requires every CI check and allows merge commits only (ADR 0010) | Public, so CodeQL, secret scanning and push protection are free (ADR 0002) | A private repo |
 
 ## AI coding
 
