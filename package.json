@@ -26,13 +26,17 @@
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:changed-lines && pnpm structure"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
     "@tanstack/react-query": "5.106.0",
     "@trpc/client": "11.24.0",
     "@trpc/server": "11.24.0",
     "@trpc/tanstack-react-query": "11.24.0",
+    "better-auth": "1.7.17",
     "next": "16.4.5",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@commitlint/cli": "21.2.4",
@@ -67,6 +71,7 @@
     "msw": "3.0.3",
     "prettier": "3.9.10",
     "prettier-plugin-tailwindcss": "0.8.1",
+    "prisma": "7.10.1",
     "tailwindcss": "^4",
     "typescript": "npm:@typescript/typescript6@~6.0.2",
     "typescript-eslint": "8.72.1",

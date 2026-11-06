@@ -82,6 +82,22 @@ Short rules for AI agents writing code. `CLAUDE.md` imports it, so every agent l
 Architecture Decision Records: one file per project decision.
 
 - **Name:** `NNNN-short-title.md`, e.g. `0001-nextjs-only.md`. Numbers are never reused.
-- **Header:** `# NNNN. Title`, then Status (`Accepted` or `Superseded by NNNN`) and Date.
-- **Sections:** Context (why a decision is needed), Decision (what we chose), Consequences (good and bad results, and any rule it overrides).
+- **Length:** under 15 lines, counting the title and blank lines. Cut words, not sections.
+- **Header:** `# NNNN. Title`, then one line with Status (`Accepted` or `Superseded by NNNN`) and Date.
+- **Sections:** bold labels, not headings. **Context** (why a decision is needed, and the options compared) and **Decision** (what we chose and why) are one short paragraph each. **Consequences** (good and bad results, rejected options, and any rule it overrides) is at most 5 bullets.
 - **Changing a decision:** write a new ADR and mark the old one superseded. Never delete or rewrite an accepted ADR.
+
+Template:
+
+```markdown
+# NNNN. Title
+
+**Status:** Accepted · **Date:** YYYY-MM-DD
+
+**Context:** ...
+
+**Decision:** ...
+
+**Consequences:**
+- ...
+```

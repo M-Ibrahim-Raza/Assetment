@@ -10,8 +10,14 @@ trustPolicy: no-downgrade
 trustPolicyExclude:
   # 3.x backport (2025-04-21, long-time maintainer) published after 4.x added provenance. Needed by eslint-config-next.
   - "eslint-import-resolver-typescript@3.10.1"
+  # Prisma 7 CLI published with Prisma's bot token instead of OIDC, so no provenance (prisma/orm#30850).
+  # Checked 2026-11-06: same files and install script as 7.9.1. The other @prisma/* 7.10.1 packages keep provenance.
+  - "prisma@7.10.1"
 # Dependency build scripts are blocked unless listed here as true.
 allowBuilds:
+  # The Prisma CLI downloads its engine on first use. The preinstall only prints warnings.
+  "@prisma/engines": false
+  prisma: false
   # Hooks are installed by the `prepare` script instead.
   lefthook: false
   sharp: false

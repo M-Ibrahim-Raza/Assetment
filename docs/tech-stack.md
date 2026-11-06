@@ -32,6 +32,27 @@ Every tool this app installs and uses. Versions come from `pnpm-lock.yaml`. Sett
 | `@trpc/tanstack-react-query` | 11.24.0 | Connects tRPC to TanStack Query. `TRPCReactProvider` in `trpc/client.tsx` uses the app's one QueryClient, inside `app/providers.tsx` | Part of the tRPC setup (ADR 0006) | - |
 | TanStack Query (`@tanstack/react-query`) | 5.106.0 | Client-side data cache: caching, polling and optimistic updates. `getQueryClient()` in `lib/query/get-query-client.ts` gives each server render a new cache and the browser one cache, with a 60-second `staleTime` | Dashboards need a shared client cache, and Server Actions run one at a time, so they can't fetch (ADR 0006) | - |
 
+## Authentication
+
+| Tool | Version | Purpose | Why | Alternatives considered |
+|---|---|---|---|---|
+| Better Auth (`better-auth`) | 1.7.17 | Email and password sign-in, two-factor auth and sessions, stored in Postgres. Installed but not wired in yet, so it's on knip's `ignoreDependencies` list | Email, password and 2FA are built in, and users stay in our database (ADR 0005) | Auth.js, Clerk |
+
+## Database
+
+| Tool | Version | Purpose | Why | Alternatives considered |
+|---|---|---|---|---|
+| Neon | - | Serverless Postgres for production, plus a copy-on-write branch for each Vercel preview deploy. Set up through the Vercel Marketplace. Not connected yet | Its free plan includes a branch per PR (ADR 0007) | Supabase, Prisma Postgres |
+| Prisma CLI (`prisma`) | 7.10.1 | Schema, migrations and client generation. Pinned to 7, because `prisma@latest` installs the Prisma 8 rewrite. In `trustPolicyExclude` (no provenance), with its install scripts blocked. Installed but not wired in yet, so it's on knip's `ignoreDependencies` list | The developer's choice of ORM. Prisma 7 works with Better Auth, and Prisma 8 doesn't yet (ADR 0008) | Drizzle |
+| Prisma Client (`@prisma/client`) | 7.10.1 | Typed queries, generated from the Prisma schema. Must match the CLI version. Not wired in yet | Part of Prisma (ADR 0008) | - |
+| `@prisma/adapter-pg` | 7.10.1 | Connects Prisma Client to Postgres over TCP with `pg`. Not wired in yet | Works with Neon and with a local Postgres in tests, where MSW would block Neon's HTTP driver (ADR 0008) | `@prisma/adapter-neon` |
+
+## Data validation
+
+| Tool | Version | Purpose | Why | Alternatives considered |
+|---|---|---|---|---|
+| Zod (`zod`) | 4.6.7 | Validates tRPC inputs, forms and other untrusted data. Not wired in yet, so it's on knip's `ignoreDependencies` list | Already a Better Auth dependency, and tRPC and Better Auth support it directly (ADR 0009) | Valibot, ArkType |
+
 ## Styling
 
 | Tool | Version | Purpose | Why | Alternatives considered |
