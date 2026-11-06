@@ -52,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # One zone far from UTC, so code that uses the machine's zone by accident fails (timezones.md §14).
+        # One zone far from UTC, so code that uses the machine's zone by accident fails.
         include:
           - tz: UTC
             artifact: test-utc
@@ -80,7 +80,7 @@ jobs:
             coverage/
             reports/junit.xml
 
-  # Not required: runs tests tagged `quarantine`, which the required `test` job skips (testing.md §13).
+  # Not required: runs tests tagged `quarantine`, which the required `test` job skips.
   quarantine:
     runs-on: ubuntu-24.04
     timeout-minutes: 10

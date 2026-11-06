@@ -1,4 +1,4 @@
-# Git hooks. Feedback only: they can be skipped, so CI runs every check again (git.md §13).
+# Git hooks. Feedback only: they can be skipped, so CI runs every check again.
 # Never use --no-verify to get past a failing check. Fix the problem.
 
 pre-commit:

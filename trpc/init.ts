@@ -3,7 +3,7 @@ import { initTRPC } from "@trpc/server";
 // Set explicitly: tRPC's default is "NODE_ENV isn't production", which is also true when NODE_ENV is unset.
 const isDev = process.env.NODE_ENV === "development";
 
-// The only initTRPC in the app (trpc.md §1). Context, domain-error mapping and protectedProcedure
+// The only initTRPC in the app. Context, domain-error mapping and protectedProcedure
 // come with auth and the first procedure.
 const t = initTRPC.create({
   isDev,
