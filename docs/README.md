@@ -85,6 +85,7 @@ Architecture Decision Records: one file per project decision.
 - **Length:** under 15 lines, counting the title and blank lines. Cut words, not sections.
 - **Header:** `# NNNN. Title`, then one line with Status (`Accepted` or `Superseded by NNNN`) and Date.
 - **Sections:** bold labels, not headings. **Context** (why a decision is needed, and the options compared) and **Decision** (what we chose and why) are one short paragraph each. **Consequences** (good and bad results, rejected options, and any rule it overrides) is at most 5 bullets.
+- **Changing a decision:** write a new ADR and mark the old one superseded. Never delete or rewrite an accepted ADR.
 
 Template:
 
@@ -100,4 +101,3 @@ Template:
 **Consequences:**
 - ...
 ```
-- **Changing a decision:** write a new ADR and mark the old one superseded. Never delete or rewrite an accepted ADR.
