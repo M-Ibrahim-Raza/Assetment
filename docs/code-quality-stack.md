@@ -21,7 +21,7 @@ The code quality tools for this app, how they're set up, and where each check ru
 | SAST | CodeQL + Semgrep CE | CodeQL default setup: deep cross-file checks, free on public repos. Semgrep CE 1.182.1: fast pattern scan on every PR, run with `uvx` and a 7-day cooldown (not in `package.json`). Rulesets: `p/default`, `p/typescript`, `p/react`, `p/nextjs`, `p/github-actions`. Metrics off. |
 | Workflows | Rules only, no scanner | Pin every Action by full SHA, with the version in a comment, at least 7 days old (as Dependabot waits). Minimal `permissions:`. No `pull_request_target`. `persist-credentials: false` on checkout. Untrusted values such as the PR title go through `env:`, never straight into `run:`. Semgrep's `p/github-actions` rules catch script injection. Shared setup lives in `.github/actions/setup`. |
 | Git hooks | lefthook 2.2.1 | Config committed. Hooks install through the `prepare` script; lefthook's own install script stays blocked. pre-commit runs ESLint `--fix`, then Prettier, on staged files and re-stages the fixes. 2.2.2 was uploaded by hand without provenance, so stay on 2.2.1 until a release comes from the verified pipeline again. |
-| Commits | commitlint (`@commitlint/config-conventional`) | Conventional Commits on commits (`commit-msg` hook) and PR titles (CI). Merge commits or rebase merging ([ADR 0011](adr/0011-no-signed-commits.md)). Don't start a body line with `word:`: commitlint reads it as a footer. |
+| Commits | commitlint (`@commitlint/config-conventional`) | Conventional Commits on commits (`commit-msg` hook) and PR titles (CI). Merge commits or rebase merging ([git-rules.md](git-rules.md)). Don't start a body line with `word:`: commitlint reads it as a footer. |
 
 ## 2. Where each check runs
 
@@ -86,9 +86,9 @@ Not required: `quarantine` runs `pnpm test:quarantine`, the tests tagged `quaran
   - Pull request required, 0 approvals and no Code Owners review ([ADR 0003](adr/0003-solo-dev-with-ai-agents.md)), conversations resolved.
   - Required status checks: every required CI job in section 2, by name, from GitHub Actions. Branch must be up to date before merging.
   - Code scanning results required (CodeQL: high or higher security alerts, and errors).
-  - Force pushes and deletion blocked. Merge commits or rebase merging ([ADR 0011](adr/0011-no-signed-commits.md)). Bypass list empty.
+  - Force pushes and deletion blocked. Merge commits or rebase merging ([git-rules.md](git-rules.md)). Bypass list empty.
   - Merge queue only if the repo belongs to a GitHub organization.
-- **Merge settings:** merge commits or rebase merging ([ADR 0011](adr/0011-no-signed-commits.md)). The merge commit's title is the PR title and its body is the PR description. Merged branches are deleted automatically.
+- **Merge settings:** merge commits or rebase merging ([git-rules.md](git-rules.md)). The merge commit's title is the PR title and its body is the PR description. Merged branches are deleted automatically.
 - **Security:** secret scanning and push protection, Dependabot alerts, security updates and version updates, CodeQL default setup.
 - **Optional:** AI review (`claude-code-action`) on each PR. Advisory only, never a required check.
 

@@ -34,7 +34,7 @@ Don't restate the product in the spec. Link to `docs/product.md` instead. After 
 
 ## Git
 
-- PRs merge with a merge commit or a rebase merge ([ADR 0011](docs/adr/0011-no-signed-commits.md)), so every commit lands on `main` as it is. Keep each commit small and atomic. Squash fixups locally before opening the PR.
+@docs/git-rules.md
 
 ## Code quality
 

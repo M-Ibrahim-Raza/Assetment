@@ -11,6 +11,7 @@ What each file here is for and what goes in it.
 | `tech-stack.md` | Every tool, with its version, purpose, reason, alternatives and notes. Tool choices live here, not in ADRs |
 | `code-quality-stack.md` | The code quality tools picked for this app, their setup and where each check runs |
 | `code-quality-rules.md` | Code quality rules every AI agent follows. `CLAUDE.md` imports it |
+| `git-rules.md` | Git rules every person and AI agent follows. `CLAUDE.md` imports it |
 | `adr/` | Important decisions: architecture and how we work. One file each, with reasons and trade-offs |
 
 Order: `product.md` → `journeys.md` → `features.md` → `prototype-screens/` → `specs/<feature>/spec.md`.
@@ -79,6 +80,10 @@ This project's code quality decisions: tools and settings, scripts, CI jobs, Git
 
 Short rules for AI agents writing code. `CLAUDE.md` imports it, so every agent loads it. Keep it short: details belong in `code-quality-stack.md`.
 
+## git-rules.md
+
+Branches, commits, pushing, PRs and merging. At most 30 lines, each under 20 words. GitHub settings stay in `code-quality-stack.md`.
+
 ## adr/
 
 Architecture Decision Records: one file per important decision.
@@ -86,10 +91,10 @@ Architecture Decision Records: one file per important decision.
 Write an ADR only for a decision that:
 
 - sets how the app is built: its architecture, or a pattern every feature follows (e.g. 0006, tRPC for client data),
-- sets how we work: Git, CI, reviews, repo settings,
+- sets how we work: CI, reviews, repo settings,
 - or overrides a rule in another doc.
 
-Picking a tool or service is not an ADR. Add it to `tech-stack.md`. When a tool comes with a big decision, the ADR records the decision and `tech-stack.md` records the tool.
+Picking a tool or service is not an ADR. Add it to `tech-stack.md`. When a tool comes with a big decision, the ADR records the decision and `tech-stack.md` records the tool. Git rules go in `git-rules.md`, not in an ADR.
 
 - **Name:** `NNNN-short-title.md`, e.g. `0001-nextjs-only.md`. Numbers are never reused.
 - **Length:** 200 words at most for the whole file, as `wc -w` counts them. Cut words, not sections.
