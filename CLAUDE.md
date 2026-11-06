@@ -34,10 +34,7 @@ Don't restate the product in the spec. Link to `docs/product.md` instead. After 
 
 ## Git
 
-- Sign every commit. Signing is set up in Git config (`commit.gpgsign = true`, SSH key). Never turn it off (`--no-gpg-sign`, `-c commit.gpgsign=false`).
-- `main` only accepts signed commits. Before pushing, check the commit is signed: `git cat-file -p HEAD | grep gpgsig`.
-- Never update a PR branch with GitHub's rebase (the "Update branch" button or `gh pr update-branch --rebase`). It creates unsigned commits that block the merge. Rebase locally on `origin/main` instead.
-- PRs merge with a merge commit ([ADR 0010](docs/adr/0010-merge-commits.md)), so every commit lands on `main` as it is. Keep each commit small and atomic. Squash fixups locally, signed, before opening the PR.
+- PRs merge with a merge commit or a rebase merge ([ADR 0011](docs/adr/0011-no-signed-commits.md)), so every commit lands on `main` as it is. Keep each commit small and atomic. Squash fixups locally before opening the PR.
 
 ## Code quality
 
