@@ -1,18 +1,12 @@
 # 0002. Public GitHub repo
 
-- **Status:** Accepted
-- **Date:** 2026-11-04
+**Status:** Accepted · **Date:** 2026-11-04
 
-## Context
+**Context:** The code is hosted on GitHub. Public or private decides which security tools are free.
 
-The code is hosted on GitHub. Whether the repo is public or private decides which security tools are free.
+**Decision:** The repo is public.
 
-## Decision
-
-The repo is public.
-
-## Consequences
-
+**Consequences:**
 - CodeQL code scanning, secret scanning and push protection are free.
 - Anyone can read the code, issues and full commit history. A secret committed even once is exposed and must be rotated right away.
 - Never put customer data or private notes in the repo.
