@@ -176,3 +176,4 @@ Every tool this app uses or has chosen. Versions come from `pnpm-lock.yaml`. Set
 | Tool | Version | Purpose | Why | Alternatives considered | Notes |
 |---|---|---|---|---|---|
 | Claude Code | - | AI agents write most of the code. A PostToolUse hook runs `eslint --fix`, then Prettier, on each edited file (`.claude/hooks/format-and-lint.mjs`) | One developer builds the app with AI agents (ADR 0003) | - | - |
+| shadcn skill (`shadcn/ui` repo, `skills/shadcn`) | `4233ed1` (2026-10-14) | Teaches agents the shadcn CLI, component rules and theming, from `.claude/skills/shadcn/`. Claude loads it whenever it works with shadcn/ui | Agents use the real component APIs instead of inventing them | - | Markdown files only. `SKILL.md` patched to `pnpm exec shadcn`. Redo both when updating |
