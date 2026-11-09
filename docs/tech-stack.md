@@ -120,7 +120,7 @@ Every tool this app uses or has chosen. Versions come from `pnpm-lock.yaml`. Set
 
 | Tool | Version | Purpose | Why | Alternatives considered | Notes |
 |---|---|---|---|---|---|
-| Playwright (`@playwright/test`) | 1.64.1 | End-to-end tests against a fresh production build, in Chromium only | - | - | - |
+| Playwright (`@playwright/test`) | 1.64.1 | End-to-end tests against a fresh production build, in Chromium only. Also screenshots prototype screens (`prototypes/kit/screenshots.mts`) | - | - | - |
 
 ## Mutation testing
 
