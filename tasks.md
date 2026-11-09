@@ -4,9 +4,7 @@
 - [ ] Designing
 - [ ] Screen Setup
 - [ ] Update knip dependencies after implementation to avoid errors
-- [ ] Loguru Skill from Laptop
 - [ ] UI Prototyping Skills
-- [ ] UI/UX Rules
 
 
 ## Skills
