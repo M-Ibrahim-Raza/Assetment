@@ -9,11 +9,14 @@ const config: KnipConfig = {
   ignoreBinaries: ["uvx"],
   // Approved, but no code uses them yet. Once one is used, knip fails until it's removed from this list.
   ignoreDependencies: [
+    "@base-ui/react",
     "@fast-check/vitest",
     "@prisma/adapter-pg",
     "@prisma/client",
     "@testing-library/user-event",
     "better-auth",
+    "class-variance-authority",
+    "lucide-react",
     "prisma",
     "zod",
   ],

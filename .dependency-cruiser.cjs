@@ -17,6 +17,16 @@ module.exports = {
       to: { path: "^prototypes/" },
     },
     {
+      name: "ui-imports-no-app-code",
+      comment:
+        "components/ui/ holds only shadcn CLI files, so app logic can't hide there (ADR 0008).",
+      severity: "error",
+      from: { path: "^components/ui/" },
+      to: {
+        pathNot: "^(?:components/ui/|hooks/|lib/utils[.]ts$|node_modules/)",
+      },
+    },
+    {
       name: "no-circular",
       comment:
         "Circular imports make load order fragile and hide design problems.",
