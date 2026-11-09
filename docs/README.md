@@ -5,7 +5,7 @@ What each file here is for and what goes in it.
 | File | What it is |
 |---|---|
 | `product.md` | One page on what the app is, who it's for and why |
-| `journeys.md` | The main tasks users do, step by step, with the screen and features for each step |
+| `journeys/` | One file per main task users do, step by step, with the screen and features for each step |
 | `features.md` | Feature list, handoff notes, progress board |
 | `prototype-screens/` | Screenshots of the chosen prototype screens |
 | `tech-stack.md` | Every tool, with its version, purpose, reason, alternatives and notes. Tool choices live here, not in ADRs |
@@ -14,7 +14,7 @@ What each file here is for and what goes in it.
 | `git-rules.md` | Git rules every person and AI agent follows. `CLAUDE.md` imports it |
 | `adr/` | Important decisions: architecture and how we work. One file each, with reasons and trade-offs |
 
-Order: `product.md` → `journeys.md` → `features.md` → `prototype-screens/` → `specs/<feature>/spec.md`.
+Order: `product.md` → `journeys/` → `features.md` → `prototype-screens/` → `specs/<feature>/spec.md`.
 
 ## product.md
 
@@ -24,16 +24,19 @@ No features or code. Specs link to it instead of repeating it.
 - **Personas (1–2):** one type of user each: who they are, what they're trying to do, how they do it today, what frustrates them.
 - **Goal and success metric:** what v1 must achieve, plus one measurable number that shows it works.
 - **Appetite:** time budget for v1. Scope is cut to fit it.
-- **Core journeys:** one line per journey (`J1 – <name>`), linking to `journeys.md`. No steps here.
+- **Core journeys:** one line per journey (`J1 – <name>`), linking to its file in `journeys/`. No steps here.
 - **Non-goals:** what v1 deliberately won't do.
 
-## journeys.md
+## journeys/
 
-The 3–5 main tasks a user comes to the app to do. One section per journey:
+The main tasks a user comes to the app to do. One file per journey, plus a `README.md` that lists them all. Create a journey with `/new-journey`.
 
-- **Heading:** `J1 – <name>`. IDs are `J1`, `J2`, … Never reused.
+- **File name:** `<ID>-<short-name>.md`, e.g. `J1-set-up-net-worth.md`. IDs are `J1`, `J2`, … Never reused.
+- **Length:** each journey file is under 20 lines, as `wc -l` counts them.
+- **Heading:** `# J1 – <name>`.
 - **Persona and goal:** who does it and what they get done.
 - **Steps table** with columns `#`, `Step`, `Screen`, `Features`. Steps are in order. Each step needs a screen in the prototype. `Features` lists the feature IDs that make the step work, filled in while building the prototype.
+- **`README.md`:** one line per journey, linking to its file. Add the line with each new journey.
 
 ## features.md
 
@@ -43,7 +46,7 @@ The 3–5 main tasks a user comes to the app to do. One section per journey:
 |---|---|
 | ID | `F01`, `F02`, … Never reused. |
 | Feature | Short name. Links to `specs/<folder>` once specified. |
-| Journey | Journey ID from `journeys.md` (`J1`, `J2`, …). |
+| Journey | Journey ID, linked to its file in `journeys/`, e.g. `[J1](journeys/J1-set-up-net-worth.md)`. |
 | Priority | Must / Should / Could / Won't (v1). |
 | Depends on | IDs that must be built first. |
 | Status | Phase 1: `open` → `approved` or `rejected`. Build: `specified` → `planned` → `tasked` → `implemented` → `reviewed` → `documented` → `done`. `done` means the feature is complete, with nothing left to do. `on hold` can be set at any stage: paused on purpose, resumed later from the same stage. |

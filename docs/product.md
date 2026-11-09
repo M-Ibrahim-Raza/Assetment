@@ -33,13 +33,13 @@ People who track their money in a spreadsheet run into these problems. The last 
 
 ## Core journeys
 
-Steps for each are in [journeys.md](journeys.md).
+Steps for each are in [journeys/](journeys/README.md).
 
-- J1 – Set up and see net worth
-- J2 – Log money in or out
-- J3 – See where money goes
-- J4 – Track investments
-- J5 – Watch net worth over time
+- [J1 – Set up and see net worth](journeys/J1-set-up-net-worth.md)
+- [J2 – Log money in or out](journeys/J2-log-money.md)
+- [J3 – See where money goes](journeys/J3-where-money-goes.md)
+- [J4 – Track investments](journeys/J4-track-investments.md)
+- [J5 – Watch net worth over time](journeys/J5-net-worth-over-time.md)
 
 ## Non-goals
 
