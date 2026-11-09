@@ -29,7 +29,7 @@ No features or code. Specs link to it instead of repeating it.
 
 ## journeys/
 
-The main tasks a user comes to the app to do. One file per journey, plus a `README.md` that lists them all.
+The main tasks a user comes to the app to do. One file per journey, plus a `README.md` that lists them all. Create a journey with `/new-journey`.
 
 - **File name:** `<ID>-<short-name>.md`, e.g. `J1-set-up-net-worth.md`. IDs are `J1`, `J2`, … Never reused.
 - **Length:** each journey file is under 20 lines, as `wc -l` counts them.
