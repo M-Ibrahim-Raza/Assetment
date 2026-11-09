@@ -7,14 +7,13 @@ What each file here is for and what goes in it.
 | `product.md` | One page on what the app is, who it's for and why |
 | `journeys/` | One file per main task users do, step by step, with the screen and features for each step |
 | `features.md` | Feature list, handoff notes, progress board |
-| `prototype-screens/` | Screenshots of the chosen prototype screens |
 | `tech-stack.md` | Every tool, with its version, purpose, reason, alternatives and notes. Tool choices live here, not in ADRs |
 | `code-quality-stack.md` | The code quality tools picked for this app, their setup and where each check runs |
 | `code-quality-rules.md` | Code quality rules every AI agent follows. `CLAUDE.md` imports it |
 | `git-rules.md` | Git rules every person and AI agent follows. `CLAUDE.md` imports it |
 | `adr/` | Important decisions: architecture and how we work. One file each, with reasons and trade-offs |
 
-Order: `product.md` → `journeys/` → `features.md` → `prototype-screens/` → `specs/<feature>/spec.md`.
+Order: `product.md` → `journeys/` → the prototype in `prototypes/` → `features.md` → `specs/<feature>/spec.md`.
 
 ## product.md
 
@@ -55,14 +54,9 @@ The main tasks a user comes to the app to do. One file per journey, plus a `READ
 **Handoff note**, one per Must feature, written at freeze. `/sdd-specify` starts from it.
 
 - **What:** what it does, in 2–3 lines.
-- **Screens:** prototype screen(s) it covers, with screenshot file names.
+- **Screens:** prototype screen(s) it covers, with their URLs, e.g. `/dashboard`.
+- **Decisions:** the chosen variant and why, in one line.
 - **Edge cases:** odd situations noticed while clicking.
-
-## prototype-screens/
-
-- One PNG per chosen screen, named `<ID>-<screen>.png`.
-- Only the chosen variant, not the rejected ones.
-- Taken at 1440×900.
 
 ## tech-stack.md
 
@@ -95,14 +89,15 @@ Write an ADR only for a decision that:
 
 - sets how the app is built: its architecture, or a pattern every feature follows (e.g. 0005, tRPC for client data),
 - sets how we work: CI, reviews, repo settings,
-- or overrides a rule in another doc.
+- or changes a rule in another doc. Update that doc in the same change.
 
 Picking a tool or service is not an ADR. Add it to `tech-stack.md`. When a tool comes with a big decision, the ADR records the decision and `tech-stack.md` records the tool. Git rules go in `git-rules.md`, not in an ADR.
 
 - **Name:** `NNNN-short-title.md`, e.g. `0001-nextjs-only.md`. Numbers are never reused.
 - **Length:** 200 words at most for the whole file, as `wc -w` counts them. Cut words, not sections.
 - **Header:** `# NNNN. Title`, then one line with Status (`Accepted` or `Superseded by [NNNN](NNNN-short-title.md)`) and Date.
-- **Sections:** bold labels, not headings. **Context** (why a decision is needed, and the name of every option compared) and **Decision** (what we chose and why it won) are one short paragraph each. **Consequences** (good and bad results, why each other option lost, and any rule it overrides) is at most 5 bullets.
+- **Sections:** bold labels, not headings. **Context** (why a decision is needed) and **Decision** (what we chose and why) are one short paragraph each. **Consequences** (good and bad results) is at most 5 bullets.
+- **Decision only:** don't list the options compared or why they lost. Agents read ADRs as rules, and rejected options confuse them.
 - **Changing a decision:** write a new ADR and mark the old one superseded. Never delete an accepted ADR or change its decision. Fixing its format or wording is fine.
 
 Template:

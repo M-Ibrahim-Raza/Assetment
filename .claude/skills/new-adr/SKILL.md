@@ -16,7 +16,7 @@ Read first:
 Steps:
 
 1. **Check it's ADR-worthy.** It must match one of the cases in the rules. 
-2. **Fill gaps.** Ask with AskUserQuestion for what's missing: why decide now, the options compared, why the winner won, why each other lost. Mark one option as recommended. Don't invent reasons: an ADR is only worth keeping if its reasons are real.
+2. **Fill gaps.** Ask with AskUserQuestion for what's missing: why decide now, what was chosen, and why. When you offer options, mark one as recommended. Don't invent reasons: an ADR is only worth keeping if its reasons are real. Don't write the options compared or why they lost into the ADR.
 3. **Draft.**
    - Number: one above the highest in `docs/adr/`.
    - Title: 2–5 kebab-case words. Date: today.
