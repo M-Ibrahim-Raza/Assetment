@@ -46,6 +46,10 @@ Don't restate the product in the spec. Link to `docs/product.md` instead. After 
 
 @docs/code-quality-rules.md
 
+## UI/UX
+
+@docs/ui-ux-rules.md
+
 ## Next.js
 
 `next dev` writes this block. It points to the docs for the installed Next.js version.

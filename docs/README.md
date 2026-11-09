@@ -11,6 +11,7 @@ What each file here is for and what goes in it.
 | `code-quality-stack.md` | The code quality tools picked for this app, their setup and where each check runs |
 | `code-quality-rules.md` | Code quality rules every AI agent follows. `CLAUDE.md` imports it |
 | `git-rules.md` | Git rules every person and AI agent follows. `CLAUDE.md` imports it |
+| `ui-ux-rules.md` | Top 10 UI/UX rules every person and AI agent follows. `CLAUDE.md` imports it |
 | `adr/` | Important decisions: architecture and how we work. One file each, with reasons and trade-offs |
 
 Order: `product.md` → `journeys/` → the prototype in `prototypes/` → `features.md` → `specs/<feature>/spec.md`.
@@ -80,6 +81,10 @@ Short rules for AI agents writing code. `CLAUDE.md` imports it, so every agent l
 ## git-rules.md
 
 Branches, commits, pushing, PRs and merging. At most 30 lines, each under 20 words. GitHub settings stay in `code-quality-stack.md`.
+
+## ui-ux-rules.md
+
+Top 10 UI/UX rules for every screen. A heading, one line of intro, then 10 rules, one line each.
 
 ## adr/
 
