@@ -12,6 +12,7 @@ Rules for every AI agent writing code in this repo. Tools, checks and settings: 
 - Never delete, skip or loosen a test, or change its expected value, to make it pass. If a test looks wrong, stop and say why.
 - Every test must check results, not just run code. Add property tests (`@fast-check/vitest`) for parsers, validators, money and date logic.
 - Always ask before adding a dependency, even one an ADR or `tech-stack.md` names. Name the package and version, then wait for a clear yes. A skipped or rejected question is not a yes. Double-check the package name.
-- Reuse existing code instead of copying it. Never import from `prototype/`. Follow the import rules in `.dependency-cruiser.cjs`.
+- Reuse existing code instead of copying it. Never import from `prototypes/`. Follow the import rules in `.dependency-cruiser.cjs`.
+- If you change a View's props, update its scenarios in `prototypes/` in the same PR ([ADR 0007](adr/0007-screen-page-and-view.md)).
 - Never commit secrets or `.env` files. Never put a secret in a `NEXT_PUBLIC_` variable.
 - Don't change CI workflows, `.claude/`, or lint, test or coverage config unless the task is about them.

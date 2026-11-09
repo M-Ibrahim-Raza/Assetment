@@ -4,7 +4,7 @@ const exclude = [
   ...configDefaults.exclude,
   ".next/**",
   ".stryker-tmp/**",
-  "prototype/**",
+  "prototypes/**",
 ];
 
 export default defineConfig({

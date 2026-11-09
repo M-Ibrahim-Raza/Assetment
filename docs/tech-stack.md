@@ -122,7 +122,7 @@ Every tool this app uses or has chosen. Versions come from `pnpm-lock.yaml`. Set
 | Tool | Version | Purpose | Why | Alternatives considered | Notes |
 |---|---|---|---|---|---|
 | knip | 6.44.1 | Finds unused files, exports and packages | - | - | - |
-| dependency-cruiser | 18.7.2 | Import rules: no imports from `prototype/`, no cycles, no orphan files | - | - | - |
+| dependency-cruiser | 18.7.2 | Import rules: no imports from `prototypes/`, no cycles, no orphan files | - | - | - |
 | jscpd | 5.4.2 | Fails if more than 3% of the code is duplicated | - | - | - |
 
 ## Git hooks and commits
