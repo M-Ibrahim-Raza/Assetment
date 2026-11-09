@@ -86,7 +86,7 @@ Branches, commits, pushing, PRs and merging. At most 30 lines, each under 20 wor
 
 ## adr/
 
-Architecture Decision Records: one file per important decision.
+Architecture Decision Records: one file per important decision. Record one with `/new-adr`.
 
 Write an ADR only for a decision that:
 
