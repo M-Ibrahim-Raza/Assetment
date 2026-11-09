@@ -4,7 +4,7 @@ const exclude = [
   ...configDefaults.exclude,
   ".next/**",
   ".stryker-tmp/**",
-  "prototype/**",
+  "prototypes/**",
 ];
 
 export default defineConfig({
@@ -32,6 +32,8 @@ export default defineConfig({
         "test/**",
         "e2e/**",
         "coverage/**",
+        // shadcn CLI files, tested upstream (ADR 0008).
+        "components/ui/**",
       ],
       reporter: ["text-summary", "html", "cobertura"],
       // Raised by hand, never lowered. No thresholds.autoUpdate: it rewrites this file on every local run.

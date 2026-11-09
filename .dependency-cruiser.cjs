@@ -11,10 +11,20 @@ module.exports = {
     {
       name: "no-prototype-imports",
       comment:
-        "prototype/ is throwaway. Read its decisions; never import its code.",
+        "Production never imports the UI prototype in prototypes/ (ADR 0007).",
       severity: "error",
-      from: { pathNot: "^prototype/" },
-      to: { path: "^prototype/" },
+      from: { pathNot: "^prototypes/" },
+      to: { path: "^prototypes/" },
+    },
+    {
+      name: "ui-imports-no-app-code",
+      comment:
+        "components/ui/ holds only shadcn CLI files, so app logic can't hide there (ADR 0008).",
+      severity: "error",
+      from: { path: "^components/ui/" },
+      to: {
+        pathNot: "^(?:components/ui/|hooks/|lib/utils[.]ts$|node_modules/)",
+      },
     },
     {
       name: "no-circular",
@@ -37,6 +47,8 @@ module.exports = {
           configFile,
           // Tool plugins, loaded by path from a tool's config instead of imported.
           "^tools/",
+          // The UI prototype. Its imports aren't followed (see options), so its files look orphaned.
+          "^prototypes/",
         ],
       },
       to: {},
@@ -138,11 +150,11 @@ module.exports = {
     },
   ],
   options: {
-    // Shows imports into prototype/ (so the rule above catches them) without checking the prototype's own code.
-    doNotFollow: { path: ["node_modules", "^prototype/"] },
-    // Build output, reports, and next-env.d.ts, which Next.js generates.
+    // Shows imports into prototypes/ (so the rule above catches them) without checking the prototype's own code.
+    doNotFollow: { path: ["node_modules", "^prototypes/"] },
+    // Build output, reports, and next-env.d.ts, which Next.js generates, for the app and the prototype.
     exclude: {
-      path: "^(?:(?:\\.next|\\.stryker-tmp|coverage|reports|test-results|playwright-report)/|next-env[.]d[.]ts$)",
+      path: "^(?:(?:(?:prototypes/)?\\.next|\\.stryker-tmp|coverage|reports|test-results|playwright-report)/|(?:prototypes/)?next-env[.]d[.]ts$)",
     },
     tsConfig: { fileName: "tsconfig.json" },
     tsPreCompilationDeps: true,

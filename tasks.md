@@ -3,25 +3,16 @@
 - [ ] Prototype
 - [ ] Designing
 - [ ] Screen Setup
-- [ ] Tech Stack
-- [ ] TTD
-- [ ] ADR
 - [ ] Update knip dependencies after implementation to avoid errors
+- [ ] Loguru Skill from Laptop
+- [ ] UI Prototyping Skills
+- [ ] UI/UX Rules
 
-
-
-
-To Review:
-code_quality
-tech_stack
-ADRs format
-Readme
-Git instructions
 
 ## Skills
-Logging
-Code Documentation
-typing hints
+- [ ] Validation / Review Skill of SDD
+- [ ] Update Plan Skill of SDD to take input of multiple skills
+- [ ] Update Skill of SDD to take input of multiple skills
 
 
 

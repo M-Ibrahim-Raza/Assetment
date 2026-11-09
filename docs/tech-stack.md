@@ -68,6 +68,17 @@ Every tool this app uses or has chosen. Versions come from `pnpm-lock.yaml`. Set
 | `@tailwindcss/turbopack` | 4.3.4 | Runs Tailwind on CSS files in Turbopack | - | - | - |
 | Geist and Geist Mono (`next/font/google`) | Part of Next.js | App fonts, loaded in `app/layout.tsx` | - | - | - |
 
+## UI components
+
+| Tool | Version | Purpose | Why | Alternatives considered | Notes |
+|---|---|---|---|---|---|
+| shadcn/ui (`shadcn`) | 4.23.0 | CLI that copies components into `components/ui/` and writes `components.json`. Its `shadcn/tailwind.css` is imported in `app/globals.css` | Production owns the design system, and the prototype imports it (ADR 0006). The components are code we own | - | Run the CLI pinned: `pnpm dlx shadcn@4.23.0` |
+| Base UI (`@base-ui/react`) | 1.9.0 | Behaviour and accessibility under the shadcn/ui components in `components/ui/`. Installed, no component uses it yet | shadcn's default base since July 2026. Native Combobox, Autocomplete, Number Field and multi-value Select fit ticker search and multi-select filters | Radix (no combobox or multi-value Select, slower releases), React Aria (fewest shadcn examples, needs an ADR) | Pass `-b base` to every `shadcn init`. Write `render`, never `asChild` |
+| lucide (`lucide-react`) | 1.70.0 | Icons, set as `iconLibrary` in `components.json`. Installed, no component uses it yet | shadcn's default outline icons, so every example and agent uses them. Covers wallet, bank, receipt and coins | Tabler (5,000+ icons, but shadcn examples need translating), Phosphor (no release since May 2025) | Switch to Tabler with `shadcn migrate icons` if lucide lacks an icon |
+| `class-variance-authority` | 0.7.1 | Variants (`cva`) inside shadcn components. Installed, no component uses it yet | Part of shadcn/ui | - | - |
+| `cn` | 0.5.2 | Merges class names. Re-exported from `lib/utils.ts` | Part of shadcn/ui. Replaces clsx and tailwind-merge | - | - |
+| `tw-animate-css` | 1.4.0 | Animation utilities, imported in `app/globals.css` | Part of shadcn/ui | - | - |
+
 ## Formatting
 
 | Tool | Version | Purpose | Why | Alternatives considered | Notes |
@@ -122,7 +133,7 @@ Every tool this app uses or has chosen. Versions come from `pnpm-lock.yaml`. Set
 | Tool | Version | Purpose | Why | Alternatives considered | Notes |
 |---|---|---|---|---|---|
 | knip | 6.44.1 | Finds unused files, exports and packages | - | - | - |
-| dependency-cruiser | 18.7.2 | Import rules: no imports from `prototype/`, no cycles, no orphan files | - | - | - |
+| dependency-cruiser | 18.7.2 | Import rules: no imports from `prototypes/`, no cycles, no orphan files | - | - | - |
 | jscpd | 5.4.2 | Fails if more than 3% of the code is duplicated | - | - | - |
 
 ## Git hooks and commits

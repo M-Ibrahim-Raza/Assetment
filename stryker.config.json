@@ -18,7 +18,8 @@
     "!**/*.test.{ts,tsx}",
     "!**/*.d.ts",
     "!*.config.{ts,mts}",
-    "!{test,e2e,prototype,node_modules,.next,coverage,reports}/**"
+    "!{test,e2e,prototypes,node_modules,.next,coverage,reports}/**",
+    "!components/ui/**"
   ],
   "thresholds": { "high": 80, "low": 60, "break": 60 },
   "reporters": ["clear-text", "progress", "html"]
