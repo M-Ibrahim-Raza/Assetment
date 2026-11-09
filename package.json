@@ -13,7 +13,7 @@
     "start": "next start",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint": "eslint . --max-warnings 0",
+    "lint": "next typegen && next typegen prototypes && eslint . --max-warnings 0",
     "typecheck": "next typegen && tsc --noEmit && pnpm typecheck:proto",
     "typecheck:proto": "next typegen prototypes && tsc -p prototypes --noEmit",
     "proto": "next dev prototypes --port 3001",
