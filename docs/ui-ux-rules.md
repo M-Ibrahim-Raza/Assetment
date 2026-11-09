@@ -12,7 +12,11 @@ Rules for people and AI agents who design, build or review a screen.
 
 ## States and feedback
 
-- Build loading, empty, error and success states. Errors say what to do next.
+- Build loading, empty, error and success states. Success offers the next step. Add partial, offline, no-access and near-limit states where they apply.
+- Loading: a skeleton shaped like the content. On refresh, keep the current content in view. Never show the empty state while loading.
+- Empty on first use: what this area is for, plus a button to create the first item.
+- No results: show the query or filters that caused it, plus "Clear filters". Never the first-use message.
+- Error: what happened in plain words and what to do next, plus Retry. Keep the user's input.
 - Visible feedback within 100 ms of every action. A progress indicator for anything over 1 s. Percent or steps, plus Cancel, for anything over 10 s.
 - Reversible actions: do it at once, with an Undo toast. Confirm only irreversible ones, naming the object and the consequence, with a button that repeats the verb ("Delete 3 accounts").
 - A toast with an action stays at least 10 s. A toast is never the only place for an error.
