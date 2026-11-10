@@ -45,4 +45,4 @@ Steps:
    - the open questions
    - the files changed, and each check with its result.
 
-Don't commit, and don't delete variants: the user picks one after trying them.
+Don't commit, and don't delete variants: the user picks one after trying them, then runs `/prototype-finalize`.

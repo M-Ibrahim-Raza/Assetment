@@ -11,7 +11,8 @@ Rules for all content Claude writes in this repo (docs, specs, plans, tasks, not
 
 - `docs/product.md`: what the app is, who it's for and why.
 - `docs/journeys/`: one file per main user journey, step by step, with screens and features.
-- `docs/features.md`: feature list, handoff notes and the progress board.
+- `docs/features.md`: feature list and the progress board.
+- `specs/<feature>/handoff.md`: what the prototype decided for each Must feature.
 - `prototypes/`: the living UI prototype, one folder per screen.
 - `docs/adr/`: important decisions, one file each. Tool choices go in `docs/tech-stack.md`.
 
@@ -22,7 +23,7 @@ Read `docs/README.md` before writing or editing any file in `docs/`. It defines 
 Before you draft `specs/<feature>/spec.md`, read:
 
 1. `docs/product.md`
-2. The feature's row and handoff note in `docs/features.md`
+2. The feature's row in `docs/features.md` and its handoff note, `specs/<feature>/handoff.md`
 3. The feature's journey file in `docs/journeys/`
 4. The code of each screen in the handoff note: `prototypes/screens/<screen>/`, or its production View once the screen has shipped
 
