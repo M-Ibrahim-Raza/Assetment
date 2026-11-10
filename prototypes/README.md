@@ -13,7 +13,7 @@ Run it from the repo root with `pnpm proto`, then open http://localhost:3001. Ch
 | `screens.ts` | Journey screen name → prototype URL, so the index can link it. |
 | `components/` | Prototype-only components that several screens share. Create it when the first one is needed. |
 | `fixtures/` | Fake data builders shared by screens. |
-| `kit/` | Prototype tooling: `ProtoScreen`, `ProtoBar`, the scenario types, `useProtoAction`. |
+| `kit/` | Prototype tooling: `ProtoScreen`, `ProtoBar`, the scenario types, `useProtoAction`, and `screenshots.mts`, which shoots a screen at five widths. |
 
 `/demo` (in `screens/demo/`) shows the shape every screen follows. It is not a real screen.
 

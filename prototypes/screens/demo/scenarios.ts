@@ -1,6 +1,6 @@
 // Demo screen: the shape every prototype screen follows. Not a real screen.
 //
-// Open questions (write them here while exploring, resolve them before freeze):
+// Open questions (write them here while exploring, resolve them in /prototype-finalize):
 // - None.
 
 import { accounts, type Account } from "@proto/fixtures/accounts";

@@ -120,7 +120,7 @@ Every tool this app uses or has chosen. Versions come from `pnpm-lock.yaml`. Set
 
 | Tool | Version | Purpose | Why | Alternatives considered | Notes |
 |---|---|---|---|---|---|
-| Playwright (`@playwright/test`) | 1.64.1 | End-to-end tests against a fresh production build, in Chromium only | - | - | - |
+| Playwright (`@playwright/test`) | 1.64.1 | End-to-end tests against a fresh production build, in Chromium only. Also screenshots prototype screens (`prototypes/kit/screenshots.mts`) | - | - | - |
 
 ## Mutation testing
 
@@ -176,3 +176,5 @@ Every tool this app uses or has chosen. Versions come from `pnpm-lock.yaml`. Set
 | Tool | Version | Purpose | Why | Alternatives considered | Notes |
 |---|---|---|---|---|---|
 | Claude Code | - | AI agents write most of the code. A PostToolUse hook runs `eslint --fix`, then Prettier, on each edited file (`.claude/hooks/format-and-lint.mjs`) | One developer builds the app with AI agents (ADR 0003) | - | - |
+| shadcn skill (`shadcn/ui` repo, `skills/shadcn`) | `4233ed1` (2026-10-14) | Teaches agents the shadcn CLI, component rules and theming, from `.claude/skills/shadcn/`. Claude loads it whenever it works with shadcn/ui | Agents use the real component APIs instead of inventing them | - | Markdown files only. `SKILL.md` patched to `pnpm exec shadcn`. Redo both when updating |
+| shadcn MCP server (`shadcn mcp`) | 4.23.0 | Lets agents search, view and get install commands for registry items. `.mcp.json` runs the pinned CLI | Agents find existing components and blocks before writing custom UI | - | Don't run `shadcn mcp init`: it installs `shadcn@latest` and writes `npx` |

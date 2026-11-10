@@ -6,14 +6,15 @@ What each file here is for and what goes in it.
 |---|---|
 | `product.md` | One page on what the app is, who it's for and why |
 | `journeys/` | One file per main task users do, step by step, with the screen and features for each step |
-| `features.md` | Feature list, handoff notes, progress board |
+| `features.md` | Feature list and progress board |
 | `tech-stack.md` | Every tool, with its version, purpose, reason, alternatives and notes. Tool choices live here, not in ADRs |
 | `code-quality-stack.md` | The code quality tools picked for this app, their setup and where each check runs |
 | `code-quality-rules.md` | Code quality rules every AI agent follows. `CLAUDE.md` imports it |
 | `git-rules.md` | Git rules every person and AI agent follows. `CLAUDE.md` imports it |
+| `ui-ux-rules.md` | UI/UX rules every person and AI agent follows, grouped by topic. `CLAUDE.md` imports it |
 | `adr/` | Important decisions: architecture and how we work. One file each, with reasons and trade-offs |
 
-Order: `product.md` → `journeys/` → the prototype in `prototypes/` → `features.md` → `specs/<feature>/spec.md`.
+Order: `product.md` → `journeys/` → the prototype in `prototypes/` → `features.md` → `specs/<feature>/handoff.md` → `specs/<feature>/spec.md`.
 
 ## product.md
 
@@ -44,14 +45,14 @@ The main tasks a user comes to the app to do. One file per journey, plus a `READ
 | Column | Meaning |
 |---|---|
 | ID | `F01`, `F02`, … Never reused. |
-| Feature | Short name. Links to `specs/<folder>` once specified. |
+| Feature | Short name. Links to `specs/<folder>` once handed off. |
 | Journey | Journey ID, linked to its file in `journeys/`, e.g. `[J1](journeys/J1-set-up-net-worth.md)`. |
 | Priority | Must / Should / Could / Won't (v1). |
 | Depends on | IDs that must be built first. |
 | Status | Phase 1: `open` → `approved` or `rejected`. Build: `specified` → `planned` → `tasked` → `implemented` → `reviewed` → `documented` → `done`. `done` means the feature is complete, with nothing left to do. `on hold` can be set at any stage: paused on purpose, resumed later from the same stage. |
 | Docs | Link to the feature's doc in `docs/`, added once it's written (`/update-app-docs`). |
 
-**Handoff note**, one per Must feature, written at freeze. `/sdd-specify` starts from it.
+**Handoff note**, one per Must feature, in `specs/<feature>/handoff.md`, the folder `spec.md` goes in later. Name the folder `<ID>-<short-name>`, e.g. `specs/F03-sign-in/`. Heading `# F01 – <Feature>`. Written by `/prototype-finalize` once a screen's variant is picked. `/sdd-specify` starts from it, with the screen brief from `/prototype-spec`.
 
 - **What:** what it does, in 2–3 lines.
 - **Screens:** prototype screen(s) it covers, with their URLs, e.g. `/dashboard`.
@@ -80,6 +81,10 @@ Short rules for AI agents writing code. `CLAUDE.md` imports it, so every agent l
 ## git-rules.md
 
 Branches, commits, pushing, PRs and merging. At most 30 lines, each under 20 words. GitHub settings stay in `code-quality-stack.md`.
+
+## ui-ux-rules.md
+
+UI/UX rules for every screen. A heading, one line of intro, then one `##` section per topic, such as Forms or Navigation. Each rule is one bullet on one line.
 
 ## adr/
 
