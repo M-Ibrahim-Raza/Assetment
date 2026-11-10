@@ -52,7 +52,7 @@ The main tasks a user comes to the app to do. One file per journey, plus a `READ
 | Status | Phase 1: `open` → `approved` or `rejected`. Build: `specified` → `planned` → `tasked` → `implemented` → `reviewed` → `documented` → `done`. `done` means the feature is complete, with nothing left to do. `on hold` can be set at any stage: paused on purpose, resumed later from the same stage. |
 | Docs | Link to the feature's doc in `docs/`, added once it's written (`/update-app-docs`). |
 
-**Handoff note**, one per Must feature, in `specs/<feature>/handoff.md`, the folder `spec.md` goes in later. Name the folder `<ID>-<short-name>`, e.g. `specs/F03-sign-in/`. Heading `# F01 – <Feature>`. Written by `/prototype-finalize` once a screen's variant is picked. `/sdd-specify` starts from it.
+**Handoff note**, one per Must feature, in `specs/<feature>/handoff.md`, the folder `spec.md` goes in later. Name the folder `<ID>-<short-name>`, e.g. `specs/F03-sign-in/`. Heading `# F01 – <Feature>`. Written by `/prototype-finalize` once a screen's variant is picked. `/sdd-specify` starts from it, with the screen brief from `/prototype-spec`.
 
 - **What:** what it does, in 2–3 lines.
 - **Screens:** prototype screen(s) it covers, with their URLs, e.g. `/dashboard`.

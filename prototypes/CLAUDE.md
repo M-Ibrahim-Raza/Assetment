@@ -1,6 +1,6 @@
 # Prototype rules
 
-`prototypes/` is the living UI prototype ([ADR 0006](../docs/adr/0006-living-ui-prototype.md)). Run it with `pnpm proto` (port 3001). Build or change a screen with `/prototype-screen`. Finalize it with `/prototype-finalize` once a variant is picked.
+`prototypes/` is the living UI prototype ([ADR 0006](../docs/adr/0006-living-ui-prototype.md)). Run it with `pnpm proto` (port 3001). Build or change a screen with `/prototype-screen`. Finalize it with `/prototype-finalize` once a variant is picked. `/sdd-specify` reads it with `/prototype-spec`.
 
 - One folder per screen in `screens/<screen>/`, named as in the journey's `Screen` column.
 - Routes in `app/` use the same URLs as production. Keep pages thin.

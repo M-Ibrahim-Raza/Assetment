@@ -25,7 +25,7 @@ Before you draft `specs/<feature>/spec.md`, read:
 1. `docs/product.md`
 2. The feature's row in `docs/features.md` and its handoff note, `specs/<feature>/handoff.md`
 3. The feature's journey file in `docs/journeys/`
-4. The code of each screen in the handoff note: `prototypes/screens/<screen>/`, or its production View once the screen has shipped
+4. The screen brief from `/prototype-spec <feature ID>`. It reads each screen in the handoff note, in `prototypes/screens/<screen>/` or its production View once shipped. Its Gaps become Open Questions.
 
 Don't restate the product in the spec. Link to `docs/product.md` instead. After the spec is saved, set the feature's Status to `specified` in `docs/features.md`. Update it the same way after each later phase: `planned`, `tasked`, `implemented`, `reviewed`, `documented`, `done`. When the feature's doc is written, add its link in the Docs column.
 
