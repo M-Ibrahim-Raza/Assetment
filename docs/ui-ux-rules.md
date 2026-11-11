@@ -33,10 +33,12 @@ Rules for people and AI agents who design, build or review a screen.
 
 - Tab, filters, sort, search, page and the selected item live in the URL, so Back and reload keep the view.
 - Mark the current nav item with `aria-current="page"`.
+- Five places: Home, Spending, Portfolio and Debts, with Add in the middle. A tab bar on phones, a sidebar from tablet width.
 
 ## Money
 
 - One PKR format everywhere, right-aligned digits, and + or − on gains and losses, not just color.
+- Headline totals show a lakh or crore note under the exact amount, e.g. "48.1 lakh".
 
 ## Responsive and accessible
 
