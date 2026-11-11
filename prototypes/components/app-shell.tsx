@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import {
+  type ComponentPropsWithRef,
+  createContext,
+  type MouseEvent,
   type ReactElement,
   type ReactNode,
   use,
@@ -21,7 +24,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Kbd } from "@/components/ui/kbd";
 import { Toaster } from "@/components/ui/sonner";
 import {
@@ -88,8 +91,36 @@ function useShortcutLabel(): string {
   );
 }
 
-// Shown on controls whose screen isn't in the prototype yet. They look real, so the shell can be judged.
-const NOT_BUILT = "Not built yet";
+/**
+ * What Add does on a screen that opens Quick add in place: Quick add itself, once its panel is
+ * closed. Without it, Add is a plain link to Quick add.
+ */
+export const AddActionContext = createContext<(() => void) | null>(null);
+
+/**
+ * The way in to Quick add: a link styled as a button. Other props, and the ref, reach the link, so
+ * a tooltip trigger can render it.
+ */
+function AddLink({
+  children,
+  ...props
+}: Omit<ComponentPropsWithRef<"a">, "href" | "onClick">) {
+  const openHere = use(AddActionContext);
+  const onClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    openHere?.();
+  };
+
+  return (
+    <ScreenLink
+      screen="Quick add"
+      {...props}
+      {...(openHere === null ? {} : { onClick })}
+    >
+      {children}
+    </ScreenLink>
+  );
+}
 
 interface AppShellProps {
   /** The tab this screen belongs to. */
@@ -200,26 +231,27 @@ export function AppShell({
                 />
               )}
               {collapsed ? (
-                <SideTooltip label={`Add · ${NOT_BUILT.toLowerCase()}`}>
-                  <Button
-                    size="icon-lg"
+                <SideTooltip label="Add">
+                  <AddLink
                     aria-label="Add"
-                    aria-disabled="true"
-                    className="rounded-full"
+                    className={cn(
+                      buttonVariants({ size: "icon-lg" }),
+                      "rounded-full",
+                    )}
                   >
                     <Plus />
-                  </Button>
+                  </AddLink>
                 </SideTooltip>
               ) : (
-                <Button
-                  size="lg"
-                  aria-disabled="true"
-                  title={NOT_BUILT}
-                  className="justify-start"
+                <AddLink
+                  className={cn(
+                    buttonVariants({ size: "lg" }),
+                    "justify-start",
+                  )}
                 >
                   <Plus data-icon="inline-start" />
                   Add
-                </Button>
+                </AddLink>
               )}
               <nav
                 aria-label="Main"
@@ -269,14 +301,15 @@ export function AppShell({
           <BarTab tab={SPENDING} current={current} />
           <div className="flex justify-center">
             {/* Raised above the bar, so it reads as the one action among four places. */}
-            <Button
+            <AddLink
               aria-label="Add"
-              aria-disabled="true"
-              title={NOT_BUILT}
-              className="-mt-5 size-14 rounded-full shadow-md"
+              className={cn(
+                buttonVariants(),
+                "-mt-5 size-14 rounded-full shadow-md",
+              )}
             >
               <Plus className="size-6" />
-            </Button>
+            </AddLink>
           </div>
           <BarTab tab={PORTFOLIO} current={current} />
           <BarTab tab={DEBTS} current={current} />
