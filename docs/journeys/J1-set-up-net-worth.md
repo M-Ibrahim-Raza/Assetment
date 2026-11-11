@@ -12,4 +12,4 @@
 | 4 | Add PSX stocks and funds as buys | Add trade | |
 | 5 | Add property and plots with a value entered by hand, and the price paid if known | Add asset | |
 | 6 | Add debts: loans, card balances, committees | Add debt | |
-| 7 | See today's net worth: Portfolio minus debts | Dashboard | |
+| 7 | See today's net worth: Portfolio minus debts | Dashboard | F01 |
