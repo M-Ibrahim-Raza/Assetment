@@ -18,7 +18,7 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.22 0.025 165);
   --primary: oklch(0.43 0.1 158);
-  --primary-foreground: oklch(0.99 0 0);
+  --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.89 0.025 165);
   --secondary-foreground: oklch(0.22 0.025 165);
   --muted: oklch(0.95 0.01 170);
@@ -28,9 +28,9 @@
   --destructive: oklch(0.51 0.2 27);
   --gain: oklch(0.46 0.11 155);
   --loss: oklch(0.5 0.19 27);
-  /* The ink fields: the Debts tile, the net worth bar and the spent bar. Not `foreground`, which turns light in dark mode. */
+  /* The ink fields: the Debts tile, the net worth bar and the spent bar. Not `foreground`, which turns light in dark mode. Text on ink, as on the sidebar, is white. */
   --ink: oklch(0.22 0.025 165);
-  --ink-foreground: oklch(0.955 0.01 170);
+  --ink-foreground: oklch(1 0 0);
   /* The button on the green hero, such as "Try again". By day it is the sage block's colour. Literal values: the hero points --secondary here. */
   --hero-action: oklch(0.89 0.025 165);
   --hero-action-foreground: oklch(0.22 0.025 165);
@@ -47,11 +47,11 @@
   --block-radius: 1.5rem;
   --font-display: var(--font-bricolage);
   --sidebar: oklch(0.22 0.025 165);
-  --sidebar-foreground: oklch(0.97 0.01 170);
+  --sidebar-foreground: oklch(1 0 0);
   --sidebar-primary: oklch(0.43 0.1 158);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.32 0.03 165);
-  --sidebar-accent-foreground: oklch(0.99 0 0);
+  --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.8 0.1 158);
 }
@@ -60,19 +60,19 @@
  * Green night: a green-tinted near-black page, with blocks a step lighter. Ink and the sidebar are
  * the deepest layer. The hero green and the sage block are calmer than by day, and gain and loss
  * are lighter, so they still read on the dark blocks. The hero's button stays a light pill, so it
- * still stands out on the green.
+ * still stands out on the green. Text is white; only the small helper text stays grey.
  */
 .dark {
   --background: oklch(0.17 0.012 165);
-  --foreground: oklch(0.94 0.01 165);
+  --foreground: oklch(1 0 0);
   --card: oklch(0.215 0.014 165);
-  --card-foreground: oklch(0.94 0.01 165);
+  --card-foreground: oklch(1 0 0);
   --popover: oklch(0.24 0.015 165);
-  --popover-foreground: oklch(0.94 0.01 165);
+  --popover-foreground: oklch(1 0 0);
   --primary: oklch(0.42 0.085 158);
-  --primary-foreground: oklch(0.98 0 0);
+  --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.3 0.035 162);
-  --secondary-foreground: oklch(0.93 0.015 165);
+  --secondary-foreground: oklch(1 0 0);
   --muted: oklch(0.27 0.014 165);
   --muted-foreground: oklch(0.72 0.02 165);
   --accent: oklch(0.3 0.035 162);
@@ -81,23 +81,23 @@
   --gain: oklch(0.78 0.13 155);
   --loss: oklch(0.72 0.16 25);
   --ink: oklch(0.12 0.012 165);
-  --ink-foreground: oklch(0.94 0.01 165);
+  --ink-foreground: oklch(1 0 0);
   --hero-action: oklch(0.87 0.03 163);
   --hero-action-foreground: oklch(0.2 0.025 165);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.72 0.11 158);
   --chart-1: oklch(0.6 0.1 158);
-  --chart-2: oklch(0.94 0.01 165);
+  --chart-2: oklch(1 0 0);
   --chart-3: oklch(0.3 0.035 162);
   --chart-4: oklch(0.75 0.1 158);
   --chart-5: oklch(0.55 0.02 165);
   --sidebar: oklch(0.12 0.012 165);
-  --sidebar-foreground: oklch(0.94 0.01 165);
+  --sidebar-foreground: oklch(1 0 0);
   --sidebar-primary: oklch(0.42 0.085 158);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.22 0.02 165);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
+  --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.8 0.1 158);
 }

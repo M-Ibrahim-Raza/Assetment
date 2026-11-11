@@ -153,7 +153,7 @@ function Tile({
           characters <= 12 ? "text-lg sm:text-2xl" : "text-sm sm:text-xl",
         )}
       />
-      <span className="text-sm opacity-80">{caption}</span>
+      <span className="text-sm">{caption}</span>
     </ScreenLink>
   );
 }
