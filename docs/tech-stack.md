@@ -73,11 +73,13 @@ Every tool this app uses or has chosen. Versions come from `pnpm-lock.yaml`. Set
 | Tool | Version | Purpose | Why | Alternatives considered | Notes |
 |---|---|---|---|---|---|
 | shadcn/ui (`shadcn`) | 4.23.0 | CLI that copies components into `components/ui/` and writes `components.json`. Its `shadcn/tailwind.css` is imported in `app/globals.css` | Production owns the design system, and the prototype imports it (ADR 0006). The components are code we own | - | Run the CLI pinned: `pnpm dlx shadcn@4.23.0` |
-| Base UI (`@base-ui/react`) | 1.9.0 | Behaviour and accessibility under the shadcn/ui components in `components/ui/`. Installed, no component uses it yet | shadcn's default base since July 2026. Native Combobox, Autocomplete, Number Field and multi-value Select fit ticker search and multi-select filters | Radix (no combobox or multi-value Select, slower releases), React Aria (fewest shadcn examples, needs an ADR) | Pass `-b base` to every `shadcn init`. Write `render`, never `asChild` |
-| lucide (`lucide-react`) | 1.70.0 | Icons, set as `iconLibrary` in `components.json`. Installed, no component uses it yet | shadcn's default outline icons, so every example and agent uses them. Covers wallet, bank, receipt and coins | Tabler (5,000+ icons, but shadcn examples need translating), Phosphor (no release since May 2025) | Switch to Tabler with `shadcn migrate icons` if lucide lacks an icon |
-| `class-variance-authority` | 0.7.1 | Variants (`cva`) inside shadcn components. Installed, no component uses it yet | Part of shadcn/ui | - | - |
+| Base UI (`@base-ui/react`) | 1.9.0 | Behaviour and accessibility under the shadcn/ui components in `components/ui/` | shadcn's default base since July 2026. Native Combobox, Autocomplete, Number Field and multi-value Select fit ticker search and multi-select filters | Radix (no combobox or multi-value Select, slower releases), React Aria (fewest shadcn examples, needs an ADR) | Pass `-b base` to every `shadcn init`. Write `render`, never `asChild` |
+| lucide (`lucide-react`) | 1.70.0 | Icons, set as `iconLibrary` in `components.json` | shadcn's default outline icons, so every example and agent uses them. Covers wallet, bank, receipt and coins | Tabler (5,000+ icons, but shadcn examples need translating), Phosphor (no release since May 2025) | Switch to Tabler with `shadcn migrate icons` if lucide lacks an icon |
+| `class-variance-authority` | 0.7.1 | Variants (`cva`) inside shadcn components | Part of shadcn/ui | - | - |
 | `cn` | 0.5.2 | Merges class names. Re-exported from `lib/utils.ts` | Part of shadcn/ui. Replaces clsx and tailwind-merge | - | - |
 | `tw-animate-css` | 1.4.0 | Animation utilities, imported in `app/globals.css` | Part of shadcn/ui | - | - |
+| Sonner (`sonner`) | 2.0.8 | Toasts, through shadcn's `components/ui/sonner.tsx`. Undo after a reversible action. Only the prototype uses it so far | shadcn's toast component: an action button, a set duration (Undo needs 10 s) and a live region for screen readers | - | - |
+| `next-themes` | 0.4.6 | Tells the toasts whether the theme is light or dark. Nothing sets a theme yet, so they follow the system | Required by shadcn's sonner component | - | Revisit when light and dark support is decided |
 
 ## Formatting
 
