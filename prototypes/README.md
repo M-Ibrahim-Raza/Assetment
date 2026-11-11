@@ -22,6 +22,7 @@ Run it from the repo root with `pnpm proto`, then open http://localhost:3001. Ch
 - `?variant=a` switches variants. ← and → do too, when nothing is focused.
 - `?scenario=empty` switches state: `default`, `empty`, `loading`, `error`, `many`, and any others the screen defines.
 - `?latency=slow` delays in-memory actions by 1.5 s, to show pending states.
+- A screen can keep its own params, such as Setup's `?step=`. Switching the variant or scenario drops them, so each scenario starts where it says.
 
 The ProtoBar at the bottom sets all three, and the URL always reproduces what's on screen. On phones it shrinks to a "Proto" pill at the top, so it doesn't cover the app's tab bar. Tap the pill to open the bar, and × to hide it.
 

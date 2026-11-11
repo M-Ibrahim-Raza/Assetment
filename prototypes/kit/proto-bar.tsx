@@ -36,6 +36,9 @@ const PILL_DISPLAY = {
   closed: "flex",
 } as const satisfies Record<BarMode, string>;
 
+/** The params the kit owns. Any other belongs to the screen. */
+const KIT_PARAMS = ["variant", "scenario", "latency"];
+
 /** Floating controls for the prototype. Styled apart from the screen so it's never mistaken for the design. */
 export function ProtoBar({
   variants,
@@ -54,9 +57,16 @@ export function ProtoBar({
   );
   const [mode, setMode] = useState<BarMode>("auto");
 
-  // Keeps the other params, so a link always reproduces what's on screen.
+  // Keeps the kit's other params, so a link always reproduces what's on screen.
   const setParam = (name: string, value: string) => {
     const next = new URLSearchParams(searchParams);
+    // A screen's own params, such as a wizard's `step`, belong to the variant and scenario they
+    // were set in. A new one starts where its scenario says.
+    if (name !== "latency") {
+      for (const key of [...next.keys()]) {
+        if (!KIT_PARAMS.includes(key)) next.delete(key);
+      }
+    }
     next.set(name, value);
     router.replace(`${pathname}?${next.toString()}` as Route, {
       scroll: false,

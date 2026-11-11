@@ -6,4 +6,5 @@ import type { Route } from "next";
  */
 export const screenRoutes: Readonly<Partial<Record<string, Route>>> = {
   Dashboard: "/dashboard",
+  Setup: "/setup",
 };

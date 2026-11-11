@@ -4,6 +4,8 @@ const pkr = new Intl.NumberFormat("en-PK", {
   maximumFractionDigits: 0,
 });
 
+const plain = new Intl.NumberFormat("en-PK", { maximumFractionDigits: 0 });
+
 const short = new Intl.NumberFormat("en-PK", { maximumFractionDigits: 1 });
 
 const percent = new Intl.NumberFormat("en-PK", {
@@ -18,6 +20,11 @@ const CRORE = 10_000_000;
 /** Whole rupees, e.g. "Rs 245,300". Prototype-only: production has its own money formatting. */
 export function formatPkr(rupees: number): string {
   return pkr.format(rupees);
+}
+
+/** Whole rupees with commas and no "Rs", e.g. "245,300": what an amount field shows while typing. */
+export function formatDigits(rupees: number): string {
+  return plain.format(rupees);
 }
 
 // A real minus sign, not a hyphen, so it lines up with the plus.

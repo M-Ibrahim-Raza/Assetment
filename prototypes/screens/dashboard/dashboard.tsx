@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { AppShell } from "@proto/components/app-shell";
+import { ScreenLink } from "@proto/components/screen-link";
 import type { Dashboard, DashboardViewProps } from "./scenarios";
 import { ChecksBlock } from "./checks-block";
 import { MonthBlock } from "./month-block";
@@ -83,14 +84,13 @@ function FirstUseBlock() {
             "A few short steps: your accounts, gold, stocks, property and debts. Skip anything you don't have, and your net worth shows straight away."
           }
         </p>
-        <Button
-          variant="secondary"
-          size="lg"
-          aria-disabled="true"
-          title="Not built yet"
+        {/* A real link styled as the hero's button: it opens the setup wizard. */}
+        <ScreenLink
+          screen="Setup"
+          className={buttonVariants({ variant: "secondary", size: "lg" })}
         >
           Set up your net worth
-        </Button>
+        </ScreenLink>
       </div>
     </HeroBlock>
   );
