@@ -1,28 +1,12 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { ShellActions } from "@proto/components/app-shell";
+import { BLOCK, PAD } from "@proto/components/blocks";
 import { DISPLAY } from "@proto/components/display";
 
+// The look's shared parts live in components/blocks.ts, so other screens use them too.
+export { BLOCK, EYEBROW, HEADING, INK, PAD } from "@proto/components/blocks";
 export { DISPLAY };
-
-/** The small capital label above a block's content. */
-export const EYEBROW =
-  "text-sm leading-4 font-semibold tracking-widest uppercase";
-
-/** A block's heading: short, heavy and tight. */
-export const HEADING = cn(
-  DISPLAY,
-  "text-3xl leading-none font-extrabold tracking-tight",
-);
-
-/** Side padding shared by every block, so their content lines up down the page. */
-export const PAD = "px-4 md:px-10";
-
-/** Every block's corners, from theme.css. Blocks sit `gap-3` apart, so each section reads as its own. */
-export const BLOCK = "rounded-(--block-radius)";
-
-/** An ink field and its text, from theme.css: the Debts tile and the net worth bar. */
-export const INK = "bg-(--ink) text-(--ink-foreground)";
 
 /**
  * The primary-colour field at the top of the screen. It carries the wordmark and the shell's

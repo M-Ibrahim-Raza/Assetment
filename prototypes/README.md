@@ -11,7 +11,7 @@ Run it from the repo root with `pnpm proto`, then open http://localhost:3001. Ch
 | `app/` | Thin routes with the same URLs as production. `/` lists every journey from `docs/journeys/`. |
 | `screens/<screen>/` | Screens the prototype owns: not built yet, or a fork of a shipped View. `scenarios.ts`, plus the View or its variants. |
 | `screens.ts` | Journey screen name → prototype URL, so the index can link it. |
-| `components/` | Prototype-only components that several screens share, such as `AppShell` (tab bar, a sidebar with the logo that collapses to an icon rail, header with the profile panel), `ThemeProvider`, `Money` and `ScreenLink`. |
+| `components/` | Prototype-only components that several screens share, such as `AppShell` (tab bar, a sidebar with the logo that collapses to an icon rail, header with the profile panel), `ThemeProvider`, `Money` and `ScreenLink`. `blocks.ts` holds the look's shared classes: block corners, padding, headings and the ink field. |
 | `fixtures/` | Fake data builders shared by screens. |
 | `kit/` | Prototype tooling: `ProtoScreen`, `ProtoBar`, the scenario types, `useProtoAction`, the money formatters, and `screenshots.mts`, which shoots a screen at five widths, in light and dark. |
 
