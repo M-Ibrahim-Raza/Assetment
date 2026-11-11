@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Assetment logo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap"
+    />
+    <style>
+      :root {
+        --page: #f4f4f2;
+        --light: #ffffff;
+        --mist: #eaf2ef;
+        --dark: #0f1e18;
+        --text: #15191a;
+        --muted: #5f6566;
+        --line: #dcdcd8;
+        --font: "Bricolage Grotesque", system-ui, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--text);
+        font: 15px/1.5 var(--font);
+      }
+      main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 32px 16px 64px;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(28px, 5vw, 44px);
+        font-weight: 750;
+        letter-spacing: -0.02em;
+      }
+      h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      p {
+        margin: 4px 0 0;
+        max-width: 70ch;
+        color: var(--muted);
+      }
+      section {
+        margin-top: 48px;
+      }
+      .panels {
+        margin-top: 16px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 24px 32px;
+        padding: 24px 16px;
+      }
+      .on-light {
+        background: var(--light);
+      }
+      .on-mist {
+        background: var(--mist);
+      }
+      .on-dark {
+        background: var(--dark);
+      }
+      figure {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        max-width: 100%;
+      }
+      figcaption {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .on-dark figcaption {
+        color: #a4abac;
+      }
+      .mark {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+      canvas {
+        image-rendering: pixelated;
+      }
+      .swatches {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 20px;
+        margin-top: 8px;
+        font-size: 13px;
+      }
+      .swatch {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .chip {
+        width: 18px;
+        height: 18px;
+        border-radius: 5px;
+        border: 1px solid rgb(0 0 0 / 15%);
+      }
+      code {
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Assetment logo</h1>
+      <p>
+        The final kit: four colour variants, each as the logo (A and text) and
+        the icon (A only). Every variant is shown on the backgrounds it is made
+        for. Files are in <code>final/</code>; how to use them is in
+        <code>README.md</code>.
+      </p>
+      <div id="variants"></div>
+    </main>
+
+    <script>
+      const GOLD = "#a47a22";
+      const INK = "#0f1e18";
+      const LIGHT = "#eaf2ef";
+      // [folder, name, use, A colour, text colour, backgrounds]
+      const variants = [
+        [
+          "1-gold-light-text",
+          "Dark gold A, light text",
+          "For dark backgrounds.",
+          GOLD,
+          LIGHT,
+          ["dark"],
+        ],
+        [
+          "2-gold-ink-text",
+          "Dark gold A, ink text",
+          "The main logo, for light backgrounds.",
+          GOLD,
+          INK,
+          ["light", "mist"],
+        ],
+        [
+          "3-gold",
+          "Dark gold",
+          "One colour. Works on light and dark backgrounds.",
+          GOLD,
+          GOLD,
+          ["light", "mist", "dark"],
+        ],
+        [
+          "4-ink",
+          "All ink",
+          "One colour, for light backgrounds and plain or single-colour use.",
+          INK,
+          INK,
+          ["light", "mist"],
+        ],
+      ];
+
+      const el = (tag, attrs = {}, ...kids) => {
+        const node = document.createElement(tag);
+        Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
+        kids.forEach((kid) =>
+          node.append(
+            typeof kid === "string" ? document.createTextNode(kid) : kid,
+          ),
+        );
+        return node;
+      };
+
+      const mark = (src, width, height) =>
+        el("img", { class: "mark", src, alt: "", width, height });
+
+      // Draw the mark at true size onto a canvas, then show it enlarged with hard pixel edges.
+      const pixels = (src, width, height, zoom) => {
+        const canvas = el("canvas", {
+          width,
+          height,
+          style: `width:${width * zoom}px;height:${height * zoom}px`,
+        });
+        const img = new Image();
+        img.onload = () =>
+          canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+        img.src = src;
+        return canvas;
+      };
+
+      const fig = (node, caption) =>
+        el("figure", {}, node, el("figcaption", {}, caption));
+
+      const swatch = (label, hex) =>
+        el(
+          "span",
+          { class: "swatch" },
+          el("span", { class: "chip", style: `background:${hex}` }),
+          `${label} `,
+          el("code", {}, hex),
+        );
+
+      // The logo SVG is 4722 × 804 units, cropped to the ink.
+      const RATIO = 4722 / 804;
+      const logoAt = (file, h) => mark(file, Math.round(h * RATIO), h);
+
+      const list = document.getElementById("variants");
+      variants.forEach(([dir, name, use, a, text, tones], i) => {
+        const slug = dir.replace(/^\d-/, "");
+        const logo = `final/${dir}/assetment-${slug}-logo.svg`;
+        const icon = `final/${dir}/assetment-${slug}-icon.svg`;
+        const rows = tones.map((tone) =>
+          el(
+            "div",
+            { class: `row on-${tone}` },
+            fig(logoAt(logo, 64), "Logo, 64 px tall"),
+            fig(logoAt(logo, 24), "24 px"),
+            fig(mark(icon, 96, 96), "Icon, 96 px"),
+            fig(mark(icon, 32, 32), "32 px"),
+            fig(mark(icon, 16, 16), "16 px"),
+            fig(pixels(icon, 16, 16, 4), "16 px, real pixels"),
+          ),
+        );
+        list.append(
+          el(
+            "section",
+            { "aria-labelledby": `v${i + 1}` },
+            el("h2", { id: `v${i + 1}` }, `${i + 1} · ${name}`),
+            el("p", {}, use),
+            el(
+              "div",
+              { class: "swatches" },
+              swatch("A", a),
+              swatch("Text", text),
+              el("code", {}, `final/${dir}/`),
+            ),
+            el("div", { class: "panels" }, ...rows),
+          ),
+        );
+      });
+    </script>
+  </body>
+</html>

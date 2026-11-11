@@ -3,7 +3,13 @@
 import type { Route } from "next";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useEffectEvent, useOptimistic, useTransition } from "react";
+import {
+  useEffect,
+  useEffectEvent,
+  useOptimistic,
+  useState,
+  useTransition,
+} from "react";
 
 interface ProtoBarProps {
   variants: readonly { key: string; name: string }[];
@@ -11,6 +17,27 @@ interface ProtoBarProps {
   currentVariant: string;
   currentScenario: string;
 }
+
+/**
+ * `auto` shows the bar from tablet width up and the pill on phones, where the bar would cover a
+ * bottom tab bar. The hidden one stays in the DOM, because kit/screenshots.mts reads the bar.
+ */
+type BarMode = "auto" | "open" | "closed";
+
+const BAR_DISPLAY = {
+  auto: "hidden sm:flex",
+  open: "flex",
+  closed: "hidden",
+} as const satisfies Record<BarMode, string>;
+
+const PILL_DISPLAY = {
+  auto: "flex sm:hidden",
+  open: "hidden",
+  closed: "flex",
+} as const satisfies Record<BarMode, string>;
+
+/** The params the kit owns. Any other belongs to the screen. */
+const KIT_PARAMS = ["variant", "scenario", "latency"];
 
 /** Floating controls for the prototype. Styled apart from the screen so it's never mistaken for the design. */
 export function ProtoBar({
@@ -28,10 +55,18 @@ export function ProtoBar({
   const [slow, setOptimisticSlow] = useOptimistic(
     searchParams.get("latency") === "slow",
   );
+  const [mode, setMode] = useState<BarMode>("auto");
 
-  // Keeps the other params, so a link always reproduces what's on screen.
+  // Keeps the kit's other params, so a link always reproduces what's on screen.
   const setParam = (name: string, value: string) => {
     const next = new URLSearchParams(searchParams);
+    // A screen's own params, such as a wizard's `step`, belong to the variant and scenario they
+    // were set in. A new one starts where its scenario says.
+    if (name !== "latency") {
+      for (const key of [...next.keys()]) {
+        if (!KIT_PARAMS.includes(key)) next.delete(key);
+      }
+    }
     next.set(name, value);
     router.replace(`${pathname}?${next.toString()}` as Route, {
       scroll: false,
@@ -62,77 +97,100 @@ export function ProtoBar({
   }, []);
 
   return (
-    <nav
-      aria-label="Prototype controls"
-      className="fixed inset-x-0 bottom-4 z-50 mx-auto flex w-fit max-w-[calc(100%-2rem)] flex-wrap items-center gap-x-4 gap-y-2 rounded-3xl bg-foreground px-4 py-2 text-sm text-background shadow-lg"
-    >
-      <Link href="/" className="underline underline-offset-4">
-        Index
-      </Link>
+    <nav aria-label="Prototype controls">
+      <button
+        type="button"
+        className={`${PILL_DISPLAY[mode]} fixed top-2 left-1/2 z-50 -translate-x-1/2 items-center gap-1 rounded-full bg-foreground px-3 py-1 text-xs text-background shadow-lg`}
+        onClick={() => {
+          setMode("open");
+        }}
+      >
+        <span className="sr-only">Show prototype controls.</span>
+        Proto{current ? ` · ${current.key.toUpperCase()}` : ""}
+      </button>
 
-      {variants.length > 1 && current && (
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            aria-label="Previous variant"
-            className="size-8 rounded-full hover:bg-background/20"
-            onClick={() => {
-              stepVariant(-1);
+      <div
+        className={`${BAR_DISPLAY[mode]} fixed inset-x-0 bottom-4 z-50 mx-auto w-fit max-w-[calc(100%-2rem)] flex-wrap items-center gap-x-4 gap-y-2 rounded-3xl bg-foreground px-4 py-2 text-sm text-background shadow-lg`}
+      >
+        <Link href="/" className="underline underline-offset-4">
+          Index
+        </Link>
+
+        {variants.length > 1 && current && (
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              aria-label="Previous variant"
+              className="size-8 rounded-full hover:bg-background/20"
+              onClick={() => {
+                stepVariant(-1);
+              }}
+            >
+              ←
+            </button>
+            <span aria-live="polite">
+              {current.key.toUpperCase()} · {current.name}
+            </span>
+            <button
+              type="button"
+              aria-label="Next variant"
+              className="size-8 rounded-full hover:bg-background/20"
+              onClick={() => {
+                stepVariant(1);
+              }}
+            >
+              →
+            </button>
+          </div>
+        )}
+
+        <label className="flex items-center gap-2">
+          Scenario
+          <select
+            value={scenario}
+            className="rounded-md bg-background px-2 py-1 text-foreground"
+            onChange={(event) => {
+              const { value } = event.target;
+              startTransition(() => {
+                setOptimisticScenario(value);
+                setParam("scenario", value);
+              });
             }}
           >
-            ←
-          </button>
-          <span aria-live="polite">
-            {current.key.toUpperCase()} · {current.name}
-          </span>
-          <button
-            type="button"
-            aria-label="Next variant"
-            className="size-8 rounded-full hover:bg-background/20"
-            onClick={() => {
-              stepVariant(1);
-            }}
-          >
-            →
-          </button>
-        </div>
-      )}
+            {scenarios.map((scenario) => (
+              <option key={scenario} value={scenario}>
+                {scenario}
+              </option>
+            ))}
+          </select>
+        </label>
 
-      <label className="flex items-center gap-2">
-        Scenario
-        <select
-          value={scenario}
-          className="rounded-md bg-background px-2 py-1 text-foreground"
-          onChange={(event) => {
-            const { value } = event.target;
-            startTransition(() => {
-              setOptimisticScenario(value);
-              setParam("scenario", value);
-            });
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={slow}
+            onChange={(event) => {
+              const { checked } = event.target;
+              startTransition(() => {
+                setOptimisticSlow(checked);
+                setParam("latency", checked ? "slow" : "normal");
+              });
+            }}
+          />
+          Slow actions
+        </label>
+
+        <button
+          type="button"
+          aria-label="Hide prototype controls"
+          className="size-8 rounded-full hover:bg-background/20"
+          onClick={() => {
+            setMode("closed");
           }}
         >
-          {scenarios.map((scenario) => (
-            <option key={scenario} value={scenario}>
-              {scenario}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          checked={slow}
-          onChange={(event) => {
-            const { checked } = event.target;
-            startTransition(() => {
-              setOptimisticSlow(checked);
-              setParam("latency", checked ? "slow" : "normal");
-            });
-          }}
-        />
-        Slow actions
-      </label>
+          ×
+        </button>
+      </div>
     </nav>
   );
 }

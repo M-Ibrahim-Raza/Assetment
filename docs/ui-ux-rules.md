@@ -33,13 +33,17 @@ Rules for people and AI agents who design, build or review a screen.
 
 - Tab, filters, sort, search, page and the selected item live in the URL, so Back and reload keep the view.
 - Mark the current nav item with `aria-current="page"`.
+- Five places: Home, Spending, Portfolio and Debts, with Add in the middle. A tab bar on phones, a sidebar from tablet width.
 
 ## Money
 
 - One PKR format everywhere, right-aligned digits, and + or − on gains and losses, not just color.
+- Headline totals show a lakh or crore note under the exact amount, e.g. "48.1 lakh".
 
 ## Responsive and accessible
 
 - Phone first: every screen works at 320 px wide and 200% zoom, with no sideways scroll.
 - Meet WCAG 2.2 AA. Everything works by keyboard and touch. Nothing needs hover.
+- Light and dark themes, plus Auto, which follows the device and is the default. Both meet AA.
+- Text on dark backgrounds is white (#ffffff), not tinted or dimmed. Only small helper text is grey.
 - Every overlay closes with Esc and a visible close button.

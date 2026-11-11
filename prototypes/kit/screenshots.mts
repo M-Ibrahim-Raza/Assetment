@@ -1,8 +1,9 @@
-// Screenshots one prototype screen: each variant and scenario at 320, 375, 768, 1280 and 1920 px.
-// Lists sideways scroll, console errors and failed loads, and exits with 1 if there are any.
-// Start the prototype with `pnpm proto` first, then run from the repo root:
-//   node prototypes/kit/screenshots.mts /accounts/new --variants a,b
+// Screenshots one prototype screen: each variant and scenario at 320, 375, 768, 1280 and 1920 px,
+// in the light and the dark theme. Lists sideways scroll, console errors and failed loads, and
+// exits with 1 if there are any. Start the prototype with `pnpm proto` first, then run from the repo root:
+//   node prototypes/kit/screenshots.mts /accounts/new --variants a,b --themes dark
 // Without --scenarios, it takes every scenario in the ProtoBar. It reads the ProtoBar, so keep the two in step.
+// The theme is the device's: the app's default, Auto, follows it.
 import { mkdir } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -11,6 +12,8 @@ import { chromium, type Page } from "@playwright/test";
 
 const BASE_URL = "http://localhost:3001";
 const WIDTHS = [320, 375, 768, 1280, 1920];
+const THEMES = ["light", "dark"] as const;
+type Theme = (typeof THEMES)[number];
 const HEIGHT = 900;
 // The first visit to a route compiles it, which takes a while in dev.
 const TIMEOUT_MS = 60_000;
@@ -21,14 +24,29 @@ const { positionals, values } = parseArgs({
   options: {
     variants: { type: "string", default: "a" },
     scenarios: { type: "string" },
+    themes: { type: "string", default: THEMES.join(",") },
     out: { type: "string" },
   },
 });
 
+const list = (value: string) =>
+  value
+    .split(",")
+    .map((item) => item.trim())
+    .filter((item) => item !== "");
+
+const isTheme = (value: string): value is Theme =>
+  (THEMES as readonly string[]).includes(value);
+
 const route = positionals[0];
-if (route?.startsWith("/") !== true) {
+const themes = list(values.themes);
+if (
+  route?.startsWith("/") !== true ||
+  themes.length === 0 ||
+  !themes.every(isTheme)
+) {
   console.error(
-    "Usage: node prototypes/kit/screenshots.mts <url> [--variants a,b] [--scenarios default,empty] [--out <dir>]",
+    "Usage: node prototypes/kit/screenshots.mts <url> [--variants a,b] [--scenarios default,empty] [--themes light,dark] [--out <dir>]",
   );
   process.exit(2);
 }
@@ -41,12 +59,6 @@ try {
   );
   process.exit(1);
 }
-
-const list = (value: string) =>
-  value
-    .split(",")
-    .map((item) => item.trim())
-    .filter((item) => item !== "");
 
 const open = (page: Page, query: string) =>
   page.goto(`${BASE_URL}${route}${query}`, {
@@ -79,8 +91,14 @@ try {
     problems.push(`${route}: no ProtoBar, so no scenarios to shoot`);
   }
 
-  for (const width of WIDTHS) {
-    const page = await browser.newPage({ viewport: { width, height: HEIGHT } });
+  const runs = themes.flatMap((theme) =>
+    WIDTHS.map((width) => ({ theme, width })),
+  );
+  for (const { theme, width } of runs) {
+    const page = await browser.newPage({
+      viewport: { width, height: HEIGHT },
+      colorScheme: theme,
+    });
     let shot = "";
     page.on("console", (message) => {
       if (message.type() === "error") {
@@ -93,7 +111,7 @@ try {
 
     for (const variant of variants) {
       for (const scenario of scenarios) {
-        shot = `${variant}-${scenario}-${String(width)}`;
+        shot = `${variant}-${scenario}-${theme}-${String(width)}`;
         const response = await open(
           page,
           `?variant=${encodeURIComponent(variant)}&scenario=${encodeURIComponent(scenario)}`,
