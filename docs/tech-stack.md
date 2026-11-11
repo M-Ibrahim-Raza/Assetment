@@ -79,7 +79,7 @@ Every tool this app uses or has chosen. Versions come from `pnpm-lock.yaml`. Set
 | `cn` | 0.5.2 | Merges class names. Re-exported from `lib/utils.ts` | Part of shadcn/ui. Replaces clsx and tailwind-merge | - | - |
 | `tw-animate-css` | 1.4.0 | Animation utilities, imported in `app/globals.css` | Part of shadcn/ui | - | - |
 | Sonner (`sonner`) | 2.0.8 | Toasts, through shadcn's `components/ui/sonner.tsx`. Undo after a reversible action. Only the prototype uses it so far | shadcn's toast component: an action button, a set duration (Undo needs 10 s) and a live region for screen readers | - | - |
-| `next-themes` | 0.4.6 | Tells the toasts whether the theme is light or dark. Nothing sets a theme yet, so they follow the system | Required by shadcn's sonner component | - | Revisit when light and dark support is decided |
+| `next-themes` | 0.4.6 | Light, dark or Auto theme: puts the `dark` class on `<html>` before the first paint and remembers the choice. Toasts follow it. Only the prototype uses it so far | Required by shadcn's sonner component, and it stops a dark reload flashing light | - | React 19 warns about its inline script: `scriptProps` makes the client copy `text/plain` |
 
 ## Formatting
 

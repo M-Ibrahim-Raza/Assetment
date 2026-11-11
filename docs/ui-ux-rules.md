@@ -44,4 +44,5 @@ Rules for people and AI agents who design, build or review a screen.
 
 - Phone first: every screen works at 320 px wide and 200% zoom, with no sideways scroll.
 - Meet WCAG 2.2 AA. Everything works by keyboard and touch. Nothing needs hover.
+- Light and dark themes, plus Auto, which follows the device and is the default. Both meet AA.
 - Every overlay closes with Esc and a visible close button.
