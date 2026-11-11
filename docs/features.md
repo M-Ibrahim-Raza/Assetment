@@ -17,3 +17,7 @@ What Assetment does, one row per feature. Columns and statuses: [README.md](READ
 | F11 | Property at your own value | [J1](journeys/J1-set-up-net-worth.md) | Must | F07 | open | |
 | F12 | Debts: loans, cards and committees | [J1](journeys/J1-set-up-net-worth.md) | Must | F07 | open | |
 | F13 | Foreign-currency accounts | [J1](journeys/J1-set-up-net-worth.md) | Should | F08 | open | |
+| F14 | [Quick add](../specs/F14-quick-add/) | [J2](journeys/J2-log-money.md) | Must | F06, F08 | approved | |
+| F15 | [Your usuals](../specs/F15-your-usuals/) | [J2](journeys/J2-log-money.md) | Must | F14 | approved | |
+| F16 | [Card spending and debt payments](../specs/F16-card-spending-and-debt-payments/) | [J2](journeys/J2-log-money.md) | Must | F14, F12 | approved | |
+| F17 | Receipt scan | [J2](journeys/J2-log-money.md) | Should | F14 | open | |
