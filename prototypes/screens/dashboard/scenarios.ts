@@ -38,11 +38,12 @@ export interface NetWorth {
   pricesAsOf: string;
 }
 
-/** What moved net worth this month. Kept is `earned - spent`, and the change is kept plus `portfolioMoved`. */
+/** What moved net worth this month. Kept is `received - spent`, and the change is kept plus `portfolioMoved`. */
 export interface MonthStory {
   /** The month's name, e.g. "November". */
   name: string;
-  earned: number;
+  /** All money in: salary, freelance, gifts, refunds. Called "Received", as in Quick add. */
+  received: number;
   spent: number;
   /** Rise or fall in what the Portfolio is worth, from prices and typed-in values. */
   portfolioMoved: number;
@@ -103,7 +104,7 @@ const typical: Dashboard = {
   },
   month: {
     name: "November",
-    earned: 310_000,
+    received: 310_000,
     spent: 212_400,
     portfolioMoved: 41_200,
   },
@@ -136,13 +137,13 @@ const firstUse: Dashboard = {
     trend: [],
     pricesAsOf: "9 Nov",
   },
-  month: { name: "November", earned: 0, spent: 0, portfolioMoved: 0 },
+  month: { name: "November", received: 0, spent: 0, portfolioMoved: 0 },
   checks: [],
   spending: [],
   recent: [],
 };
 
-// Large totals, long names, many rows, and a month that went down: spent more than earned, and prices fell.
+// Large totals, long names, many rows, and a month that went down: spent more than received, and prices fell.
 const heavy: Dashboard = {
   netWorth: {
     portfolio: 128_450_000,
@@ -157,7 +158,7 @@ const heavy: Dashboard = {
   },
   month: {
     name: "November",
-    earned: 245_000,
+    received: 245_000,
     // The nine spending categories below add up to this.
     spent: 278_700,
     portfolioMoved: -1_230_600,

@@ -17,10 +17,10 @@ interface MonthBlockProps {
  * with the net worth change. Spending and the Portfolio meet here.
  */
 export function MonthBlock({ month, netWorthChange }: MonthBlockProps) {
-  const kept = month.earned - month.spent;
+  const kept = month.received - month.spent;
   // The share of this month's income that went out, capped at all of it.
   const spentShare =
-    month.earned > 0 ? Math.min(1, month.spent / month.earned) : null;
+    month.received > 0 ? Math.min(1, month.spent / month.received) : null;
 
   return (
     <section
@@ -43,7 +43,7 @@ export function MonthBlock({ month, netWorthChange }: MonthBlockProps) {
             </>
           ) : (
             <>
-              You spent <Money value={-kept} /> more than you earned
+              You spent <Money value={-kept} /> more than you received
             </>
           )}
         </p>
@@ -51,8 +51,8 @@ export function MonthBlock({ month, netWorthChange }: MonthBlockProps) {
         {spentShare !== null && <SplitBar spentShare={spentShare} />}
 
         <dl className="flex flex-col">
-          <Row label="Earned" screen="Spending">
-            <Money value={month.earned} signed />
+          <Row label="Received" screen="Spending">
+            <Money value={month.received} signed />
           </Row>
           <Row label="Spent" screen="Spending">
             <Money value={-month.spent} signed />
@@ -86,7 +86,7 @@ function Direction({ value }: { value: number }) {
   return <Icon aria-hidden="true" className="size-4 shrink-0" />;
 }
 
-/** What was earned, as two solid bars: spent in ink, kept in green. The caption carries the numbers. */
+/** What was received, as two solid bars: spent in ink, kept in green. The caption carries the numbers. */
 function SplitBar({ spentShare }: { spentShare: number }) {
   const spent = Math.round(spentShare * 100);
   const kept = 100 - spent;

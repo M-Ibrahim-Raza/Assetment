@@ -1,6 +1,6 @@
 # F02 – Month story
 
-**What:** the month so far as one sentence, "You kept Rs 97,600", with a bar of what was spent and kept. Under it: earned, spent and how far the Portfolio moved, ending in the net worth change this month.
+**What:** the month so far as one sentence, "You kept Rs 97,600", with a bar of what was spent and kept. Under it: received, spent and how far the Portfolio moved, ending in the net worth change this month.
 
 **Screens:** `/dashboard`
 
@@ -8,8 +8,8 @@
 
 **Edge cases:**
 
-- Overspent: "You spent Rs 33,700 more than you earned", and the bar shows Spent 100%.
+- Overspent: "You spent Rs 33,700 more than you received", and the bar shows Spent 100%.
 - No income yet: no bar.
 - Portfolio fell: an arrow and a minus sign.
 - The net worth change always equals kept plus Portfolio moved.
-- Earned and Spent open Spending. Portfolio moved opens Portfolio.
+- Received and Spent open Spending. Portfolio moved opens Portfolio.
