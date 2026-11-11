@@ -12,6 +12,7 @@ import {
   Plus,
   ReceiptText,
 } from "lucide-react";
+import Image from "next/image";
 import {
   type ReactElement,
   type ReactNode,
@@ -30,8 +31,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import logoIcon from "@/logo/final/1-gold-light-text/assetment-gold-light-text-icon.svg";
+import logo from "@/logo/final/1-gold-light-text/assetment-gold-light-text-logo.svg";
 import { AmountsContext } from "./amounts";
-import { DISPLAY } from "./display";
 import { ProfileMenu } from "./profile-menu";
 import { ScreenLink } from "./screen-link";
 import { useSidebarCollapsed } from "./use-sidebar-collapsed";
@@ -181,16 +183,21 @@ export function AppShell({
                 collapsed ? "w-20 items-center px-2" : "w-56 px-4",
               )}
             >
-              {!collapsed && (
-                <p
-                  data-slot="brand"
-                  className={cn(
-                    DISPLAY,
-                    "truncate px-3 text-lg font-semibold tracking-tight",
-                  )}
-                >
-                  Assetment
-                </p>
+              {/* The sidebar is ink in both themes, so it takes the logo for dark backgrounds. The rail has room for the A only, at the same size. */}
+              {collapsed ? (
+                <Image
+                  src={logoIcon}
+                  alt="Assetment"
+                  loading="eager"
+                  className="size-10 shrink-0"
+                />
+              ) : (
+                <Image
+                  src={logo}
+                  alt="Assetment"
+                  loading="eager"
+                  className="ml-3 h-7 w-auto self-start"
+                />
               )}
               {collapsed ? (
                 <SideTooltip label={`Add · ${NOT_BUILT.toLowerCase()}`}>
