@@ -11,5 +11,5 @@
 - Data comes from `fixtures/`: realistic Pakistani data (PKR, JazzCash, Easypaisa, PSX tickers, gold in tola, committees). No real APIs, env vars or auth.
 - Variants: at most 3, structurally different, via `?variant=`. Delete the losers once one is chosen.
 - Open questions go in the header comment of `scenarios.ts`.
-- Check every scenario against the [UI/UX rules](../docs/ui-ux-rules.md) at 320, 375, 768, 1280 and 1920 px. `node prototypes/kit/screenshots.mts` takes the screenshots.
+- Check every scenario against the [UI/UX rules](../docs/ui-ux-rules.md) at 320, 375, 768, 1280 and 1920 px, in light and dark. `node prototypes/kit/screenshots.mts` takes the screenshots of both.
 - Before saying a task is done, run `pnpm proto:check`.

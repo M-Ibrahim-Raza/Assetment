@@ -9,7 +9,7 @@ import type { Dashboard, DashboardViewProps } from "./scenarios";
 import { ChecksBlock } from "./checks-block";
 import { MonthBlock } from "./month-block";
 import { NetWorthHero } from "./net-worth-hero";
-import { BLOCK, DISPLAY, HeroBlock, PAD } from "./parts";
+import { BLOCK, DISPLAY, HeroBlock, INK, PAD } from "./parts";
 import { RecentBlock } from "./recent-block";
 import { SpendingBlock } from "./spending-block";
 
@@ -137,11 +137,9 @@ function LoadingBlocks() {
             <Skeleton className="h-3 w-20" />
             <Skeleton className="h-6 w-28 max-w-full" />
           </div>
-          <div
-            className={cn("flex flex-col gap-2 bg-foreground py-5", BLOCK, PAD)}
-          >
-            <Skeleton className="h-3 w-20 bg-background/20" />
-            <Skeleton className="h-6 w-28 max-w-full bg-background/20" />
+          <div className={cn("flex flex-col gap-2 py-5", INK, BLOCK, PAD)}>
+            <Skeleton className="h-3 w-20 bg-(--ink-foreground)/20" />
+            <Skeleton className="h-6 w-28 max-w-full bg-(--ink-foreground)/20" />
           </div>
         </div>
       </div>

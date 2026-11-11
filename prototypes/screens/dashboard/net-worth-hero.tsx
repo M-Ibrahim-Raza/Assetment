@@ -11,7 +11,7 @@ import {
   formatSignedPkr,
 } from "@proto/kit/format";
 import type { NetWorth } from "./scenarios";
-import { BLOCK, DISPLAY, EYEBROW, HeroBlock, PAD } from "./parts";
+import { BLOCK, DISPLAY, EYEBROW, HeroBlock, INK, PAD } from "./parts";
 
 /**
  * A type size that keeps the headline amount on one line, from a 320 px phone up. It steps with
@@ -105,7 +105,7 @@ export function NetWorthHero({ netWorth }: { netWorth: NetWorth }) {
           value={-netWorth.debts}
           signed
           // The ink tile is the one away from the sidebar, which is ink too.
-          className="bg-foreground text-background"
+          className={INK}
         />
       </div>
     </>

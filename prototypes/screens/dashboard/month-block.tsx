@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Money } from "@proto/components/amounts";
 import { ScreenLink } from "@proto/components/screen-link";
 import type { MonthStory } from "./scenarios";
-import { BLOCK, DISPLAY, EYEBROW, PAD } from "./parts";
+import { BLOCK, DISPLAY, EYEBROW, INK, PAD } from "./parts";
 
 interface MonthBlockProps {
   month: MonthStory;
@@ -65,7 +65,8 @@ export function MonthBlock({ month, netWorthChange }: MonthBlockProps) {
       </div>
       <p
         className={cn(
-          "flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 bg-foreground py-4 text-background",
+          "flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 py-4",
+          INK,
           PAD,
         )}
       >
@@ -93,7 +94,7 @@ function SplitBar({ spentShare }: { spentShare: number }) {
     <div className="flex flex-col gap-2">
       <div aria-hidden="true" className="flex h-6 gap-1">
         <div
-          className={cn("bg-foreground", BLOCK)}
+          className={cn("bg-(--ink)", BLOCK)}
           style={{ width: `${String(spent)}%` }}
         />
         <div

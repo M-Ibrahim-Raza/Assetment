@@ -21,6 +21,9 @@ export const PAD = "px-4 md:px-10";
 /** Every block's corners, from theme.css. Blocks sit `gap-3` apart, so each section reads as its own. */
 export const BLOCK = "rounded-(--block-radius)";
 
+/** An ink field and its text, from theme.css: the Debts tile and the net worth bar. */
+export const INK = "bg-(--ink) text-(--ink-foreground)";
+
 /**
  * The primary-colour field at the top of the screen. It carries the wordmark and the shell's
  * actions, because this layout has no header row. It is a size container, so the headline can
@@ -29,9 +32,10 @@ export const BLOCK = "rounded-(--block-radius)";
 export function HeroBlock({ children }: { children: ReactNode }) {
   return (
     // Focus rings in here are drawn in the text colour: the usual ring colour is the field's own.
+    // Secondary buttons take the hero's own button colours, which stay light at night.
     <section
       className={cn(
-        "@container bg-primary text-primary-foreground [--ring:var(--primary-foreground)]",
+        "@container bg-primary text-primary-foreground [--ring:var(--primary-foreground)] [--secondary-foreground:var(--hero-action-foreground)] [--secondary:var(--hero-action)]",
         BLOCK,
       )}
     >

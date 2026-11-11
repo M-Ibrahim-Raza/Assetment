@@ -4,7 +4,6 @@ import {
   ChartPie,
   ChevronLeft,
   ChevronRight,
-  CircleUserRound,
   CreditCard,
   Eye,
   EyeOff,
@@ -33,6 +32,7 @@ import {
 import { cn } from "@/lib/utils";
 import { AmountsContext } from "./amounts";
 import { DISPLAY } from "./display";
+import { ProfileMenu } from "./profile-menu";
 import { ScreenLink } from "./screen-link";
 import { useSidebarCollapsed } from "./use-sidebar-collapsed";
 
@@ -287,8 +287,8 @@ export function AppShell({
 }
 
 /**
- * The switch that hides amounts, and the profile button. The shell's header shows them. A screen
- * that runs edge to edge places them itself.
+ * The switch that hides amounts, and the profile button with its panel (theme, settings). The
+ * shell's header shows them. A screen that runs edge to edge places them itself.
  */
 export function ShellActions() {
   const amounts = use(AmountsContext);
@@ -303,15 +303,7 @@ export function ShellActions() {
       >
         {amounts.hidden ? <EyeOff /> : <Eye />}
       </Button>
-      <Button
-        variant="ghost"
-        size="icon-lg"
-        aria-label="Profile and settings"
-        aria-disabled="true"
-        title={NOT_BUILT}
-      >
-        <CircleUserRound />
-      </Button>
+      <ProfileMenu />
     </div>
   );
 }
