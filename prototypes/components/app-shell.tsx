@@ -2,6 +2,8 @@
 
 import {
   ChartPie,
+  ChevronLeft,
+  ChevronRight,
   CircleUserRound,
   CreditCard,
   Eye,
@@ -11,13 +13,28 @@ import {
   Plus,
   ReceiptText,
 } from "lucide-react";
-import { type ReactNode, use, useState } from "react";
+import {
+  type ReactElement,
+  type ReactNode,
+  use,
+  useEffect,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { Button } from "@/components/ui/button";
+import { Kbd } from "@/components/ui/kbd";
 import { Toaster } from "@/components/ui/sonner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { AmountsContext } from "./amounts";
 import { DISPLAY } from "./display";
 import { ScreenLink } from "./screen-link";
+import { useSidebarCollapsed } from "./use-sidebar-collapsed";
 
 export type TabKey = "home" | "spending" | "portfolio" | "debts";
 
@@ -55,6 +72,20 @@ const DEBTS: Tab = {
 };
 const TABS = [HOME, SPENDING, PORTFOLIO, DEBTS];
 
+// Only from tablet width up: phones have no sidebar.
+const HAS_SIDEBAR = "(min-width: 768px)";
+
+const noSubscription = () => () => undefined;
+
+/** "⌘B" on Apple devices, "Ctrl+B" elsewhere. The server, which can't tell, says "Ctrl+B". */
+function useShortcutLabel(): string {
+  return useSyncExternalStore(
+    noSubscription,
+    () => (/Mac|iPhone|iPad/.test(navigator.userAgent) ? "⌘B" : "Ctrl+B"),
+    () => "Ctrl+B",
+  );
+}
+
 // Shown on controls whose screen isn't in the prototype yet. They look real, so the shell can be judged.
 const NOT_BUILT = "Not built yet";
 
@@ -82,6 +113,33 @@ export function AppShell({
   children,
 }: AppShellProps) {
   const [amountsHidden, setAmountsHidden] = useState(false);
+  const [collapsed, setCollapsed] = useSidebarCollapsed();
+  const toggleLabel = collapsed ? "Expand sidebar" : "Collapse sidebar";
+  const shortcut = useShortcutLabel();
+
+  // Ctrl+B or ⌘B toggles the sidebar, as in most apps with one. It takes the key over from the browser.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== "b") return;
+      if (!(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey) {
+        return;
+      }
+      // In rich text, the same keys mean bold.
+      if (
+        event.target instanceof HTMLElement &&
+        event.target.isContentEditable
+      ) {
+        return;
+      }
+      if (!window.matchMedia(HAS_SIDEBAR).matches) return;
+      event.preventDefault();
+      setCollapsed(!collapsed);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [collapsed, setCollapsed]);
   const amounts = {
     hidden: amountsHidden,
     toggle: () => {
@@ -92,42 +150,89 @@ export function AppShell({
   return (
     <AmountsContext value={amounts}>
       <div className="flex flex-1">
-        {/* Focus rings inside the sidebar use its own ring colour, which is chosen to show on it. */}
-        <aside className="sticky top-0 hidden h-svh w-56 shrink-0 flex-col gap-6 border-r border-sidebar-border bg-sidebar p-4 text-sidebar-foreground [--ring:var(--sidebar-ring)] md:flex">
-          <p
-            data-slot="brand"
-            className={cn(DISPLAY, "px-3 text-lg font-semibold tracking-tight")}
-          >
-            Assetment
-          </p>
-          <Button
-            size="lg"
-            aria-disabled="true"
-            title={NOT_BUILT}
-            className="justify-start"
-          >
-            <Plus data-icon="inline-start" />
-            Add
-          </Button>
-          <nav aria-label="Main" className="flex flex-col gap-1">
-            {TABS.map((tab) => (
-              <ScreenLink
-                key={tab.key}
-                screen={tab.screen}
-                current={tab.key === current}
+        <TooltipProvider>
+          {/* The sidebar and its edge handle. The handle sits outside the sidebar, which clips while its width animates. */}
+          <div className="sticky top-0 z-20 hidden h-svh shrink-0 md:block">
+            <SideTooltip
+              label={
+                <>
+                  {toggleLabel} <Kbd>{shortcut}</Kbd>
+                </>
+              }
+            >
+              <Button
+                variant="outline"
+                size="icon-xs"
+                aria-label={toggleLabel}
+                aria-keyshortcuts="Control+B Meta+B"
+                onClick={() => {
+                  setCollapsed(!collapsed);
+                }}
+                // A 24 px circle on the edge. Its invisible hit area grows up, down and outward, never over the + on the rail.
+                className="absolute top-5 -right-3 z-10 rounded-full bg-card shadow-sm before:absolute before:-inset-y-2 before:-right-2 before:left-0"
+              >
+                {collapsed ? <ChevronRight /> : <ChevronLeft />}
+              </Button>
+            </SideTooltip>
+            {/* Focus rings inside the sidebar use its own ring colour, which is chosen to show on it. */}
+            <aside
+              className={cn(
+                "flex h-full flex-col gap-6 overflow-hidden border-r border-sidebar-border bg-sidebar py-4 text-sidebar-foreground transition-[width] duration-200 ease-out [--ring:var(--sidebar-ring)] motion-reduce:transition-none",
+                collapsed ? "w-20 items-center px-2" : "w-56 px-4",
+              )}
+            >
+              {!collapsed && (
+                <p
+                  data-slot="brand"
+                  className={cn(
+                    DISPLAY,
+                    "truncate px-3 text-lg font-semibold tracking-tight",
+                  )}
+                >
+                  Assetment
+                </p>
+              )}
+              {collapsed ? (
+                <SideTooltip label={`Add · ${NOT_BUILT.toLowerCase()}`}>
+                  <Button
+                    size="icon-lg"
+                    aria-label="Add"
+                    aria-disabled="true"
+                    className="rounded-full"
+                  >
+                    <Plus />
+                  </Button>
+                </SideTooltip>
+              ) : (
+                <Button
+                  size="lg"
+                  aria-disabled="true"
+                  title={NOT_BUILT}
+                  className="justify-start"
+                >
+                  <Plus data-icon="inline-start" />
+                  Add
+                </Button>
+              )}
+              <nav
+                aria-label="Main"
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm",
-                  tab.key === current
-                    ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
+                  "flex flex-col gap-1",
+                  collapsed && "w-full gap-2",
                 )}
               >
-                <tab.icon aria-hidden="true" className="size-4 shrink-0" />
-                {tab.label}
-              </ScreenLink>
-            ))}
-          </nav>
-        </aside>
+                {TABS.map((tab) => (
+                  <SideNavItem
+                    key={tab.key}
+                    tab={tab}
+                    current={current}
+                    collapsed={collapsed}
+                  />
+                ))}
+              </nav>
+            </aside>
+          </div>
+        </TooltipProvider>
 
         <div className="flex min-w-0 flex-1 flex-col">
           {bleed ? (
@@ -208,6 +313,74 @@ export function ShellActions() {
         <CircleUserRound />
       </Button>
     </div>
+  );
+}
+
+/** A tooltip to the right of an icon-only sidebar control, on hover or keyboard focus. */
+function SideTooltip({
+  label,
+  children,
+}: {
+  label: ReactNode;
+  children: ReactElement;
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger render={children} />
+      <TooltipContent side="right">{label}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+interface SideNavItemProps {
+  tab: Tab;
+  current: TabKey;
+  /** The rail: the icon with its name in small text under it, like the phone tab bar. */
+  collapsed: boolean;
+}
+
+function SideNavItem({ tab, current, collapsed }: SideNavItemProps) {
+  const active = tab.key === current;
+
+  if (!collapsed) {
+    return (
+      <ScreenLink
+        screen={tab.screen}
+        current={active}
+        className={cn(
+          "flex items-center gap-3 rounded-lg px-3 py-2 text-sm",
+          active
+            ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+            : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
+        )}
+      >
+        <tab.icon aria-hidden="true" className="size-4 shrink-0" />
+        {tab.label}
+      </ScreenLink>
+    );
+  }
+  // Names are always visible, so touch users don't need a tooltip.
+  return (
+    <ScreenLink
+      screen={tab.screen}
+      current={active}
+      className={cn(
+        "group flex min-w-0 flex-col items-center gap-1 rounded-lg text-xs",
+        active
+          ? "font-medium text-sidebar-accent-foreground"
+          : "text-sidebar-foreground/70 hover:text-sidebar-foreground",
+      )}
+    >
+      <span
+        className={cn(
+          "flex h-8 w-12 items-center justify-center rounded-full",
+          active ? "bg-sidebar-accent" : "group-hover:bg-sidebar-accent/60",
+        )}
+      >
+        <tab.icon aria-hidden="true" className="size-5" />
+      </span>
+      <span className="max-w-full truncate">{tab.label}</span>
+    </ScreenLink>
   );
 }
 

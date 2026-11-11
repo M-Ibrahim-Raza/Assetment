@@ -8,6 +8,10 @@
 // - "Still right" on a balance check removes it at once, with an Undo toast.
 // - Home shows only the Portfolio total. The four groups are on the Portfolio tab.
 //
+// The sidebar collapses to an icon rail (added after finalizing), with a round handle on its edge
+// or Ctrl/⌘ + B. The rail shows small names under the icons, so it works on touch. Tablets start
+// with the rail and desktops with the full sidebar, until the user chooses; the browser remembers.
+//
 // Open questions (write them here while exploring, resolve them in /prototype-finalize):
 // None.
 
