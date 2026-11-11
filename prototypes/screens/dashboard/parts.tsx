@@ -43,7 +43,7 @@ export function HeroBlock({ children }: { children: ReactNode }) {
         className={cn("flex flex-col gap-6 pt-4 pb-8 md:pt-6 md:pb-10", PAD)}
       >
         <div className="flex items-center justify-between gap-3 md:justify-end">
-          {/* The sidebar shows the name from tablet width up. */}
+          {/* The sidebar shows the logo from tablet width up. */}
           <p
             className={cn(
               DISPLAY,
