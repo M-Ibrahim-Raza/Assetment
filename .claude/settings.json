@@ -1,5 +1,14 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Read(./tasks.md)",
+      "Edit(./tasks.md)",
+      "Read(./.env)",
+      "Read(./.env.local)",
+      "Read(./**/*.pem)"
+    ]
+  },
   "hooks": {
     "PostToolUse": [
       {
