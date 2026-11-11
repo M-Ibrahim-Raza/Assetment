@@ -1,0 +1,11 @@
+/*
+ * The prototype's stylesheet: production's theme and tokens, then the chosen look on top of them
+ * (theme.css), until F06 moves that look into production.
+ *
+ * Tailwind only scans the app it builds, which here is prototypes/. The prototype also renders
+ * production UI (components/ui, shipped Views), so it must scan the repo root too. Without this,
+ * classes used only in production files are never generated.
+ */
+@import "../../app/globals.css";
+@import "./theme.css";
+@source "../../";

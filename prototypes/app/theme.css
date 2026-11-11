@@ -1,0 +1,48 @@
+/*
+ * The prototype's look, chosen on the Dashboard ("Rounded blocks", 2026-11-11). It overrides the
+ * stock shadcn values in app/globals.css for the whole prototype. Production takes these values
+ * when F06 (app shell and look) is built.
+ *
+ * Bottle green for the headline block, bars and Add; sage for the month block; near-black ink for
+ * the sidebar, the Debts tile and totals; white blocks on a mist page (a faint cool green-grey).
+ * `--font-display` is the heavy face for headings and headline numbers.
+ */
+:root {
+  --background: oklch(0.955 0.01 170);
+  --foreground: oklch(0.22 0.025 165);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.025 165);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.025 165);
+  --primary: oklch(0.43 0.1 158);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.89 0.025 165);
+  --secondary-foreground: oklch(0.22 0.025 165);
+  --muted: oklch(0.95 0.01 170);
+  --muted-foreground: oklch(0.45 0.02 165);
+  --accent: oklch(0.89 0.025 165);
+  --accent-foreground: oklch(0.32 0.08 158);
+  --destructive: oklch(0.51 0.2 27);
+  --gain: oklch(0.46 0.11 155);
+  --loss: oklch(0.5 0.19 27);
+  --border: oklch(0.9 0.01 170);
+  --input: oklch(0.9 0.01 170);
+  --ring: oklch(0.43 0.1 158);
+  --chart-1: oklch(0.43 0.1 158);
+  --chart-2: oklch(0.22 0.025 165);
+  --chart-3: oklch(0.89 0.025 165);
+  --chart-4: oklch(0.65 0.1 158);
+  --chart-5: oklch(0.6 0.02 165);
+  --radius: 1rem;
+  /* The corners of the big blocks on a screen, such as Home's net worth and month blocks. */
+  --block-radius: 1.5rem;
+  --font-display: var(--font-bricolage);
+  --sidebar: oklch(0.22 0.025 165);
+  --sidebar-foreground: oklch(0.97 0.01 170);
+  --sidebar-primary: oklch(0.43 0.1 158);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.32 0.03 165);
+  --sidebar-accent-foreground: oklch(0.99 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.8 0.1 158);
+}
