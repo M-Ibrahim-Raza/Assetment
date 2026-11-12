@@ -11,6 +11,7 @@
 - It opens over the screen the user is on: the whole screen on phones, a centred box on desktop. ✕ and Esc close it; a tap outside doesn't. Every later form uses this panel.
 - The kinds are Spent, Received and Moved, with Spent first. Colour says the kind: ink, bottle green, sage. Switching keeps the amount, the day and the note.
 - The kind lives in the link: `/add`, `/add?kind=income`, `/add?kind=transfer`. Switching adds no Back steps. An unknown kind opens on Spent.
+- The amount sits on a line, like on a cheque, with no box. The line is faint at rest and solid while typing. With an error it stays the text colour, as red is too faint on the colour block, and the message under it says what is wrong.
 - The line under the amount says what is being saved, such as "Careem · JazzCash", so it can be checked while the keypad covers the fields. Large amounts show the lakh or crore note.
 - The account shows its balance and what it will be after this entry. More than it holds is a warning, not a block.
 - The most used categories and accounts show as chips, the rest under More. Date: Today, Yesterday, or another day from the device's own picker. The note is optional and becomes the entry's name.

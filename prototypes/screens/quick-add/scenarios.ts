@@ -8,6 +8,8 @@
 // - It opens over the screen the user is on: full height on phones, a centred box on desktop.
 //   After Save it closes and the user is back where they were. Every later form copies this.
 // - The amount is the hero, on a block in the kind's colour, with the keypad open at once.
+// - The amount sits on a line, like on a cheque, with no box: faint at rest, solid while typing.
+//   "Rs" is smaller than the number, on its baseline, so the amount leads.
 // - A row of usuals sits above the amount, where it stays in view while the phone's keypad is up.
 //   A tap fills the category and account, and offers last time's amount as "Rs 680 again"
 //   without filling it in.

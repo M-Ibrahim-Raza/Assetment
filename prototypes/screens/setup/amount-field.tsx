@@ -71,18 +71,30 @@ export function AmountField({
       <FieldLabel htmlFor={id} className={cn(labelHidden && "sr-only")}>
         {label}
       </FieldLabel>
-      {/* The classes below size the field for the wizard: a look still being chosen in the prototype. */}
+      {/*
+        The big field is a ledger line, like the line on a cheque: no box and no ring. The line is
+        faint at rest and turns solid while you type, which is the focus cue. With an error it stays
+        the text colour, because red is too faint on a colour field, and the message carries the error.
+        The shadow thickens the line without moving the layout.
+      */}
       <InputGroup
         className={cn(
           big
-            ? "h-auto rounded-none border-0 border-b-2 border-current dark:bg-transparent"
+            ? cn(
+                "h-auto items-baseline rounded-none border-0 border-b border-current/50 dark:bg-transparent",
+                "has-[[data-slot=input-group-control]:focus-visible]:border-current has-[[data-slot=input-group-control]:focus-visible]:shadow-[0_1px_0_0_currentColor] has-[[data-slot=input-group-control]:focus-visible]:ring-0",
+                "has-[[data-slot][aria-invalid=true]]:border-current has-[[data-slot][aria-invalid=true]]:ring-0",
+                "has-[>[data-align=inline-start]]:[&>input]:pl-1",
+              )
             : "h-12",
         )}
       >
         <InputGroupAddon
           className={cn(
             onField && "text-current",
-            big && cn(DISPLAY, "pl-0 text-2xl font-extrabold sm:text-3xl"),
+            // Quieter than the number, on its baseline, so the amount leads.
+            big &&
+              cn(DISPLAY, "px-0 text-xl font-semibold opacity-80 sm:text-2xl"),
           )}
         >
           Rs
