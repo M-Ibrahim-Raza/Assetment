@@ -282,6 +282,15 @@ function Wizard({ setup }: { setup: Setup }) {
   };
   const isAdded = (thing: Thing) => addedUnder(thing).count > 0;
 
+  /** What a step adds up to, from its things. Null while nothing is added to it. */
+  const totalOf = (group: SetupGroup): number | null => {
+    const added = ALL_THINGS.filter((thing) => groupOf(thing) === group).map(
+      addedUnder,
+    );
+    if (added.every((each) => each.count === 0)) return null;
+    return sum(added.map((each) => each.total));
+  };
+
   /**
    * A question about one thing, on a white card under the step bar. A step that holds more than
    * one ticked thing lists them as pills under the bar.
@@ -303,6 +312,7 @@ function Wizard({ setup }: { setup: Setup }) {
               }}
               onBack={onBack}
               soFar={state.netWorth}
+              totalOf={totalOf}
             />
             {parts.length > 1 && (
               <Parts

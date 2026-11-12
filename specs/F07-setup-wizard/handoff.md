@@ -14,7 +14,7 @@
 - The step bar shows only the groups with something ticked, so at most 5. Tapping a step opens it. A group gets its tick when the user leaves it, even through "Skip for now".
 - A step with 2 or more ticked tiles shows them as pills under the bar. A pill gets a tick once something is added under it, and tapping it opens it.
 - Step headings name the user's own things, such as "Your gold and silver" or "Balance in HBL Current today". They don't ask "How much … do you have?", which can sound like the app wants to know the user's wealth.
-- "So far" shows the running net worth at the end of the bar, hidden at zero. On phones it drops under the step count.
+- "So far" shows the running net worth at the end of the bar, hidden at zero. Each step's total sits under its name in quieter text once something is added, with debts as a minus. On phones the names are hidden, so the current step's total and "So far" share one line under the step count.
 - Back on the first question returns to the board. The place is in the URL, so browser Back and reload keep it.
 - "Finish later" goes to Home at any point. Coming back shows "Welcome back" on the step where the user left.
 - A half-done setup shows in Home's Things to check as "Finish setting up: gold and debts left". That item isn't in Home's prototype yet.
