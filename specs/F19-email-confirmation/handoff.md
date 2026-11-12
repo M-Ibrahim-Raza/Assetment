@@ -12,5 +12,5 @@
 - "Send it again" sends a new link, with a toast.
 - "Wrong email? Change it" opens the email field in place. "Send the link there" updates the account's email and sends a new link. It doesn't go back to the form: the account already exists.
 - An old link shows "This link has expired", one line on why, "Send a new link", and "Carry on with setup".
-- The first session works before the email is confirmed. Signing in again needs it confirmed, through Better Auth's own check. The spec confirms that check doesn't also block the first session.
+- The first session works before the email is confirmed. Signing in again needs it confirmed, through Better Auth's own check. The spec confirms that check doesn't also block the first session. If it needs a different setup from `tech-stack.md`'s "Require email verification", record it with `/new-adr` and update that note in the same change.
 - A long email breaks anywhere, so a 320 px phone never scrolls sideways.
