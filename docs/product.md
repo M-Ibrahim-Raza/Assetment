@@ -17,7 +17,7 @@ People who track their money in a spreadsheet run into these problems. The last 
 **Salaried investor (Pakistan, 25–40)**
 
 - **Who:** a salaried professional. Salary lands in a bank account. Spends by card, wallet (JazzCash, Easypaisa) and cash.
-- **Owns and owes:** bank and wallet balances, some gold, PSX stocks or mutual funds, maybe a plot. Debts such as a loan, a card balance or a committee.
+- **Owns and owes:** bank and wallet balances, some gold, PSX stocks or mutual funds, maybe a plot, maybe money lent to family. Debts such as a loan, a card balance or a committee.
 - **Trying to:** know their net worth and where their money goes.
 - **Today:** a spreadsheet kept by hand.
 - **Frustration:** falls behind on logging, and can't see net worth without updating many cells.

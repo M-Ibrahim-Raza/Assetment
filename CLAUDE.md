@@ -12,6 +12,7 @@ Rules for all content Claude writes in this repo (docs, specs, plans, tasks, not
 - `docs/product.md`: what the app is, who it's for and why.
 - `docs/journeys/`: one file per main user journey, step by step, with screens and features.
 - `docs/features.md`: feature list and the progress board.
+- `docs/money-model.md`: how owned and owed amounts move, such as debts, money lent and payments.
 - `specs/<feature>/handoff.md`: what the prototype decided for each Must feature.
 - `prototypes/`: the living UI prototype, one folder per screen.
 - `docs/adr/`: important decisions, one file each. Tool choices go in `docs/tech-stack.md`.
@@ -25,7 +26,8 @@ Before you draft `specs/<feature>/spec.md`, read:
 1. `docs/product.md`
 2. The feature's row in `docs/features.md` and its handoff note, `specs/<feature>/handoff.md`
 3. The feature's journey file in `docs/journeys/`
-4. The screen brief from `/prototype-spec <feature ID>`. It reads each screen in the handoff note, in `prototypes/screens/<screen>/` or its production View once shipped. Its Gaps become Open Questions.
+4. `docs/money-model.md`, if the feature touches money
+5. The screen brief from `/prototype-spec <feature ID>`. It reads each screen in the handoff note, in `prototypes/screens/<screen>/` or its production View once shipped. Its Gaps become Open Questions.
 
 Don't restate the product in the spec. Link to `docs/product.md` instead. After the spec is saved, set the feature's Status to `specified` in `docs/features.md`. Update it the same way after each later phase: `planned`, `tasked`, `implemented`, `reviewed`, `documented`, `done`. When the feature's doc is written, add its link in the Docs column.
 

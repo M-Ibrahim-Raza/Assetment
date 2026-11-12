@@ -7,6 +7,7 @@ What each file here is for and what goes in it.
 | `product.md` | One page on what the app is, who it's for and why |
 | `journeys/` | One file per main task users do, step by step, with the screen and features for each step |
 | `features.md` | Feature list and progress board |
+| `money-model.md` | How owned and owed amounts move: debts, money lent, payments and corrections |
 | `tech-stack.md` | Every tool, with its version, purpose, reason, alternatives and notes. Tool choices live here, not in ADRs |
 | `code-quality-stack.md` | The code quality tools picked for this app, their setup and where each check runs |
 | `code-quality-rules.md` | Code quality rules every AI agent follows. `CLAUDE.md` imports it |
@@ -58,6 +59,14 @@ The main tasks a user comes to the app to do. One file per journey, plus a `READ
 - **Screens:** prototype screen(s) it covers, with their URLs, e.g. `/dashboard`.
 - **Decisions:** the chosen variant and why, in one line.
 - **Edge cases:** odd situations noticed while clicking.
+
+## money-model.md
+
+The rules for how amounts move, one `##` section per kind of thing, such as Loans or Committees. Specs link to it instead of repeating the rules.
+
+- **In:** what each thing stores, what changes its amount, what counts as Spent or Received, and how net worth moves.
+- **Out:** screens and layout. They live in `prototypes/` and the handoff notes.
+- Update it whenever a decision changes how money moves.
 
 ## tech-stack.md
 

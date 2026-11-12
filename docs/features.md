@@ -23,3 +23,5 @@ What Assetment does, one row per feature. Columns and statuses: [README.md](READ
 | F17 | Receipt scan | [J2](journeys/J2-log-money.md) | Should | F14 | open | |
 | F18 | [Sign up](../specs/F18-sign-up/) | [J1](journeys/J1-set-up-net-worth.md) | Must | F06 | approved | |
 | F19 | [Email confirmation](../specs/F19-email-confirmation/) | [J1](journeys/J1-set-up-net-worth.md) | Must | F18 | approved | |
+| F20 | Money lent | [J1](journeys/J1-set-up-net-worth.md) | Must | F07 | open | |
+| F21 | Scheduled debt payments: committee drafts and automatic loan instalments | [J2](journeys/J2-log-money.md) | Must | F12, F03 | open | |

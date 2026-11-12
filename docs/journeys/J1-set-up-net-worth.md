@@ -12,4 +12,5 @@
 | 4 | Add PSX stocks and funds as buys | Setup | F07, F10 |
 | 5 | Add property and plots with a value entered by hand, and the price paid if known | Setup | F07, F11 |
 | 6 | Add debts: loans, card balances, committees | Setup | F07, F12 |
-| 7 | See today's net worth: Portfolio minus debts | Dashboard | F01 |
+| 7 | Add money lent to family or friends | Setup | F07, F20 |
+| 8 | See today's net worth: Portfolio minus debts | Dashboard | F01 |
