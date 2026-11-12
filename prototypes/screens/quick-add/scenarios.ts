@@ -35,8 +35,9 @@
 // - The row: up to 8 usuals of the selected kind, most used first. It is hidden before there is
 //   any history. The usual that matches the form shows pressed.
 // - On phones the row is a swipe strip (asked for by the user): it runs to the screen's edges, the
-//   third card peeks in, cards snap one by one, and there is no scrollbar. Wider screens show a
-//   grid of three.
+//   third card peeks in, cards snap one by one, and there is no scrollbar. An arrow at the right
+//   edge says there is more (also asked for): a tap scrolls two cards on. It hides at the end.
+//   Wider screens show a grid of three.
 // - A usual's own name ("Careem") goes in the note, so the entry is saved under it, unless the
 //   user typed a note of their own.
 // - The line under the amount says what is being saved ("Careem · JazzCash"), so it can be

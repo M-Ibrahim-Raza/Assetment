@@ -9,7 +9,7 @@
 **Edge cases:**
 
 - Up to 8 usuals of the selected kind, most used first. Before there is any history the row is hidden, and the category chips do the job.
-- On phones it is a swipe strip that runs to the screen's edges, with the third card peeking in and cards snapping one by one. Wider screens show a grid of three.
+- On phones it is a swipe strip that runs to the screen's edges, with the third card peeking in and cards snapping one by one. An arrow at the right edge shows there is more: a tap scrolls two cards on and keeps the keypad up. It hides at the end of the row, and when all the usuals fit. Wider screens show a grid of three.
 - A tap fills the category and account and keeps the keypad up. It offers last time's amount as "Rs 680 again" without filling it in. "Again" moves focus to Save.
 - The usual that matches the form shows pressed, also when the form opens on it. Changing the account by hand un-presses it.
 - The usual's name, such as "Careem", becomes the entry's name, unless the user typed a note of their own.

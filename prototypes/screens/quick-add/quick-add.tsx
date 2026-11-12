@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useState } from "react";
+import { ChevronRight } from "lucide-react";
+import { useEffect, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -149,10 +150,9 @@ function caption(form: EntryForm): string {
   return [...what, ...day].filter((part) => part !== "").join(" · ");
 }
 
-/** A card in the row: as wide as two and a bit fit on a 320 px phone, so the cut-off one hints at more. */
 /**
  * A card in the row. On phones each is 40% of the row, so two show whole and the third peeks in
- * from the screen's edge: the cue that the row swipes.
+ * from the screen's edge. The arrow over that edge says plainly that the row swipes.
  */
 const CARD = cn(
   "h-auto w-2/5 max-w-44 min-w-32 shrink-0 snap-start flex-col items-start justify-start gap-0.5 rounded-xl bg-card px-3 py-2 text-left",
@@ -186,6 +186,8 @@ interface UsualsRowProps {
  */
 function UsualsRow({ usuals, current, form, onPick }: UsualsRowProps) {
   const labelId = useId();
+  const [box, setBox] = useState<HTMLDivElement | null>(null);
+  const more = useMoreToTheRight(box);
   if (usuals.length === 0) return null;
   const nameOf = (id: string) =>
     form.places.find((place) => place.id === id)?.name ?? "";
@@ -195,43 +197,120 @@ function UsualsRow({ usuals, current, form, onPick }: UsualsRowProps) {
       <h3 id={labelId} className={cn(EYEBROW, "px-1")}>
         Your usuals
       </h3>
-      <ToggleGroup
-        aria-labelledby={labelId}
-        variant="outline"
-        value={current === undefined ? [] : [current.id]}
-        onValueChange={(value) => {
-          // Tapping the pressed one again picks it again, so its last amount is offered.
-          const usual =
-            usuals.find((candidate) => candidate.id === value[0]) ?? current;
-          if (usual !== undefined) onPick(usual);
-        }}
-        className={ROW}
-      >
-        {usuals.map((usual) => (
-          <ToggleGroupItem
-            key={usual.id}
-            value={usual.id}
-            className={CARD}
-            // Focus stays in the amount field, so the keypad doesn't drop and come back on each tap.
-            onMouseDown={(event) => {
-              event.preventDefault();
+      <div ref={setBox} className="relative flex min-w-0 flex-col">
+        <ToggleGroup
+          aria-labelledby={labelId}
+          variant="outline"
+          value={current === undefined ? [] : [current.id]}
+          onValueChange={(value) => {
+            // Tapping the pressed one again picks it again, so its last amount is offered.
+            const usual =
+              usuals.find((candidate) => candidate.id === value[0]) ?? current;
+            if (usual !== undefined) onPick(usual);
+          }}
+          className={ROW}
+        >
+          {usuals.map((usual) => (
+            <ToggleGroupItem
+              key={usual.id}
+              value={usual.id}
+              className={CARD}
+              // Focus stays in the amount field, so the keypad doesn't drop and come back on each tap.
+              onMouseDown={(event) => {
+                event.preventDefault();
+              }}
+            >
+              <span className="w-full truncate font-semibold">
+                {usual.title}
+              </span>
+              <span className="w-full truncate text-xs opacity-80">
+                {usual.kind === "transfer"
+                  ? `To ${nameOf(usual.toAccount)}`
+                  : nameOf(usual.account)}
+              </span>
+              {/* Its own line, so it is never cut off: it is what "again" will offer. */}
+              <Money
+                value={usual.lastAmount}
+                className="w-full truncate text-xs font-medium"
+              />
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
+        {more && (
+          <MoreArrow
+            onClick={() => {
+              const row = box?.querySelector<HTMLElement>(ROW_SLOT);
+              const still = window.matchMedia(
+                "(prefers-reduced-motion: reduce)",
+              ).matches;
+              // About two cards on. The row snaps, so it stops on a card.
+              row?.scrollBy({
+                left: row.clientWidth * 0.8,
+                behavior: still ? "auto" : "smooth",
+              });
             }}
-          >
-            <span className="w-full truncate font-semibold">{usual.title}</span>
-            <span className="w-full truncate text-xs opacity-80">
-              {usual.kind === "transfer"
-                ? `To ${nameOf(usual.toAccount)}`
-                : nameOf(usual.account)}
-            </span>
-            {/* Its own line, so it is never cut off: it is what "again" will offer. */}
-            <Money
-              value={usual.lastAmount}
-              className="w-full truncate text-xs font-medium"
-            />
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+          />
+        )}
+      </div>
     </section>
+  );
+}
+
+const ROW_SLOT = "[data-slot=toggle-group]";
+
+/**
+ * Whether the row has cards past its right edge. Checked when the row scrolls, changes size, or
+ * gets other cards, as when the kind switch swaps them. From tablet width the row is a grid, so
+ * there is never more.
+ */
+function useMoreToTheRight(box: HTMLElement | null): boolean {
+  const [more, setMore] = useState(false);
+  useEffect(() => {
+    const row = box?.querySelector<HTMLElement>(ROW_SLOT);
+    if (row === null || row === undefined) return;
+    const check = () => {
+      setMore(row.scrollLeft + row.clientWidth < row.scrollWidth - 1);
+    };
+    // A ResizeObserver also reports once when it starts, which is the first check.
+    const resize = new ResizeObserver(check);
+    resize.observe(row);
+    const cards = new MutationObserver(check);
+    cards.observe(row, { childList: true });
+    row.addEventListener("scroll", check, { passive: true });
+    return () => {
+      resize.disconnect();
+      cards.disconnect();
+      row.removeEventListener("scroll", check);
+    };
+  }, [box]);
+  return more;
+}
+
+/**
+ * The arrow at the row's right edge on phones: a sign that the row swipes, and a tap scrolls it
+ * on. It is only for touch. Keyboard and screen reader users move through the cards themselves,
+ * which scrolls them into view, so it is hidden from both.
+ */
+function MoreArrow({ onClick }: { onClick: () => void }) {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-y-0 -right-3 flex w-14 items-center justify-end bg-linear-to-l from-background from-40% to-transparent pr-2 md:hidden"
+    >
+      <Button
+        type="button"
+        size="icon-lg"
+        tabIndex={-1}
+        className="pointer-events-auto rounded-full bg-foreground text-background shadow-md hover:bg-foreground/90"
+        // Focus stays in the amount field, so the keypad stays up, as with the cards.
+        onMouseDown={(event) => {
+          event.preventDefault();
+        }}
+        onClick={onClick}
+      >
+        <ChevronRight />
+      </Button>
+    </div>
   );
 }
 
