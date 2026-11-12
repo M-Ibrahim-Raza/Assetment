@@ -1,19 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { ReactNode, Ref } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
-import logoOnDarkIcon from "@/logo/final/1-gold-light-text/assetment-gold-light-text-icon.svg";
-import logoOnDark from "@/logo/final/1-gold-light-text/assetment-gold-light-text-logo.svg";
-import logoOnLightIcon from "@/logo/final/2-gold-ink-text/assetment-gold-ink-text-icon.svg";
-import logoOnLight from "@/logo/final/2-gold-ink-text/assetment-gold-ink-text-logo.svg";
 import { Money } from "@proto/components/amounts";
 import { BLOCK, EYEBROW, INK, PAD } from "@proto/components/blocks";
 import { DISPLAY } from "@proto/components/display";
+import { Logo } from "@proto/components/logo";
 import { ScreenLink } from "@proto/components/screen-link";
 import { formatLakhCrore, formatPkr } from "@proto/kit/format";
 import { CountUp } from "./count-up";
@@ -38,31 +34,7 @@ export function SetupFrame({ children }: { children: ReactNode }) {
     <div className="flex flex-1 flex-col">
       <header className="flex items-center justify-between gap-3 px-4 pt-3 md:px-6">
         <h1 className="sr-only">Set up your net worth</h1>
-        {/* The page is light by day and dark at night, so each has its own logo. Phones get the A alone. */}
-        <Image
-          src={logoOnLightIcon}
-          alt="Assetment"
-          loading="eager"
-          className="size-9 sm:hidden dark:hidden"
-        />
-        <Image
-          src={logoOnDarkIcon}
-          alt="Assetment"
-          loading="eager"
-          className="hidden size-9 dark:block dark:sm:hidden"
-        />
-        <Image
-          src={logoOnLight}
-          alt="Assetment"
-          loading="eager"
-          className="hidden h-7 w-auto sm:block dark:hidden dark:sm:hidden"
-        />
-        <Image
-          src={logoOnDark}
-          alt="Assetment"
-          loading="eager"
-          className="hidden h-7 w-auto dark:sm:block"
-        />
+        <Logo />
         <ScreenLink
           screen="Dashboard"
           className={buttonVariants({ variant: "ghost", size: "lg" })}
