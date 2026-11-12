@@ -8,4 +8,5 @@ export const screenRoutes: Readonly<Partial<Record<string, Route>>> = {
   Dashboard: "/dashboard",
   Setup: "/setup",
   "Quick add": "/add",
+  "Sign up": "/sign-up",
 };

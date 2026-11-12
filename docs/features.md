@@ -21,3 +21,5 @@ What Assetment does, one row per feature. Columns and statuses: [README.md](READ
 | F15 | [Your usuals](../specs/F15-your-usuals/) | [J2](journeys/J2-log-money.md) | Must | F14 | approved | |
 | F16 | [Card spending and debt payments](../specs/F16-card-spending-and-debt-payments/) | [J2](journeys/J2-log-money.md) | Must | F14, F12 | approved | |
 | F17 | Receipt scan | [J2](journeys/J2-log-money.md) | Should | F14 | open | |
+| F18 | [Sign up](../specs/F18-sign-up/) | [J1](journeys/J1-set-up-net-worth.md) | Must | F06 | approved | |
+| F19 | [Email confirmation](../specs/F19-email-confirmation/) | [J1](journeys/J1-set-up-net-worth.md) | Must | F18 | approved | |
