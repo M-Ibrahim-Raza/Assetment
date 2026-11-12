@@ -171,7 +171,7 @@ interface AmountQuestionProps {
   skip?: Skip | null;
 }
 
-/** How much is in it: one amount field and nothing else. The heading asks the question. */
+/** The amount in it: one amount field and nothing else. The heading names it. */
 export function AmountQuestion({
   draft,
   failed,
@@ -202,9 +202,7 @@ export function AmountQuestion({
   return (
     <>
       <h2 ref={heading} tabIndex={-1} className={TITLE}>
-        {cash
-          ? "How much cash do you have?"
-          : `How much is in ${draft.name} today?`}
+        {cash ? "Your cash in hand" : `Balance in ${draft.name} today`}
       </h2>
       <form noValidate onSubmit={submit} className="flex flex-col gap-6">
         {saveFailed && (
@@ -217,9 +215,7 @@ export function AmountQuestion({
         )}
         <AmountField
           id={id}
-          label={
-            cash ? "Cash you have today" : `Balance in ${draft.name} today`
-          }
+          label={cash ? "Cash in hand today" : `Balance in ${draft.name} today`}
           digits={digits}
           onDigits={setDigits}
           hint="Roughly is fine. You can correct it later."

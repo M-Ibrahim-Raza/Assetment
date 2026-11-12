@@ -102,29 +102,17 @@ const LIST_QUESTION: Readonly<Record<AccountKind, string>> = {
   cash: "Your cash in hand",
 };
 
-// The user said they have these, so each asks "which" or "how much", not "any".
+// The user said they have these, so each heading names theirs.
 const ITEM_QUESTION: Readonly<
   Record<ItemKind, { title: string; help: string }>
 > = {
-  metals: {
-    title: "How much gold and silver do you have?",
-    help: GROUP_HELP.metals,
-  },
-  stocks: {
-    title: "Which stocks and funds do you hold?",
-    help: GROUP_HELP.stocks,
-  },
-  property: { title: "What property do you own?", help: GROUP_HELP.property },
-  loan: {
-    title: "What loans do you have?",
-    help: "From a bank, a company or a person.",
-  },
-  card: {
-    title: "Which credit cards have a balance?",
-    help: "What you owe on each today.",
-  },
+  metals: { title: "Your gold and silver", help: GROUP_HELP.metals },
+  stocks: { title: "Your stocks and funds", help: GROUP_HELP.stocks },
+  property: { title: "Your property", help: GROUP_HELP.property },
+  loan: { title: "Your loans", help: "From a bank, a company or a person." },
+  card: { title: "Your credit cards", help: "What you owe on each today." },
   committee: {
-    title: "Which committees are you in?",
+    title: "Your committees",
     help: "The turns you still have to pay.",
   },
 };
@@ -598,7 +586,7 @@ function Board({
             What do you have?
           </h2>
           <p className="text-lg">
-            {"Tick what applies. We'll ask about those, one at a time."}
+            {"Tick what applies. You'll add those, one at a time."}
           </p>
         </div>
         <Tiles label="What you own" things={OWNED_THINGS} {...tiles} />
@@ -721,7 +709,7 @@ const WELCOME_STEPS = [
   },
   {
     title: "Add rough amounts",
-    line: "One question at a time. You can correct them later.",
+    line: "One at a time. You can correct them later.",
   },
   {
     title: "See your net worth",
@@ -752,7 +740,7 @@ function Welcome({ heading, onStart }: WelcomeProps) {
         </h2>
         <p className="max-w-md text-lg">
           {
-            "Your net worth is everything you own minus everything you owe. Tell us what you have, and we'll add it up."
+            "Your net worth is everything you own minus everything you owe. Note yours down, and we'll do the sum."
           }
         </p>
         <Button variant="secondary" className={BIG} onClick={onStart}>

@@ -10,7 +10,7 @@
 
 - Bank offers chips for Meezan Bank, HBL, UBL and others, or a typed name. Then it asks the amount, then "Any other bank account?".
 - Wallet works the same, with JazzCash, Easypaisa, SadaPay and NayaPay.
-- Cash asks only "How much cash do you have?", then moves on.
+- Cash shows only "Your cash in hand" and the amount field, then moves on.
 - The amount field opens the number keypad, adds commas as you type, shows the lakh or crore note, and takes a pasted "Rs 245,300". It allows up to 11 digits.
 - Field errors show only after Next, such as "Enter the balance. Use 0 if it's empty."
 - A failed save keeps the amount, says "We couldn't save HBL Current", and the button says Try again. A slow save shows "Saving…".
