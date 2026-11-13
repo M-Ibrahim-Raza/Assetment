@@ -3,7 +3,9 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { valueOf } from "@proto/components/metals/weight";
 import type { Account } from "@proto/fixtures/accounts";
+import type { MetalPiece } from "@proto/fixtures/metals";
 import type {
   AccountDraft,
   ItemKind,
@@ -33,6 +35,9 @@ export function useSetup(initial: Setup) {
   const [items, setItems] = useState(initial.items);
   const [answered, setAnswered] = useState(initial.answered);
   const [ticked, setTicked] = useState(initial.ticked);
+  // The general buy-back deduction, for jewellery saved without its own.
+  const deduction = initial.metalDeduction;
+  const rates = initial.metalRates;
 
   const cash = sum(accounts.map((account) => account.balance));
   const owned =
@@ -82,6 +87,22 @@ export function useSetup(initial: Setup) {
     ]);
   };
 
+  /** Adds a gold or silver piece, or changes the one with its id, worth its weight today. */
+  const saveMetal = (piece: MetalPiece) => {
+    const item: SetupItem = {
+      id: piece.id,
+      kind: "metals",
+      name: piece.name,
+      amount: valueOf(piece, rates, deduction),
+      piece,
+    };
+    setItems((current) =>
+      current.some((row) => row.id === piece.id)
+        ? current.map((row) => (row.id === piece.id ? item : row))
+        : [...current, item],
+    );
+  };
+
   const removeItem = (item: SetupItem) => {
     const index = items.findIndex((row) => row.id === item.id);
     setItems((current) => current.filter((row) => row.id !== item.id));
@@ -119,6 +140,13 @@ export function useSetup(initial: Setup) {
     owned,
     owed,
     netWorth: owned - owed,
+    /** Gold and silver, by weight, in the order they were added. */
+    pieces: items.flatMap((item) =>
+      item.piece === undefined ? [] : [item.piece],
+    ),
+    metalRates: rates,
+    deduction,
+    saveMetal,
     saveAccount,
     removeAccount,
     addSamples,

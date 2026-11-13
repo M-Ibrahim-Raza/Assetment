@@ -15,7 +15,8 @@ export const GROUP_LABEL: Readonly<Record<SetupGroup, string>> = {
 /** One line under the question, saying what counts. */
 export const GROUP_HELP: Readonly<Record<SetupGroup, string>> = {
   accounts: "Bank accounts, wallets and cash.",
-  metals: "Jewellery, bars and coins, by weight. We price them for you.",
+  metals:
+    "Jewellery, bars and coins. Enter the weight and we work out today's value.",
   stocks: "PSX shares and mutual funds, as buys.",
   property: "A house, a plot or a shop, at the value you give it.",
   debts: "Loans, card balances and committees.",

@@ -12,6 +12,7 @@ import { DISPLAY } from "@proto/components/display";
 import { ScreenLink } from "@proto/components/screen-link";
 import type { Account, AccountKind } from "@proto/fixtures/accounts";
 import { BIG, STEP_CARD, STEP_FOOTER } from "./look";
+import { MetalsStep } from "./metals-step";
 import {
   AmountQuestion,
   type Draft,
@@ -164,6 +165,7 @@ function pathOf(
   );
 }
 
+/** The View's props, plus the gold and silver form it asks with. Each variant passes its own. */
 /**
  * Setup as a personal path. A welcome, then a board of tiles where the user ticks what they have.
  * Then one question at a time about those only, on a white card under a named step bar. The net
@@ -208,6 +210,8 @@ function shownPlace(wanted: Place, draft: Draft | null): Place {
 
 function Wizard({ setup }: { setup: Setup }) {
   const state = useSetup(setup);
+  // A piece whose save failed or is saving. Once saved, coming back doesn't show it again.
+  const [metalsDraft, setMetalsDraft] = useState(setup.metalsDraft);
   const {
     place: wanted,
     go,
@@ -416,6 +420,26 @@ function Wizard({ setup }: { setup: Setup }) {
   const back = () => {
     go(backOf(thing));
   };
+
+  if (thing === "metals") {
+    return step(
+      thing,
+      back,
+      <MetalsStep
+        key={thing}
+        state={state}
+        draft={metalsDraft}
+        heading={heading}
+        nextLabel={nextLabel(thing)}
+        onSaved={() => {
+          setMetalsDraft(null);
+        }}
+        onDone={() => {
+          moveOn(thing);
+        }}
+      />,
+    );
+  }
 
   if (!isAccountKind(thing)) {
     return step(

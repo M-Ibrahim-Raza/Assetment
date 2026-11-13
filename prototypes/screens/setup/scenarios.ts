@@ -2,14 +2,39 @@
 // A welcome, a board to tick what they have, then one question at a time about those only, and
 // their net worth at the end. The place is in the URL (`?step=`). Features F07 and F08.
 //
-// Only the accounts step is a working form. Gold, stocks, property and debts are stand-ins that
-// add sample data, until their forms are designed here (F09 to F12).
+// The accounts step and the gold and silver step are working forms. Stocks, property and debts are
+// stand-ins that add sample data, until their forms are designed here (F10 to F12).
+//
+// F09, gold and silver by weight: "Add a piece" (it was variant d) won over Jeweller's slip, One at a
+// time and Piece by piece (prototypes/components/metals/). The `gold-` scenarios open on its step.
+// - One panel holds everything about a piece, open for the first one: name, gold or silver,
+//   jewellery or a bar or coin (21K and 24K at first), karat, and the weight in tola, masha and
+//   ratti, or grams. Today's value shows under the weight as it's typed.
+// - "I don't know the exact weight" opens a pop-up that asks for the exact weight first. A rough
+//   weight is the quieter way out: marked ≈, counted, and a Things to check reminder.
+// - When it was bought: the month and year (both or neither, with Today), then the price paid.
+//   The month's average Sarafa rate shows as the price is typed. A price under half or over 3
+//   times that gets a warning that never blocks saving.
+// - A deduction per piece, for jewellery only, starting at the last % typed.
+// - A summary: today's value, the cost (the price paid, or ≈ from the month's rate), and the
+//   profit or loss as of today. Saved pieces are rows with a total, and a row opens in place.
 //
 // Decided while finalizing, for the forms still to design:
 // - A committee counts by turn. Before your turn, what you've paid in is in Portfolio. After it,
 //   what's still to pay is in Debts. Its step asks whether your turn has come.
 // - Foreign-currency accounts are their own feature, F13. Setup is PKR only until then.
 // - A half-done setup shows in Home's Things to check: "Finish setting up: gold and debts left".
+//
+// Decided while finalizing F09 (handoff: specs/F09-gold-and-silver-by-weight/handoff.md):
+// - The typical weights for a rough guess stay, and get checked with a jeweller before launch.
+// - The last deduction % and the last unit are saved on the user's account.
+// - The ≈ reminder ("Get your wedding set weighed") is F03's item, built with Home's Things to check.
+// - With no rate at all, a piece saves by weight and is priced once the rate is in.
+// - Silver has one rate, as pure.
+// - The rate source, its daily refresh and how far back past rates go are for the spec and an ADR.
+//   A month uses its average rate.
+// - With no price and no date, profit counts from the day it's added: the cost is its value that
+//   day, after any deduction, so it starts at Rs 0.
 //
 // Open questions: None.
 
@@ -23,6 +48,14 @@ import {
   portfolioGroups,
   type PortfolioGroupKind,
 } from "@proto/fixtures/portfolio";
+import { valueOf } from "@proto/components/metals/weight";
+import {
+  metalPieces,
+  metalRates,
+  staleMetalRates,
+  type MetalPiece,
+  type MetalRates,
+} from "@proto/fixtures/metals";
 import type { Scenarios } from "@proto/kit/scenarios";
 
 /** The five things setup asks about, in order. */
@@ -48,6 +81,8 @@ export interface SetupItem {
   name: string;
   /** What it is worth today, or what is still owed, in whole rupees. */
   amount: number;
+  /** Gold and silver only: the piece by weight. Its amount is its value at the day's rate. */
+  piece?: MetalPiece;
 }
 
 /** What the user can tick on the board. */
@@ -76,6 +111,12 @@ export interface Setup {
   failedDraft: AccountDraft | null;
   /** True when the user comes back to a setup they left half-way. */
   resumed: boolean;
+  /** The day's Sarafa rates, per tola. */
+  metalRates: MetalRates;
+  /** The user's buy-back deduction on jewellery, as a share: 0.1 is 10%. 0 is the full rate. */
+  metalDeduction: number;
+  /** A gold or silver piece whose save failed, or is still saving. Its form shows it again. */
+  metalsDraft: { piece: MetalPiece; status: "failed" | "saving" } | null;
 }
 
 /** The View's props. Loading and error are states the View shows, so they are props too. */
@@ -96,12 +137,33 @@ const debtItems = (count: number): SetupItem[] =>
     amount: debt.owed,
   }));
 
-const gold: SetupItem = {
-  id: "item-gold",
+/** A piece as a setup item, worth its weight at the given rates. */
+const pieceItem = (
+  piece: MetalPiece,
+  rates: MetalRates = metalRates,
+  deduction = 0,
+): SetupItem => ({
+  id: piece.id,
   kind: "metals",
-  name: "Gold jewellery, 2 tola",
-  amount: worth("metals"),
-};
+  name: piece.name,
+  amount: valueOf(piece, rates, deduction),
+  piece,
+});
+
+// 2 tola of 22K at today's rate is Rs 912,000, and it cost what Home's Portfolio says it did.
+const gold = pieceItem({
+  id: "item-gold",
+  metal: "gold",
+  form: "jewellery",
+  name: "Gold jewellery",
+  karat: "22K",
+  tola: 2,
+  unit: "tola",
+  estimated: false,
+  paid: groups.find((group) => group.kind === "metals")?.cost ?? null,
+  cut: null,
+  bought: "2023-04",
+});
 
 // The same values Home's Portfolio uses, so a finished setup adds up to Home's net worth.
 const samples: SetupItem[] = [
@@ -144,6 +206,9 @@ const fresh: Setup = {
   samples,
   failedDraft: null,
   resumed: false,
+  metalRates,
+  metalDeduction: 0,
+  metalsDraft: null,
 };
 
 // A salaried investor part-way through the first step: the salary account and a wallet are in.
@@ -160,18 +225,7 @@ const heavy: Setup = {
   at: "accounts",
   accounts: accounts(12),
   items: [
-    {
-      id: "item-gold",
-      kind: "metals",
-      name: "Gold jewellery, 12 tola (wedding set, kept at Ammi's)",
-      amount: 5_472_000,
-    },
-    {
-      id: "item-silver",
-      kind: "metals",
-      name: "Silver, 40 tola",
-      amount: 328_000,
-    },
+    ...metalPieces(3).map((piece) => pieceItem(piece)),
     {
       id: "item-stocks",
       kind: "stocks",
@@ -217,6 +271,26 @@ const finished: Setup = {
   ticked: EVERYTHING,
 };
 
+// The gold and silver step, for comparing its forms. Typical's accounts are in, and the bar shows
+// Accounts, Gold and silver, and Debts.
+const onGold: Setup = { ...typical, at: "metals" };
+const twoPieces = metalPieces(2).map((piece) => pieceItem(piece));
+
+// Bangles of 2 tola 4 masha, typed in full, whose save didn't go through.
+const bangles: MetalPiece = {
+  id: "metal-draft",
+  metal: "gold",
+  form: "jewellery",
+  name: "Bangles",
+  karat: "21K",
+  tola: 2 + 4 / 12,
+  unit: "tola",
+  estimated: false,
+  paid: 980_000,
+  cut: null,
+  bought: "2025-08",
+};
+
 export const scenarios = {
   default: { status: "ready", setup: typical },
   empty: { status: "ready", setup: fresh },
@@ -231,6 +305,40 @@ export const scenarios = {
     },
   },
   loading: { status: "loading" },
+  gold: { status: "ready", setup: { ...onGold, items: twoPieces } },
+  "gold-empty": { status: "ready", setup: onGold },
+  "gold-many": {
+    status: "ready",
+    setup: {
+      ...onGold,
+      items: metalPieces(8).map((piece) => pieceItem(piece, metalRates, 0.1)),
+      metalDeduction: 0.1,
+    },
+  },
+  "gold-save-error": {
+    status: "ready",
+    setup: {
+      ...onGold,
+      items: twoPieces,
+      metalsDraft: { piece: bangles, status: "failed" },
+    },
+  },
+  "gold-saving": {
+    status: "ready",
+    setup: {
+      ...onGold,
+      items: twoPieces,
+      metalsDraft: { piece: bangles, status: "saving" },
+    },
+  },
+  "gold-stale-price": {
+    status: "ready",
+    setup: {
+      ...onGold,
+      items: metalPieces(2).map((piece) => pieceItem(piece, staleMetalRates)),
+      metalRates: staleMetalRates,
+    },
+  },
   error: {
     status: "error",
     message:

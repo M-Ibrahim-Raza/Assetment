@@ -5,6 +5,9 @@ import { SetupView } from "./setup";
 // Finalized on 2026-11-11: "Tick what you have" (it was variant C) won over Build your number and
 // One question at a time. It took A's named step bar and white card. Future changes go into this
 // one View.
+//
+// F09's gold and silver form: "Add a piece" (it was variant d) won over Jeweller's slip, One at a
+// time and Piece by piece. Their forms were deleted.
 export const variants = {
   a: { name: "Tick what you have", View: SetupView },
 } satisfies Variants<SetupViewProps>;
