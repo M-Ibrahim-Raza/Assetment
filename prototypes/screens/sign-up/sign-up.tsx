@@ -3,10 +3,15 @@
 import { cn } from "@/lib/utils";
 import { BLOCK, EYEBROW, HEADING, PAD } from "@proto/components/blocks";
 import { DISPLAY } from "@proto/components/display";
+import { ScreenLink } from "@proto/components/screen-link";
+import {
+  HEADER_LINK,
+  SignedOutFrame,
+} from "@proto/components/signed-out/frame";
 import { ON_GREEN } from "@proto/screens/setup/setup-frame";
 import { useStepHeading } from "@proto/screens/setup/use-setup";
 import { FullForm } from "./fields";
-import { SignUpFrame, TrustLines } from "./frame";
+import { TrustLines } from "./frame";
 import { ExpiredNote, SentNote } from "./notes";
 import type { SignUpViewProps } from "./scenarios";
 import { greet, useSignUp } from "./use-sign-up";
@@ -24,7 +29,14 @@ export function SignUpView(props: SignUpViewProps) {
   const sent = flow.phase === "sent";
 
   return (
-    <SignUpFrame>
+    <SignedOutFrame
+      prompt="Have an account?"
+      link={
+        <ScreenLink screen="Sign in" className={HEADER_LINK}>
+          Sign in
+        </ScreenLink>
+      }
+    >
       <div className="mx-auto grid w-full max-w-6xl gap-3 lg:flex-1 lg:grid-cols-2">
         <section
           className={cn(
@@ -84,6 +96,6 @@ export function SignUpView(props: SignUpViewProps) {
           )}
         </section>
       </div>
-    </SignUpFrame>
+    </SignedOutFrame>
   );
 }

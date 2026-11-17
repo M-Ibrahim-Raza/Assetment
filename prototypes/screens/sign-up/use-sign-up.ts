@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+  emailError,
+  newPasswordError,
+} from "@proto/components/signed-out/rules";
 import { TAKEN_EMAIL } from "@proto/fixtures/people";
 import { useProtoAction } from "@proto/kit/use-proto-action";
 import type { Failure, SignUpDraft, SignUpViewProps } from "./scenarios";
@@ -13,34 +17,14 @@ export type Phase = SignUpViewProps["status"];
 export const FIELDS = ["name", "email", "password"] as const;
 export type FieldName = (typeof FIELDS)[number];
 
-/** Better Auth's default shortest password. */
-export const MIN_PASSWORD = 8;
-
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export type FieldErrors = Readonly<Record<FieldName, string | null>>;
-
-/** What is wrong with an email, in plain words. Null when it looks fine. */
-export function emailError(email: string): string | null {
-  const trimmed = email.trim();
-  if (trimmed === "") return "Type your email.";
-  return EMAIL.test(trimmed)
-    ? null
-    : "This doesn't look like an email. Check the @ and the dot.";
-}
 
 /** What is wrong with each field, in plain words. Null when it's fine. */
 export function fieldErrors(draft: SignUpDraft): FieldErrors {
-  const short = draft.password.length < MIN_PASSWORD;
   return {
     name: draft.name.trim() === "" ? "Type what we should call you." : null,
     email: emailError(draft.email),
-    password:
-      draft.password === ""
-        ? "Make a password."
-        : short
-          ? `Use at least ${String(MIN_PASSWORD)} characters.`
-          : null,
+    password: newPasswordError(draft.password),
   };
 }
 

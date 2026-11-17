@@ -11,8 +11,9 @@
 // "Account made" with a long name and a 61-character email, to test wrapping at 320 px.
 //
 // Decided while finalizing:
-// - Sign in, password reset, 2FA and Settings come with a sign-in journey, not drafted yet. Sign
-//   in is a stand-in link until then.
+// - Sign in (F23) and password reset (F24) are in J6. 2FA and Settings come later.
+// - Create account is as wide as the form at every width, like the other signed-out screens. The
+//   frame, fields and that button are shared with them, in components/signed-out/.
 // - The first session works before the email is confirmed. Signing in again needs it confirmed.
 // - Under Create account: "By creating an account, you agree to our Terms and Privacy policy."
 //   Both pages are stand-ins until written.

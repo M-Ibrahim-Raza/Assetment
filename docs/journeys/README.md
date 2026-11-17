@@ -7,3 +7,4 @@ The main tasks a user comes to Assetment to do, one file each.
 - [J3 – See where money goes](J3-where-money-goes.md)
 - [J4 – Track investments](J4-track-investments.md)
 - [J5 – Watch net worth over time](J5-net-worth-over-time.md)
+- [J6 – Sign in and come back](J6-sign-in.md)

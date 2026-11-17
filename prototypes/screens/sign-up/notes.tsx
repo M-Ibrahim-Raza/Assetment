@@ -5,14 +5,11 @@ import { type SyntheticEvent, useEffect, useId, useState } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ScreenLink } from "@proto/components/screen-link";
+import { Email } from "@proto/components/signed-out/email";
+import { EmailField, focusField } from "@proto/components/signed-out/fields";
+import { emailError } from "@proto/components/signed-out/rules";
 import { BIG } from "@proto/screens/setup/look";
-import { EmailField, focusField } from "./fields";
-import { emailError, type SignUpFlow } from "./use-sign-up";
-
-/** An email inside a sentence. A long one breaks anywhere, so a 320 px phone never scrolls sideways. */
-function Email({ email }: { email: string }) {
-  return <strong className="font-semibold wrap-anywhere">{email}</strong>;
-}
+import type { SignUpFlow } from "./use-sign-up";
 
 /**
  * "Account made": the link is sent, and they can start Setup now. Under a hairline, a way to

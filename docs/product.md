@@ -40,6 +40,7 @@ Steps for each are in [journeys/](journeys/README.md).
 - [J3 – See where money goes](journeys/J3-where-money-goes.md)
 - [J4 – Track investments](journeys/J4-track-investments.md)
 - [J5 – Watch net worth over time](journeys/J5-net-worth-over-time.md)
+- [J6 – Sign in and come back](journeys/J6-sign-in.md)
 
 ## Non-goals
 

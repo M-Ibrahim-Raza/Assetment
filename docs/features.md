@@ -26,3 +26,5 @@ What Assetment does, one row per feature. Columns and statuses: [README.md](READ
 | F20 | Money lent | [J1](journeys/J1-set-up-net-worth.md) | Must | F07 | open | |
 | F21 | Scheduled debt payments: committee drafts and automatic loan instalments | [J2](journeys/J2-log-money.md) | Must | F12, F03 | open | |
 | F22 | Colour themes | [J2](journeys/J2-log-money.md) | Should | F06 | approved | |
+| F23 | [Sign in](../specs/F23-sign-in/) | [J6](journeys/J6-sign-in.md) | Must | F18, F19, F06 | approved | |
+| F24 | [Password reset](../specs/F24-password-reset/) | [J6](journeys/J6-sign-in.md) | Must | F23 | approved | |

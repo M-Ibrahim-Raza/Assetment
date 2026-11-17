@@ -18,4 +18,5 @@
 - On phones the green block is a short band with the headline only, and the three lines come after the button. Under desktop width, the form sits in a centred column under the green band.
 - Under the button: "By creating an account, you agree to our Terms and Privacy policy." Both pages are stand-ins until written.
 - Signed out, so there's no app shell. The header has only the logo and "Have an account? Sign in".
-- Sign in, password reset, 2FA and Settings come with a sign-in journey, not drafted yet.
+- Create account is as wide as the form at every width, like the other signed-out screens.
+- Sign in (F23) and password reset (F24) are in J6. 2FA and Settings come later.
