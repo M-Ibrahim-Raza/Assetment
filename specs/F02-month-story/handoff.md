@@ -12,4 +12,4 @@
 - No income yet: no bar.
 - Portfolio fell: an arrow and a minus sign.
 - The net worth change always equals kept plus Portfolio moved.
-- Received and Spent open Spending. Portfolio moved opens Portfolio.
+- Spent opens Spending. Received isn't a link yet: Spending shows only money spent, and an account's screen will list money received. Portfolio moved opens Portfolio.

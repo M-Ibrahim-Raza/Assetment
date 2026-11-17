@@ -28,3 +28,12 @@ What Assetment does, one row per feature. Columns and statuses: [README.md](READ
 | F22 | Colour themes | [J2](journeys/J2-log-money.md) | Should | F06 | approved | |
 | F23 | [Sign in](../specs/F23-sign-in/) | [J6](journeys/J6-sign-in.md) | Must | F18, F19, F06 | approved | |
 | F24 | [Password reset](../specs/F24-password-reset/) | [J6](journeys/J6-sign-in.md) | Must | F23 | approved | |
+| F25 | [Spending month summary](../specs/F25-spending-month-summary/) | [J3](journeys/J3-where-money-goes.md) | Must | F06, F14 | approved | |
+| F26 | [Compare with another month](../specs/F26-compare-with-another-month/) | [J3](journeys/J3-where-money-goes.md) | Must | F25 | approved | |
+| F27 | [Spending by category](../specs/F27-spending-by-category/) | [J3](journeys/J3-where-money-goes.md) | Must | F25 | approved | |
+| F28 | [Spending entries](../specs/F28-spending-entries/) | [J3](journeys/J3-where-money-goes.md) | Must | F25 | approved | |
+| F29 | Spending by account | [J3](journeys/J3-where-money-goes.md) | Should | F27 | approved | |
+| F30 | Spending calendar | [J3](journeys/J3-where-money-goes.md) | Should | F25 | approved | |
+| F31 | Pace chart | [J3](journeys/J3-where-money-goes.md) | Should | F26 | approved | |
+| F32 | Customize Spending | [J3](journeys/J3-where-money-goes.md) | Should | F25 | approved | |
+| F33 | Donut chart for categories and accounts | [J3](journeys/J3-where-money-goes.md) | Should | F27, F32 | approved | |
