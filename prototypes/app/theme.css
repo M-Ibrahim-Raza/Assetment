@@ -9,8 +9,17 @@
  *
  * `.dark` is the same look at night. The provider puts it on <html> for Dark, or for Auto on a
  * device set to dark. It sets every colour :root sets, or the light value would show through.
+ *
+ * Colour themes: Green is the default. The others follow it, after Green's two blocks, one pair
+ * each: `[data-palette="x"]` by day and `.dark[data-palette="x"]` at night. The palette provider
+ * puts `data-palette` on <html>. The night block must set every colour its day block sets, or the
+ * day value shows through in the dark. Gain, loss and destructive mean the same in every theme, so
+ * only Green's blocks set them. A swatch with `data-palette` shows that theme's colours, so the
+ * `.dark [data-palette="x"]` part gives it the night ones. `node prototypes/kit/contrast.mts`
+ * checks them all.
  */
-:root {
+:root,
+[data-palette="green"] {
   --background: oklch(0.955 0.01 170);
   --foreground: oklch(0.22 0.025 165);
   --card: oklch(1 0 0);
@@ -62,7 +71,8 @@
  * are lighter, so they still read on the dark blocks. The hero's button stays a light pill, so it
  * still stands out on the green. Text is white; only the small helper text stays grey.
  */
-.dark {
+.dark,
+.dark [data-palette="green"] {
   --background: oklch(0.17 0.012 165);
   --foreground: oklch(1 0 0);
   --card: oklch(0.215 0.014 165);
@@ -100,4 +110,478 @@
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.8 0.1 158);
+}
+
+/*
+ * Ocean: sea blue for the hero, pale sky for the month block, and blue-black ink on a faint
+ * blue-grey page. At night the page is blue-black and the sea blue is calmer.
+ */
+[data-palette="ocean"] {
+  --background: oklch(0.955 0.01 230);
+  --foreground: oklch(0.22 0.025 230);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.025 230);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.025 230);
+  --primary: oklch(0.46 0.1 238);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.89 0.035 230);
+  --secondary-foreground: oklch(0.22 0.025 230);
+  --muted: oklch(0.95 0.01 230);
+  --muted-foreground: oklch(0.45 0.02 230);
+  --accent: oklch(0.89 0.035 230);
+  --accent-foreground: oklch(0.32 0.065 238);
+  --ink: oklch(0.22 0.025 230);
+  --ink-foreground: oklch(1 0 0);
+  --hero-action: oklch(0.89 0.035 230);
+  --hero-action-foreground: oklch(0.22 0.025 230);
+  --border: oklch(0.9 0.01 230);
+  --input: oklch(0.9 0.01 230);
+  --ring: oklch(0.46 0.1 238);
+  --chart-1: oklch(0.46 0.1 238);
+  --chart-2: oklch(0.22 0.025 230);
+  --chart-3: oklch(0.89 0.035 230);
+  --chart-4: oklch(0.65 0.1 238);
+  --chart-5: oklch(0.6 0.02 230);
+  --sidebar: oklch(0.22 0.025 230);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.46 0.1 238);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.32 0.03 230);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.8 0.1 238);
+}
+
+.dark[data-palette="ocean"],
+.dark [data-palette="ocean"] {
+  --background: oklch(0.17 0.012 230);
+  --foreground: oklch(1 0 0);
+  --card: oklch(0.215 0.014 230);
+  --card-foreground: oklch(1 0 0);
+  --popover: oklch(0.24 0.015 230);
+  --popover-foreground: oklch(1 0 0);
+  --primary: oklch(0.44 0.085 238);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.3 0.04 230);
+  --secondary-foreground: oklch(1 0 0);
+  --muted: oklch(0.27 0.014 230);
+  --muted-foreground: oklch(0.72 0.02 230);
+  --accent: oklch(0.3 0.04 230);
+  --accent-foreground: oklch(0.88 0.06 238);
+  --ink: oklch(0.12 0.012 230);
+  --ink-foreground: oklch(1 0 0);
+  --hero-action: oklch(0.87 0.03 230);
+  --hero-action-foreground: oklch(0.2 0.025 230);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.72 0.11 238);
+  --chart-1: oklch(0.6 0.1 238);
+  --chart-2: oklch(1 0 0);
+  --chart-3: oklch(0.3 0.04 230);
+  --chart-4: oklch(0.75 0.1 238);
+  --chart-5: oklch(0.55 0.02 230);
+  --sidebar: oklch(0.12 0.012 230);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.44 0.085 238);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.22 0.02 230);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.8 0.1 238);
+}
+
+/*
+ * Indigo: a deep violet-blue hero, pale periwinkle for the month block, and indigo-black ink on a
+ * faint lavender-grey page. At night the page is indigo-black and the hero a step softer.
+ */
+[data-palette="indigo"] {
+  --background: oklch(0.955 0.01 270);
+  --foreground: oklch(0.22 0.025 270);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.025 270);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.025 270);
+  --primary: oklch(0.45 0.14 268);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.89 0.035 270);
+  --secondary-foreground: oklch(0.22 0.025 270);
+  --muted: oklch(0.95 0.01 270);
+  --muted-foreground: oklch(0.45 0.02 270);
+  --accent: oklch(0.89 0.035 270);
+  --accent-foreground: oklch(0.32 0.12 268);
+  --ink: oklch(0.22 0.025 270);
+  --ink-foreground: oklch(1 0 0);
+  --hero-action: oklch(0.89 0.035 270);
+  --hero-action-foreground: oklch(0.22 0.025 270);
+  --border: oklch(0.9 0.01 270);
+  --input: oklch(0.9 0.01 270);
+  --ring: oklch(0.45 0.14 268);
+  --chart-1: oklch(0.45 0.14 268);
+  --chart-2: oklch(0.22 0.025 270);
+  --chart-3: oklch(0.89 0.035 270);
+  --chart-4: oklch(0.65 0.14 268);
+  --chart-5: oklch(0.6 0.02 270);
+  --sidebar: oklch(0.22 0.025 270);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.45 0.14 268);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.32 0.03 270);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.8 0.09 268);
+}
+
+.dark[data-palette="indigo"],
+.dark [data-palette="indigo"] {
+  --background: oklch(0.17 0.012 270);
+  --foreground: oklch(1 0 0);
+  --card: oklch(0.215 0.014 270);
+  --card-foreground: oklch(1 0 0);
+  --popover: oklch(0.24 0.015 270);
+  --popover-foreground: oklch(1 0 0);
+  --primary: oklch(0.42 0.105 268);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.3 0.045 270);
+  --secondary-foreground: oklch(1 0 0);
+  --muted: oklch(0.27 0.014 270);
+  --muted-foreground: oklch(0.72 0.02 270);
+  --accent: oklch(0.3 0.045 270);
+  --accent-foreground: oklch(0.88 0.05 268);
+  --ink: oklch(0.12 0.012 270);
+  --ink-foreground: oklch(1 0 0);
+  --hero-action: oklch(0.87 0.03 270);
+  --hero-action-foreground: oklch(0.2 0.025 270);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.72 0.12 268);
+  --chart-1: oklch(0.6 0.14 268);
+  --chart-2: oklch(1 0 0);
+  --chart-3: oklch(0.3 0.045 270);
+  --chart-4: oklch(0.75 0.11 268);
+  --chart-5: oklch(0.55 0.02 270);
+  --sidebar: oklch(0.12 0.012 270);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.42 0.105 268);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.22 0.02 270);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.8 0.09 268);
+}
+
+/*
+ * Plum: a deep purple hero, pale lilac for the month block, and plum-black ink on a faint mauve
+ * page. At night the page is plum-black and the hero a step softer.
+ */
+[data-palette="plum"] {
+  --background: oklch(0.955 0.01 320);
+  --foreground: oklch(0.22 0.025 320);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.025 320);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.025 320);
+  --primary: oklch(0.43 0.13 325);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.89 0.035 320);
+  --secondary-foreground: oklch(0.22 0.025 320);
+  --muted: oklch(0.95 0.01 320);
+  --muted-foreground: oklch(0.45 0.02 320);
+  --accent: oklch(0.89 0.035 320);
+  --accent-foreground: oklch(0.32 0.11 325);
+  --ink: oklch(0.22 0.025 320);
+  --ink-foreground: oklch(1 0 0);
+  --hero-action: oklch(0.89 0.035 320);
+  --hero-action-foreground: oklch(0.22 0.025 320);
+  --border: oklch(0.9 0.01 320);
+  --input: oklch(0.9 0.01 320);
+  --ring: oklch(0.43 0.13 325);
+  --chart-1: oklch(0.43 0.13 325);
+  --chart-2: oklch(0.22 0.025 320);
+  --chart-3: oklch(0.89 0.035 320);
+  --chart-4: oklch(0.65 0.13 325);
+  --chart-5: oklch(0.6 0.02 320);
+  --sidebar: oklch(0.22 0.025 320);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.43 0.13 325);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.32 0.03 320);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.8 0.12 325);
+}
+
+.dark[data-palette="plum"],
+.dark [data-palette="plum"] {
+  --background: oklch(0.17 0.012 320);
+  --foreground: oklch(1 0 0);
+  --card: oklch(0.215 0.014 320);
+  --card-foreground: oklch(1 0 0);
+  --popover: oklch(0.24 0.015 320);
+  --popover-foreground: oklch(1 0 0);
+  --primary: oklch(0.42 0.11 325);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.3 0.045 320);
+  --secondary-foreground: oklch(1 0 0);
+  --muted: oklch(0.27 0.014 320);
+  --muted-foreground: oklch(0.72 0.02 320);
+  --accent: oklch(0.3 0.045 320);
+  --accent-foreground: oklch(0.88 0.08 325);
+  --ink: oklch(0.12 0.012 320);
+  --ink-foreground: oklch(1 0 0);
+  --hero-action: oklch(0.87 0.03 320);
+  --hero-action-foreground: oklch(0.2 0.025 320);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.72 0.14 325);
+  --chart-1: oklch(0.6 0.13 325);
+  --chart-2: oklch(1 0 0);
+  --chart-3: oklch(0.3 0.045 320);
+  --chart-4: oklch(0.75 0.13 325);
+  --chart-5: oklch(0.55 0.02 320);
+  --sidebar: oklch(0.12 0.012 320);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.42 0.11 325);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.22 0.02 320);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.8 0.12 325);
+}
+
+/*
+ * Rose: a deep raspberry-rose hero, pale blush for the month block, and rose-black ink on a faint
+ * pink page. At night the page is a warm near-black and the hero a step deeper.
+ */
+[data-palette="rose"] {
+  --background: oklch(0.955 0.01 10);
+  --foreground: oklch(0.22 0.025 10);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.025 10);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.025 10);
+  --primary: oklch(0.5 0.15 2);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.89 0.035 10);
+  --secondary-foreground: oklch(0.22 0.025 10);
+  --muted: oklch(0.95 0.01 10);
+  --muted-foreground: oklch(0.45 0.02 10);
+  --accent: oklch(0.89 0.035 10);
+  --accent-foreground: oklch(0.32 0.11 2);
+  --ink: oklch(0.22 0.025 10);
+  --ink-foreground: oklch(1 0 0);
+  --hero-action: oklch(0.89 0.035 10);
+  --hero-action-foreground: oklch(0.22 0.025 10);
+  --border: oklch(0.9 0.01 10);
+  --input: oklch(0.9 0.01 10);
+  --ring: oklch(0.5 0.15 2);
+  --chart-1: oklch(0.5 0.15 2);
+  --chart-2: oklch(0.22 0.025 10);
+  --chart-3: oklch(0.89 0.035 10);
+  --chart-4: oklch(0.65 0.14 2);
+  --chart-5: oklch(0.6 0.02 10);
+  --sidebar: oklch(0.22 0.025 10);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.5 0.15 2);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.32 0.03 10);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.8 0.1 2);
+}
+
+.dark[data-palette="rose"],
+.dark [data-palette="rose"] {
+  --background: oklch(0.17 0.012 10);
+  --foreground: oklch(1 0 0);
+  --card: oklch(0.215 0.014 10);
+  --card-foreground: oklch(1 0 0);
+  --popover: oklch(0.24 0.015 10);
+  --popover-foreground: oklch(1 0 0);
+  --primary: oklch(0.43 0.105 2);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.3 0.045 10);
+  --secondary-foreground: oklch(1 0 0);
+  --muted: oklch(0.27 0.014 10);
+  --muted-foreground: oklch(0.72 0.02 10);
+  --accent: oklch(0.3 0.045 10);
+  --accent-foreground: oklch(0.88 0.06 2);
+  --ink: oklch(0.12 0.012 10);
+  --ink-foreground: oklch(1 0 0);
+  --hero-action: oklch(0.87 0.03 10);
+  --hero-action-foreground: oklch(0.2 0.025 10);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.72 0.14 2);
+  --chart-1: oklch(0.6 0.14 2);
+  --chart-2: oklch(1 0 0);
+  --chart-3: oklch(0.3 0.045 10);
+  --chart-4: oklch(0.75 0.13 2);
+  --chart-5: oklch(0.55 0.02 10);
+  --sidebar: oklch(0.12 0.012 10);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.43 0.105 2);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.22 0.02 10);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.8 0.1 2);
+}
+
+/*
+ * Clay: a terracotta hero, pale sand for the month block, and warm brown-black ink on a faint sand
+ * page. At night the page is warm near-black and the terracotta a step deeper.
+ */
+[data-palette="clay"] {
+  --background: oklch(0.955 0.01 60);
+  --foreground: oklch(0.22 0.025 60);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.025 60);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.025 60);
+  --primary: oklch(0.5 0.12 42);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.89 0.04 60);
+  --secondary-foreground: oklch(0.22 0.025 60);
+  --muted: oklch(0.95 0.01 60);
+  --muted-foreground: oklch(0.45 0.02 60);
+  --accent: oklch(0.89 0.04 60);
+  --accent-foreground: oklch(0.32 0.09 42);
+  --ink: oklch(0.22 0.025 60);
+  --ink-foreground: oklch(1 0 0);
+  --hero-action: oklch(0.89 0.04 60);
+  --hero-action-foreground: oklch(0.22 0.025 60);
+  --border: oklch(0.9 0.01 60);
+  --input: oklch(0.9 0.01 60);
+  --ring: oklch(0.5 0.12 42);
+  --chart-1: oklch(0.5 0.12 42);
+  --chart-2: oklch(0.22 0.025 60);
+  --chart-3: oklch(0.89 0.04 60);
+  --chart-4: oklch(0.65 0.12 42);
+  --chart-5: oklch(0.6 0.02 60);
+  --sidebar: oklch(0.22 0.025 60);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.5 0.12 42);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.32 0.03 60);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.8 0.1 42);
+}
+
+.dark[data-palette="clay"],
+.dark [data-palette="clay"] {
+  --background: oklch(0.17 0.012 60);
+  --foreground: oklch(1 0 0);
+  --card: oklch(0.215 0.014 60);
+  --card-foreground: oklch(1 0 0);
+  --popover: oklch(0.24 0.015 60);
+  --popover-foreground: oklch(1 0 0);
+  --primary: oklch(0.45 0.095 42);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.3 0.04 60);
+  --secondary-foreground: oklch(1 0 0);
+  --muted: oklch(0.27 0.014 60);
+  --muted-foreground: oklch(0.72 0.02 60);
+  --accent: oklch(0.3 0.04 60);
+  --accent-foreground: oklch(0.88 0.06 42);
+  --ink: oklch(0.12 0.012 60);
+  --ink-foreground: oklch(1 0 0);
+  --hero-action: oklch(0.87 0.03 60);
+  --hero-action-foreground: oklch(0.2 0.025 60);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.72 0.12 42);
+  --chart-1: oklch(0.6 0.12 42);
+  --chart-2: oklch(1 0 0);
+  --chart-3: oklch(0.3 0.04 60);
+  --chart-4: oklch(0.75 0.12 42);
+  --chart-5: oklch(0.55 0.02 60);
+  --sidebar: oklch(0.12 0.012 60);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.45 0.095 42);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.22 0.02 60);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.8 0.1 42);
+}
+
+/*
+ * Slate: for people who don't want colour. A blue-grey hero, pale grey for the month block, and
+ * slate-black ink on a faint cool grey page. At night the page is slate-black.
+ */
+[data-palette="slate"] {
+  --background: oklch(0.955 0.01 250);
+  --foreground: oklch(0.22 0.025 250);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.025 250);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.025 250);
+  --primary: oklch(0.42 0.035 250);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.89 0.012 250);
+  --secondary-foreground: oklch(0.22 0.025 250);
+  --muted: oklch(0.95 0.01 250);
+  --muted-foreground: oklch(0.45 0.02 250);
+  --accent: oklch(0.89 0.012 250);
+  --accent-foreground: oklch(0.32 0.04 250);
+  --ink: oklch(0.22 0.025 250);
+  --ink-foreground: oklch(1 0 0);
+  --hero-action: oklch(0.89 0.012 250);
+  --hero-action-foreground: oklch(0.22 0.025 250);
+  --border: oklch(0.9 0.01 250);
+  --input: oklch(0.9 0.01 250);
+  --ring: oklch(0.42 0.035 250);
+  --chart-1: oklch(0.42 0.035 250);
+  --chart-2: oklch(0.22 0.025 250);
+  --chart-3: oklch(0.89 0.012 250);
+  --chart-4: oklch(0.65 0.04 250);
+  --chart-5: oklch(0.6 0.02 250);
+  --sidebar: oklch(0.22 0.025 250);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.42 0.035 250);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.32 0.03 250);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.8 0.04 250);
+}
+
+.dark[data-palette="slate"],
+.dark [data-palette="slate"] {
+  --background: oklch(0.17 0.012 250);
+  --foreground: oklch(1 0 0);
+  --card: oklch(0.215 0.014 250);
+  --card-foreground: oklch(1 0 0);
+  --popover: oklch(0.24 0.015 250);
+  --popover-foreground: oklch(1 0 0);
+  --primary: oklch(0.42 0.03 250);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.3 0.015 250);
+  --secondary-foreground: oklch(1 0 0);
+  --muted: oklch(0.27 0.014 250);
+  --muted-foreground: oklch(0.72 0.02 250);
+  --accent: oklch(0.3 0.015 250);
+  --accent-foreground: oklch(0.88 0.03 250);
+  --ink: oklch(0.12 0.012 250);
+  --ink-foreground: oklch(1 0 0);
+  --hero-action: oklch(0.87 0.03 250);
+  --hero-action-foreground: oklch(0.2 0.025 250);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.72 0.04 250);
+  --chart-1: oklch(0.6 0.04 250);
+  --chart-2: oklch(1 0 0);
+  --chart-3: oklch(0.3 0.015 250);
+  --chart-4: oklch(0.75 0.04 250);
+  --chart-5: oklch(0.55 0.02 250);
+  --sidebar: oklch(0.12 0.012 250);
+  --sidebar-foreground: oklch(1 0 0);
+  --sidebar-primary: oklch(0.42 0.03 250);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.22 0.02 250);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.8 0.04 250);
 }

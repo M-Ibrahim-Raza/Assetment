@@ -12,6 +12,15 @@
 // or Ctrl/⌘ + B. The rail shows small names under the icons, so it works on touch. Tablets start
 // with the rail and desktops with the full sidebar, until the user chooses; the browser remembers.
 //
+// Colour themes (F22, finalized 2026-11-17): the profile panel picks a colour under Auto, Light
+// and Dark. Green is the default; Ocean, Indigo, Plum, Rose, Clay and Slate were all kept, with
+// plain colour names. Each is in app/theme.css by day and at night, and passes
+// `node prototypes/kit/contrast.mts`. Decided while finalizing (details in F06's handoff note):
+// - In production the colour is saved to the user's profile. Light, Dark and Auto stay per device.
+// - The phone's browser bar takes the page colour, in every theme and mode.
+// - Sign up and sign in show the colour saved on the device.
+// - At night, link buttons use the pale accent text, not primary: an exception to white text.
+//
 // Open questions (write them here while exploring, resolve them in /prototype-finalize):
 // None.
 

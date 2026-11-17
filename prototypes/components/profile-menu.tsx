@@ -18,8 +18,12 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { RadioGroup } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { usePalette } from "./palette-provider";
+import { PaletteSwatch } from "./palette-swatch";
+import { isPalette, PALETTES } from "./palettes";
 
 const NOT_BUILT = "Not built yet";
 
@@ -31,13 +35,16 @@ const THEMES = [
 ] as const;
 
 /**
- * The profile button and the panel it opens: the theme choice, and stand-ins for Settings and Sign
- * out. Esc, a tap outside or × closes it, and focus goes back to the button.
+ * The profile button and the panel it opens: the theme (Auto, Light or Dark), the colour, and
+ * stand-ins for Settings and Sign out. Both choices apply at once, and the browser remembers them.
+ * Esc, a tap outside or × closes it, and focus goes back to the button.
  */
 export function ProfileMenu() {
   const [open, setOpen] = useState(false);
   const { theme = "system", setTheme } = useTheme();
   const themeLabel = useId();
+  const [palette, setPalette] = usePalette();
+  const colourLabel = useId();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -98,6 +105,24 @@ export function ProfileMenu() {
             ))}
           </ToggleGroup>
           <p className="text-muted-foreground">Auto follows your device.</p>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <p id={colourLabel} className="font-medium">
+            Colour
+          </p>
+          <RadioGroup
+            aria-labelledby={colourLabel}
+            value={palette}
+            onValueChange={(value) => {
+              if (isPalette(value)) setPalette(value);
+            }}
+            className="grid-cols-4 gap-x-1 gap-y-3"
+          >
+            {PALETTES.map(({ value, label }) => (
+              <PaletteSwatch key={value} value={value} label={label} />
+            ))}
+          </RadioGroup>
         </div>
 
         <Separator />

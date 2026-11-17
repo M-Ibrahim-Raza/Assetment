@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
+import { PaletteProvider } from "@proto/components/palette-provider";
 import { ThemeProvider } from "@proto/components/theme-provider";
 import "./prototype.css";
 
@@ -26,14 +27,17 @@ export const metadata: Metadata = {
 
 export default function PrototypeLayout({ children }: LayoutProps<"/">) {
   return (
-    // The theme script sets a class and color-scheme on <html> before React hydrates.
+    // The theme and palette scripts set the class, color-scheme and data-palette on <html> before
+    // React hydrates.
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <PaletteProvider>{children}</PaletteProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

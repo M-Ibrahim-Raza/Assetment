@@ -3,7 +3,9 @@
 // exits with 1 if there are any. Start the prototype with `pnpm proto` first, then run from the repo root:
 //   node prototypes/kit/screenshots.mts /accounts/new --variants a,b --themes dark
 // Without --scenarios, it takes every scenario in the ProtoBar. It reads the ProtoBar, so keep the two in step.
-// The theme is the device's: the app's default, Auto, follows it.
+// The theme is the device's: the app's default, Auto, follows it. --palettes also shoots colour
+// themes (components/palettes.ts). --widths picks widths, for colour checks that don't need all five:
+//   node prototypes/kit/screenshots.mts /dashboard --palettes plum,clay --widths 375,1280
 import { mkdir } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -18,6 +20,9 @@ const HEIGHT = 900;
 // The first visit to a route compiles it, which takes a while in dev.
 const TIMEOUT_MS = 60_000;
 const BAR = 'nav[aria-label="Prototype controls"]';
+/** Where the palette provider keeps the colour theme (PALETTE_KEY in components/palettes.ts). */
+const PALETTE_KEY = "assetment:palette";
+const DEFAULT_PALETTE = "green";
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -25,6 +30,8 @@ const { positionals, values } = parseArgs({
     variants: { type: "string", default: "a" },
     scenarios: { type: "string" },
     themes: { type: "string", default: THEMES.join(",") },
+    palettes: { type: "string", default: DEFAULT_PALETTE },
+    widths: { type: "string", default: WIDTHS.join(",") },
     out: { type: "string" },
   },
 });
@@ -40,13 +47,18 @@ const isTheme = (value: string): value is Theme =>
 
 const route = positionals[0];
 const themes = list(values.themes);
+const palettes = list(values.palettes);
+const widths = list(values.widths).map(Number);
 if (
   route?.startsWith("/") !== true ||
   themes.length === 0 ||
-  !themes.every(isTheme)
+  !themes.every(isTheme) ||
+  palettes.length === 0 ||
+  widths.length === 0 ||
+  !widths.every((width) => Number.isInteger(width) && width > 0)
 ) {
   console.error(
-    "Usage: node prototypes/kit/screenshots.mts <url> [--variants a,b] [--scenarios default,empty] [--themes light,dark] [--out <dir>]",
+    "Usage: node prototypes/kit/screenshots.mts <url> [--variants a,b] [--scenarios default,empty] [--themes light,dark] [--palettes green,plum] [--widths 375,1280] [--out <dir>]",
   );
   process.exit(2);
 }
@@ -91,14 +103,25 @@ try {
     problems.push(`${route}: no ProtoBar, so no scenarios to shoot`);
   }
 
-  const runs = themes.flatMap((theme) =>
-    WIDTHS.map((width) => ({ theme, width })),
+  const runs = palettes.flatMap((palette) =>
+    themes.flatMap((theme) =>
+      widths.map((width) => ({ palette, theme, width })),
+    ),
   );
-  for (const { theme, width } of runs) {
+  for (const { palette, theme, width } of runs) {
     const page = await browser.newPage({
       viewport: { width, height: HEIGHT },
       colorScheme: theme,
     });
+    // Saved before every load, as if the user had picked it. The pre-paint script applies it.
+    await page.addInitScript(
+      ([key, value]) => {
+        localStorage.setItem(key, value);
+      },
+      [PALETTE_KEY, palette] as const,
+    );
+    // Green keeps the names shots had before colour themes.
+    const colour = palette === DEFAULT_PALETTE ? "" : `-${palette}`;
     let shot = "";
     page.on("console", (message) => {
       if (message.type() === "error") {
@@ -111,7 +134,7 @@ try {
 
     for (const variant of variants) {
       for (const scenario of scenarios) {
-        shot = `${variant}-${scenario}-${theme}-${String(width)}`;
+        shot = `${variant}-${scenario}${colour}-${theme}-${String(width)}`;
         const response = await open(
           page,
           `?variant=${encodeURIComponent(variant)}&scenario=${encodeURIComponent(scenario)}`,
