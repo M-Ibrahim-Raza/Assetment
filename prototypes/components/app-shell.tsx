@@ -132,6 +132,8 @@ interface AppShellProps {
    * and the screen places `ShellActions` itself.
    */
   bleed?: boolean;
+  /** The screen's own header buttons, such as Customize. They sit before Hide amounts. */
+  actions?: ReactNode;
   children: ReactNode;
 }
 
@@ -143,6 +145,7 @@ export function AppShell({
   current,
   title,
   bleed = false,
+  actions,
   children,
 }: AppShellProps) {
   const [amountsHidden, setAmountsHidden] = useState(false);
@@ -279,7 +282,10 @@ export function AppShell({
           ) : (
             <header className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 pt-4 pb-3 md:px-8 md:pt-6">
               <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
-              <ShellActions />
+              <div className="flex items-center gap-1">
+                {actions}
+                <ShellActions />
+              </div>
             </header>
           )}
           {/* The bottom padding keeps the last block clear of the tab bar, and of the ProtoBar on wide screens. */}

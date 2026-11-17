@@ -12,4 +12,5 @@ export const screenRoutes: Readonly<Partial<Record<string, Route>>> = {
   "Sign in": "/sign-in",
   "Forgot password": "/forgot-password",
   "Reset password": "/reset-password",
+  Spending: "/spending",
 };
