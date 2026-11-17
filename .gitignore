@@ -39,3 +39,8 @@
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Private notes, kept out of git and away from Claude
+/tasks.md
+/temp.md
+/prompts.md

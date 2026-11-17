@@ -4,12 +4,27 @@
     "deny": [
       "Read(./tasks.md)",
       "Edit(./tasks.md)",
+      "Read(./prompts.md)",
+      "Edit(./prompts.md)",
       "Read(./.env)",
       "Read(./.env.local)",
       "Read(./**/*.pem)"
     ]
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-private-files.mjs\"",
+            "timeout": 10,
+            "statusMessage": "Checking for private files"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
