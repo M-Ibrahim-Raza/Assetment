@@ -1,6 +1,6 @@
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Money } from "@proto/components/amounts";
-import { ScreenLink } from "@proto/components/screen-link";
 import type { Entry } from "@proto/fixtures/entries";
 import { BLOCK, HEADING, PAD } from "./parts";
 
@@ -37,12 +37,13 @@ export function RecentBlock({ entries }: { entries: readonly Entry[] }) {
             ))}
           </ul>
           <p className="text-sm">
-            <ScreenLink
-              screen="Spending"
+            {/* It lands on Spending's list of the month's entries, not its top. */}
+            <Link
+              href="/spending#entries"
               className="font-semibold underline underline-offset-4"
             >
               See all entries
-            </ScreenLink>
+            </Link>
           </p>
         </>
       )}

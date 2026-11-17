@@ -51,7 +51,8 @@ export function MonthBlock({ month, netWorthChange }: MonthBlockProps) {
         {spentShare !== null && <SplitBar spentShare={spentShare} />}
 
         <dl className="flex flex-col">
-          <Row label="Received" screen="Spending">
+          {/* Spending shows only money spent, so Received waits for an account screen. */}
+          <Row label="Received">
             <Money value={month.received} signed />
           </Row>
           <Row label="Spent" screen="Spending">
@@ -112,8 +113,8 @@ function SplitBar({ spentShare }: { spentShare: number }) {
 
 interface RowProps {
   label: string;
-  /** The screen that explains this number. */
-  screen: string;
+  /** The screen that explains this number. Missing when none does yet. */
+  screen?: string;
   children: ReactNode;
 }
 
@@ -121,12 +122,16 @@ function Row({ label, screen, children }: RowProps) {
   return (
     <div className="flex items-baseline justify-between gap-3 border-t border-foreground/20 py-3">
       <dt>
-        <ScreenLink
-          screen={screen}
-          className="font-medium underline-offset-4 hover:underline"
-        >
-          {label}
-        </ScreenLink>
+        {screen === undefined ? (
+          <span className="font-medium">{label}</span>
+        ) : (
+          <ScreenLink
+            screen={screen}
+            className="font-medium underline-offset-4 hover:underline"
+          >
+            {label}
+          </ScreenLink>
+        )}
       </dt>
       <dd className="flex items-center gap-1.5 font-bold">{children}</dd>
     </div>
