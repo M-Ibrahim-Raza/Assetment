@@ -10,12 +10,15 @@ import {
   useState,
   useTransition,
 } from "react";
+import { isOnOff, optionParam, type ProtoOption } from "./options";
 
 interface ProtoBarProps {
   variants: readonly { key: string; name: string }[];
   scenarios: readonly string[];
   currentVariant: string;
   currentScenario: string;
+  /** The screen's design choices, if any. */
+  options: readonly ProtoOption[];
 }
 
 /**
@@ -36,8 +39,10 @@ const PILL_DISPLAY = {
   closed: "flex",
 } as const satisfies Record<BarMode, string>;
 
-/** The params the kit owns. Any other belongs to the screen. */
+/** The params the kit owns, including the `opt-` ones. Any other belongs to the screen. */
 const KIT_PARAMS = ["variant", "scenario", "latency"];
+const isKitParam = (name: string) =>
+  KIT_PARAMS.includes(name) || name.startsWith("opt-");
 
 /** Floating controls for the prototype. Styled apart from the screen so it's never mistaken for the design. */
 export function ProtoBar({
@@ -45,6 +50,7 @@ export function ProtoBar({
   scenarios,
   currentVariant,
   currentScenario,
+  options,
 }: ProtoBarProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -56,15 +62,16 @@ export function ProtoBar({
     searchParams.get("latency") === "slow",
   );
   const [mode, setMode] = useState<BarMode>("auto");
+  const [showOptions, setShowOptions] = useState(false);
 
   // Keeps the kit's other params, so a link always reproduces what's on screen.
   const setParam = (name: string, value: string) => {
     const next = new URLSearchParams(searchParams);
     // A screen's own params, such as a wizard's `step`, belong to the variant and scenario they
-    // were set in. A new one starts where its scenario says.
-    if (name !== "latency") {
+    // were set in. A new one starts where its scenario says. Options keep them.
+    if (name === "variant" || name === "scenario") {
       for (const key of [...next.keys()]) {
-        if (!KIT_PARAMS.includes(key)) next.delete(key);
+        if (!isKitParam(key)) next.delete(key);
       }
     }
     next.set(name, value);
@@ -180,6 +187,20 @@ export function ProtoBar({
           Slow actions
         </label>
 
+        {options.length > 0 && (
+          <button
+            type="button"
+            aria-expanded={showOptions}
+            aria-controls="proto-options"
+            className="rounded-full px-2 py-1 underline underline-offset-4 hover:bg-background/20"
+            onClick={() => {
+              setShowOptions(!showOptions);
+            }}
+          >
+            Options
+          </button>
+        )}
+
         <button
           type="button"
           aria-label="Hide prototype controls"
@@ -190,6 +211,58 @@ export function ProtoBar({
         >
           ×
         </button>
+
+        {/* No select or live region here: kit/screenshots.mts finds the scenario picker and the
+            variant name by those. */}
+        {showOptions && (
+          <div
+            id="proto-options"
+            className="flex basis-full flex-col gap-2 border-t border-background/20 pt-2"
+          >
+            {options.map((option) => {
+              const value =
+                searchParams.get(optionParam(option.key)) ?? option.default;
+              if (isOnOff(option)) {
+                return (
+                  <label key={option.key} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={value === "on"}
+                      onChange={(event) => {
+                        setParam(
+                          optionParam(option.key),
+                          event.target.checked ? "on" : "off",
+                        );
+                      }}
+                    />
+                    {option.label}
+                  </label>
+                );
+              }
+              return (
+                <fieldset
+                  key={option.key}
+                  className="flex flex-wrap items-center gap-1"
+                >
+                  <legend className="float-left mr-2">{option.label}</legend>
+                  {option.choices.map((choice) => (
+                    <button
+                      key={choice.value}
+                      type="button"
+                      aria-pressed={value === choice.value}
+                      className="rounded-full px-2 py-0.5 hover:bg-background/20 aria-pressed:bg-background aria-pressed:text-foreground"
+                      onClick={() => {
+                        setParam(optionParam(option.key), choice.value);
+                      }}
+                    >
+                      {choice.label}
+                    </button>
+                  ))}
+                </fieldset>
+              );
+            })}
+          </div>
+        )}
       </div>
     </nav>
   );

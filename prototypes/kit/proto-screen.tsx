@@ -1,3 +1,4 @@
+import type { ProtoOption } from "./options";
 import { ProtoBar } from "./proto-bar";
 import { pick, type Scenarios, type Variants } from "./scenarios";
 
@@ -5,6 +6,8 @@ interface ProtoScreenProps<Props extends object> {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
   variants: Variants<Props>;
   scenarios: Scenarios<Props>;
+  /** Design choices to switch on and off in the ProtoBar. */
+  options?: readonly ProtoOption[];
 }
 
 /**
@@ -15,6 +18,7 @@ export async function ProtoScreen<Props extends object>({
   searchParams,
   variants,
   scenarios,
+  options = [],
 }: ProtoScreenProps<Props>) {
   const params = await searchParams;
   const variant = pick(variants, params.variant);
@@ -33,6 +37,7 @@ export async function ProtoScreen<Props extends object>({
         scenarios={Object.keys(scenarios)}
         currentVariant={variant.key}
         currentScenario={scenario.key}
+        options={options}
       />
     </>
   );
