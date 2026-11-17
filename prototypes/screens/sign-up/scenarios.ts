@@ -2,7 +2,8 @@
 // no app shell. Email and password through Better Auth, plus what to call the user, so Setup and
 // Home can greet them. Everything here is faked in memory. Features F18 and F19.
 //
-// Finalized on 2026-11-12 as "Green split": a promise on green beside a plain form.
+// Finalized on 2026-11-12 as "Green split": a promise on green beside the form. On 2026-11-17 the
+// form moved onto Sign in's card (components/signed-out/card.tsx).
 // Verify later: the account works at once. "Account made" says a link was sent, with Start setup
 // as the next step, Send it again, and a way to fix a mistyped email. Opening an old link shows
 // "This link has expired".

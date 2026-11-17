@@ -23,8 +23,34 @@ export const HELP_LINK = cn(TEXT_LINK, "text-foreground");
 /** The card's foot: a hairline, then one line of small helper text. */
 export const CARD_FOOT = "border-t pt-6 text-sm text-muted-foreground";
 
+/**
+ * The card itself: white with rounded corners from tablet width, centred by its column. On phones
+ * the page is the card.
+ */
+export const CARD =
+  "flex flex-col gap-6 px-1 pt-4 sm:rounded-(--block-radius) sm:border sm:bg-card sm:p-10 sm:text-card-foreground sm:shadow-sm";
+
 /** The links under the card. The pages aren't written yet, so they are stand-ins. */
 const FOOTER_LINKS = ["Terms", "Privacy policy", "Help"] as const;
+
+/** Terms · Privacy policy · Help, under the card. */
+export function FooterLinks() {
+  return (
+    <p className="flex flex-wrap justify-center gap-x-2 px-1 text-center text-sm text-muted-foreground">
+      {FOOTER_LINKS.map((screen, index) => (
+        <Fragment key={screen}>
+          {index > 0 && <span aria-hidden="true">·</span>}
+          <ScreenLink
+            screen={screen}
+            className="underline-offset-4 hover:underline"
+          >
+            {screen}
+          </ScreenLink>
+        </Fragment>
+      ))}
+    </p>
+  );
+}
 
 interface SignedOutCardProps {
   /**
@@ -55,27 +81,13 @@ export function SignedOutCard({ way, children }: SignedOutCardProps) {
       }
     >
       <div className="mx-auto flex w-full max-w-md flex-col gap-6 sm:flex-1 sm:justify-center sm:py-6">
-        <section className="flex flex-col gap-6 px-1 pt-4 sm:rounded-(--block-radius) sm:border sm:bg-card sm:p-10 sm:text-card-foreground sm:shadow-sm">
-          {children}
-        </section>
-        <div className="flex flex-col items-center gap-3 px-1 text-center text-sm text-muted-foreground">
-          <p className="flex items-center gap-2">
+        <section className={CARD}>{children}</section>
+        <div className="flex flex-col items-center gap-3">
+          <p className="flex items-center gap-2 px-1 text-center text-sm text-muted-foreground">
             <Lock aria-hidden="true" className="size-4 shrink-0" />
             Only you can see what you own and owe.
           </p>
-          <p className="flex flex-wrap justify-center gap-x-2">
-            {FOOTER_LINKS.map((screen, index) => (
-              <Fragment key={screen}>
-                {index > 0 && <span aria-hidden="true">·</span>}
-                <ScreenLink
-                  screen={screen}
-                  className="underline-offset-4 hover:underline"
-                >
-                  {screen}
-                </ScreenLink>
-              </Fragment>
-            ))}
-          </p>
+          <FooterLinks />
         </div>
       </div>
     </SignedOutFrame>

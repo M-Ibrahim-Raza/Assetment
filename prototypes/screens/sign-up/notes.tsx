@@ -19,13 +19,13 @@ export function SentNote({ flow }: { flow: SignUpFlow }) {
   const [changing, setChanging] = useState(false);
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-lg">
+      <p>
         We sent a link to <Email email={flow.draft.email.trim()} />. Open it any
         time to confirm your email. You can start now.
       </p>
       <ScreenLink
         screen="Setup"
-        className={cn(buttonVariants(), BIG, "self-start")}
+        className={cn(buttonVariants(), BIG, "w-full")}
       >
         Start setup
         <ArrowRight data-icon="inline-end" />
@@ -120,7 +120,7 @@ function ChangeEmail({
 export function ExpiredNote({ flow }: { flow: SignUpFlow }) {
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-lg">
+      <p>
         Links stop working after a while, to keep your account safe. We’ll send
         a new one to <Email email={flow.draft.email.trim()} />.
       </p>
@@ -129,7 +129,7 @@ export function ExpiredNote({ flow }: { flow: SignUpFlow }) {
         onClick={() => {
           flow.sendNew.run();
         }}
-        className={cn(BIG, "self-start")}
+        className={cn(BIG, "w-full")}
       >
         {flow.sendNew.pending ? "Sending…" : "Send a new link"}
       </Button>
@@ -137,7 +137,7 @@ export function ExpiredNote({ flow }: { flow: SignUpFlow }) {
         screen="Setup"
         className={cn(
           buttonVariants({ variant: "ghost", size: "lg" }),
-          "self-start",
+          "w-full",
         )}
       >
         Carry on with setup
