@@ -187,6 +187,39 @@
 //   sync with web until changed), Power BI and Explo (a phone layout that never touches the
 //   desktop one). Not chosen: always two layouts (every change twice for most people), and
 //   "Show on: Phone · Computer" per section (no different order or options).
+// - Placing the sections on a computer (2026-11-18): c split them into two columns by count,
+//   which left a tall strip of empty page beside the entries, put By category and By account at
+//   different widths, and ended cards in a row at different heights. d places them by
+//   shape: the pace chart is wide, By category, By account and the calendar are tiles, and the
+//   entries are a list. People still choose what shows and in what order; the screen places it.
+//   Two columns only when the sections area is at least 44rem wide, by its own width, not the
+//   window's (the sidebar takes room). Read left to right, top to bottom, two to a row. A wide
+//   section takes its own row, and a tile left alone before it takes a full row too. Two tiles
+//   share a row and a height: two breakdowns half each, the calendar 3 of 5, so day amounts fit.
+//   A donut chart sits in the middle of a stretched card, and lists keep to the top. A calendar
+//   on its own row has cells shorter than square, so the month isn't 800 px tall.
+//   Tried as d and e, both kept: Customize has "Layout on computers" under the switch for the
+//   phone's layout, Side column (the default) or Rows, two buttons with icons like "Show as",
+//   with a line on the one picked. It isn't on the Phone tab: phones stack the sections. It's
+//   saved with the computers' layout, and Reset there sets it back.
+//   Side column: the entries take one column and tiles next to them the other, which sticks
+//   while the list scrolls (scrolling to its bottom first when it's taller than the window).
+//   The entries' head (heading, search, sort and count) stays at the top too, and the day
+//   headings stop under it.
+//   They all filter the entries, so a pick shows its result right beside it. A tile left over
+//   before the entries sits on the left; tiles after them sit on the right, and a tile left over
+//   before then takes its own row: on the left with them it would read out of the person's order
+//   on a phone, or out of the screen's order for Tab. A column holding the calendar gets 3 of 5,
+//   else the entries do. The entries with no tile next to them take the full row.
+//   Rows: the same, but the entries always take a row of their own.
+//   From Cloudscape's board items, Rubrik's size tiers, Apromore's widget sizes (items have
+//   sizes, a grid places them), Material 3's canonical layouts (list-detail, supporting pane),
+//   PatternFly's sidebar and Zoho's list sidebar (a sticky panel beside a long list), and Rachel
+//   Andrew and CSS WG issue #5675 (masonry's reading order). Not chosen: masonry (order on
+//   screen stops matching Customize and Tab), a free drag-and-resize grid (an edit mode, ragged
+//   results), fixed zones such as breakdowns always on the left (ignores the person's order), a
+//   size per section, Half or Full (more ways to look broken; only if people ask). Later: a
+//   small map in Customize of where each section lands.
 //
 // - Settled at /prototype-finalize (2026-11-17):
 //   - "Usual" stays the name for the average of up to 3 months before.
@@ -360,6 +393,51 @@ export const scenarios = {
           entries: { compact: true },
         },
       },
+    },
+  },
+  // A tile with nothing to pair with before the pace chart: By category on its own row, then the
+  // chart, then By account beside the entries. The calendar is hidden.
+  "lone-tile": {
+    status: "ready",
+    spending: { today, months: spendingMonths() },
+    layout: {
+      order: ["categories", "pace", "accounts", "entries", "calendar"],
+      hidden: ["calendar"],
+    },
+  },
+  // Only the entries, which can't be hidden.
+  "entries-only": {
+    status: "ready",
+    spending: { today, months: spendingMonths() },
+    layout: {
+      order: ["pace", "categories", "accounts", "calendar", "entries"],
+      hidden: ["pace", "categories", "accounts", "calendar"],
+    },
+  },
+  // Three days picked: a short list beside the calendar.
+  "day-picked": {
+    status: "ready",
+    spending: { today, months: spendingMonths() },
+    start: { day: "8-10" },
+  },
+  // Rows picked in Customize: the entries on a row of their own.
+  rows: {
+    status: "ready",
+    spending: { today, months: spendingMonths() },
+    layout: {
+      order: ["pace", "categories", "accounts", "calendar", "entries"],
+      hidden: ["pace"],
+      arrangement: "rows",
+    },
+  },
+  // By category as a donut chart beside By account as a list.
+  "mixed-charts": {
+    status: "ready",
+    spending: { today, months: spendingMonths() },
+    layout: {
+      order: ["pace", "categories", "accounts", "calendar", "entries"],
+      hidden: ["pace"],
+      settings: { categories: { chart: true } },
     },
   },
   loading: { status: "loading" },

@@ -2,7 +2,14 @@
 
 import { ArrowDown, ArrowUp, Minus, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { type ReactNode, use, useId } from "react";
+import {
+  type ReactNode,
+  type RefObject,
+  use,
+  useEffect,
+  useId,
+  useRef,
+} from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -493,7 +500,52 @@ interface EntriesListProps {
   params: SpendingParams;
   /** The list's own settings, switched in Customize. */
   options: EntriesSettings;
+  /** The section's heading and what goes with it, first in the head. */
+  head?: ReactNode;
+  /**
+   * Beside a side column, on a screen with two columns, the head (the heading, search, sort and
+   * count) stays at the top while the entries scroll under it, and the day headings stop under it.
+   */
+  pinned?: boolean;
   className?: string;
+}
+
+// Where a pinned head stops: the gap between blocks below the window's top, as the side column.
+const PIN_GAP = 12;
+
+/**
+ * A pinned head: from two columns, it sticks a gap below the window's top. It starts at the
+ * card's top edge, so the card's padding goes with it, and a strip of page above it hides the
+ * rows that scroll past in the gap.
+ */
+const PINNED_HEAD =
+  "@min-[44rem]:sticky @min-[44rem]:top-3 @min-[44rem]:z-20 @min-[44rem]:-mt-6 @min-[44rem]:bg-card @min-[44rem]:pt-6 @min-[44rem]:before:absolute @min-[44rem]:before:-inset-x-10 @min-[44rem]:before:bottom-full @min-[44rem]:before:h-3 @min-[44rem]:before:bg-background";
+
+/**
+ * While `on`, keeps `--entries-head` on the list at where its day headings stop: under the pinned
+ * head, which changes height as filters come and go.
+ */
+function usePinnedHead(
+  list: RefObject<HTMLElement | null>,
+  head: RefObject<HTMLElement | null>,
+  on: boolean,
+) {
+  useEffect(() => {
+    const root = list.current;
+    const top = head.current;
+    if (!on || root === null || top === null) return;
+    const observer = new ResizeObserver(() => {
+      root.style.setProperty(
+        "--entries-head",
+        `${String(PIN_GAP + top.offsetHeight)}px`,
+      );
+    });
+    observer.observe(top);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty("--entries-head");
+    };
+  }, [list, head, on]);
 }
 
 // Each way to sort the entries: its name, what its usual and reversed ways are called, and
@@ -560,9 +612,14 @@ export function EntriesList({
   summary,
   params,
   options,
+  head,
+  pinned = false,
   className,
 }: EntriesListProps) {
   const searchId = useId();
+  const listRef = useRef<HTMLDivElement>(null);
+  const headRef = useRef<HTMLDivElement>(null);
+  usePinnedHead(listRef, headRef, pinned);
   const { category, account, q } = params;
   const { days, month } = summary;
   const oneDay = days !== null && days.from === days.to;
@@ -577,89 +634,95 @@ export function EntriesList({
   const filtered = category !== undefined || account !== undefined || q !== "";
 
   return (
-    <div className={cn("flex flex-col gap-4", className)}>
-      {(!oneDay || q !== "") && (
-        <div className="flex flex-col gap-2">
-          <label htmlFor={searchId} className="text-sm font-medium">
-            Search entries
-          </label>
-          <div className="relative">
-            <Search
-              aria-hidden="true"
-              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-            />
-            <Input
-              id={searchId}
-              type="search"
-              inputMode="search"
-              enterKeyHint="search"
-              autoComplete="off"
-              value={q}
-              onChange={(event) => {
-                params.setQuery(event.target.value);
-              }}
-              className="h-11 bg-background pl-9 text-base"
-            />
+    <div ref={listRef} className={cn("flex flex-col gap-4", className)}>
+      <div
+        ref={headRef}
+        className={cn("flex flex-col gap-4", pinned && PINNED_HEAD)}
+      >
+        {head}
+        {(!oneDay || q !== "") && (
+          <div className="flex flex-col gap-2">
+            <label htmlFor={searchId} className="text-sm font-medium">
+              Search entries
+            </label>
+            <div className="relative">
+              <Search
+                aria-hidden="true"
+                className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+              />
+              <Input
+                id={searchId}
+                type="search"
+                inputMode="search"
+                enterKeyHint="search"
+                autoComplete="off"
+                value={q}
+                onChange={(event) => {
+                  params.setQuery(event.target.value);
+                }}
+                className="h-11 bg-background pl-9 text-base"
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {canSort && (
-        <SortMenu
-          fields={ENTRY_SORTS}
-          keys={ENTRY_SORT_KEYS}
-          order={order}
-          onOrder={params.setSort}
-          label="Sort entries"
-          className="-ml-2 self-start"
-        />
-      )}
-
-      {filtered && (
-        <div className="flex flex-wrap items-center gap-2">
-          {category !== undefined && (
-            <FilterChip
-              label={category}
-              onRemove={() => {
-                params.setCategory(undefined);
-              }}
-            />
-          )}
-          {account !== undefined && (
-            <FilterChip
-              label={account}
-              onRemove={() => {
-                params.setAccount(undefined);
-              }}
-            />
-          )}
-          {q !== "" && (
-            <FilterChip
-              label={`“${q}”`}
-              onRemove={() => {
-                params.setQuery("");
-              }}
-            />
-          )}
-          {/* At night the theme colour is too dark for text, so links use its pale accent. */}
-          <Button
-            variant="link"
-            className="h-11 px-1 dark:text-accent-foreground"
-            onClick={params.clearFilters}
-          >
-            Clear filters
-          </Button>
-        </div>
-      )}
-
-      {shown.length > 0 && (
-        <p aria-live="polite" className="text-sm font-semibold">
-          {shown.length} {shown.length === 1 ? "entry" : "entries"} ·{" "}
-          <Money
-            value={shown.reduce((total, entry) => total + entry.amount, 0)}
+        {canSort && (
+          <SortMenu
+            fields={ENTRY_SORTS}
+            keys={ENTRY_SORT_KEYS}
+            order={order}
+            onOrder={params.setSort}
+            label="Sort entries"
+            className="-ml-2 self-start"
           />
-        </p>
-      )}
+        )}
+
+        {filtered && (
+          <div className="flex flex-wrap items-center gap-2">
+            {category !== undefined && (
+              <FilterChip
+                label={category}
+                onRemove={() => {
+                  params.setCategory(undefined);
+                }}
+              />
+            )}
+            {account !== undefined && (
+              <FilterChip
+                label={account}
+                onRemove={() => {
+                  params.setAccount(undefined);
+                }}
+              />
+            )}
+            {q !== "" && (
+              <FilterChip
+                label={`“${q}”`}
+                onRemove={() => {
+                  params.setQuery("");
+                }}
+              />
+            )}
+            {/* At night the theme colour is too dark for text, so links use its pale accent. */}
+            <Button
+              variant="link"
+              className="h-11 px-1 dark:text-accent-foreground"
+              onClick={params.clearFilters}
+            >
+              Clear filters
+            </Button>
+          </div>
+        )}
+
+        {shown.length > 0 && (
+          <p aria-live="polite" className="text-sm font-semibold">
+            {shown.length} {shown.length === 1 ? "entry" : "entries"} ·{" "}
+            <Money
+              value={shown.reduce((total, entry) => total + entry.amount, 0)}
+            />
+          </p>
+        )}
+      </div>
 
       {shown.length === 0 ? (
         <NoEntries summary={summary} params={params} filtered={filtered} />
@@ -777,7 +840,7 @@ function EntryGroups({
     <div className="flex flex-col gap-6">
       {groups.map((group) => (
         <section key={group.key} className="flex flex-col gap-1">
-          <h3 className="sticky top-0 z-10 flex items-baseline justify-between gap-3 border-b border-foreground/15 bg-card pt-3 pb-2 text-sm font-semibold text-muted-foreground">
+          <h3 className="sticky top-0 z-10 flex items-baseline justify-between gap-3 border-b border-foreground/15 bg-card pt-3 pb-2 text-sm font-semibold text-muted-foreground @min-[44rem]:top-(--entries-head,0px)">
             <span className="min-w-0 wrap-break-word">{group.label}</span>
             {(totals || (running && group.running !== undefined)) && (
               <span className="flex shrink-0 flex-col items-end gap-0.5 text-right">

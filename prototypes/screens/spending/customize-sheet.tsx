@@ -5,10 +5,12 @@ import {
   ArrowUp,
   ChartPie,
   ChevronDown,
+  Columns2,
   List,
   Lock,
   type LucideIcon,
   Monitor,
+  Rows3,
   SlidersHorizontal,
   Smartphone,
 } from "lucide-react";
@@ -26,6 +28,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 import { DISPLAY } from "@proto/screens/dashboard/parts";
 import {
+  DEFAULT_ARRANGEMENT,
   DEFAULT_LAYOUT,
   isDefault,
   isShown,
@@ -190,6 +193,7 @@ export function CustomizeSheet({
   const tab = split ? (picked ?? screen) : screen;
   // The layout being changed: the tab's, or the shared one.
   const current = screenLayout(layout, tab);
+  const rows = (current.arrangement ?? DEFAULT_ARRANGEMENT) === "rows";
   // ", on phones" after each change while the two differ, so it's clear which one changed.
   const where = split
     ? tab === "phone"
@@ -287,6 +291,30 @@ export function CustomizeSheet({
                 );
               }}
             />
+            {/* Phones always stack the sections, so the Phone tab has no such choice. */}
+            {!(split && tab === "phone") && (
+              <div className="border-t">
+                <WaysRow
+                  name="Layout on computers"
+                  ways={["Side column", "Rows"]}
+                  about={
+                    rows
+                      ? "Entries take a row of their own, under the other sections."
+                      : "Entries sit beside a column of sections that stays in view."
+                  }
+                  on={rows}
+                  onChange={(on) => {
+                    apply(
+                      withScreen(layout, tab, {
+                        ...current,
+                        arrangement: on ? "rows" : "side-column",
+                      }),
+                      `Layout on computers: ${on ? "rows" : "side column"}.`,
+                    );
+                  }}
+                />
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-3 rounded-2xl bg-muted px-4 py-3">
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -623,25 +651,32 @@ function SectionRow({
 const WAY_ICONS: Readonly<Record<string, LucideIcon>> = {
   List,
   "Donut chart": ChartPie,
+  "Side column": Columns2,
+  Rows: Rows3,
 };
 
 /**
  * A choice between two equal ways, such as List and Donut chart: its name, then two buttons of
- * the same size, each with its icon. It comes first and a rule sets it apart from the switches
- * under it, which belong to one of the ways. Pressing the one already on leaves it on.
+ * the same size, each with its icon, and a line on the one picked, if it has one. It comes first
+ * and a rule sets it apart from the switches under it, which belong to one of the ways. Pressing
+ * the one already on leaves it on.
  */
 function WaysRow({
   name,
   ways,
+  about,
   on,
   onChange,
 }: {
   name: string;
   ways: readonly [string, string];
+  /** What the way picked does. */
+  about?: string;
   on: boolean;
   onChange: (on: boolean) => void;
 }) {
   const nameId = useId();
+  const aboutId = useId();
   return (
     <div className="flex flex-col gap-2 py-2 not-last:mb-1 not-last:border-b not-last:pb-4">
       <p id={nameId} className="text-sm font-medium text-muted-foreground">
@@ -649,6 +684,7 @@ function WaysRow({
       </p>
       <ToggleGroup
         aria-labelledby={nameId}
+        {...(about === undefined ? {} : { "aria-describedby": aboutId })}
         variant="outline"
         spacing={0}
         value={[on ? "on" : "off"]}
@@ -674,6 +710,11 @@ function WaysRow({
           );
         })}
       </ToggleGroup>
+      {about !== undefined && (
+        <p id={aboutId} className="text-sm text-muted-foreground">
+          {about}
+        </p>
+      )}
     </div>
   );
 }

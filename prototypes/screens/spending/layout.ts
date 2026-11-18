@@ -69,11 +69,21 @@ export interface SectionSettings {
 export type SetKey = keyof SectionSettings;
 
 /** Which sections show, in what order, and each section's own settings, on one kind of screen. */
+/**
+ * How the sections sit on a screen wide enough for two columns. Side column: the entries beside a
+ * column of other sections that stays in view. Rows: the entries on a row of their own.
+ */
+export type Arrangement = "side-column" | "rows";
+
+export const DEFAULT_ARRANGEMENT: Arrangement = "side-column";
+
 export interface ScreenLayout {
   order: readonly SectionKey[];
   hidden: readonly SectionKey[];
   /** Missing, or missing a setting, means the default. */
   settings?: { [Key in SetKey]?: Partial<SectionSettings[Key]> };
+  /** Computers and tablets only: phones stack the sections. Missing means a side column. */
+  arrangement?: Arrangement;
 }
 
 /**
@@ -432,12 +442,27 @@ function normalizeScreen(layout: ScreenLayout): ScreenLayout {
   };
 }
 
-/** The layout, and the phone's own if it has one, each made whole by `normalizeScreen`. */
+/**
+ * The layout, and the phone's own if it has one, each made whole by `normalizeScreen`. Only the
+ * computers' has an arrangement.
+ */
 export function normalize(layout: SpendingLayout): SpendingLayout {
-  const main = normalizeScreen(layout);
+  const main = {
+    ...normalizeScreen(layout),
+    arrangement: layout.arrangement ?? DEFAULT_ARRANGEMENT,
+  };
   return layout.phone === undefined
     ? main
     : { ...main, phone: normalizeScreen(layout.phone) };
+}
+
+/** A layout's sections and their settings, without the computers' arrangement. */
+function sectionsOf(layout: ScreenLayout): ScreenLayout {
+  return {
+    order: layout.order,
+    hidden: layout.hidden,
+    ...(layout.settings === undefined ? {} : { settings: layout.settings }),
+  };
 }
 
 /** Whether phones have their own layout. */
@@ -451,9 +476,10 @@ export function screenLayout(
   screen: ScreenKind,
 ): ScreenLayout {
   const main: ScreenLayout = {
-    order: layout.order,
-    hidden: layout.hidden,
-    ...(layout.settings === undefined ? {} : { settings: layout.settings }),
+    ...sectionsOf(layout),
+    ...(layout.arrangement === undefined
+      ? {}
+      : { arrangement: layout.arrangement }),
   };
   return screen === "phone" ? (layout.phone ?? main) : main;
 }
@@ -479,9 +505,15 @@ export function setSame(
   same: boolean,
   keep: ScreenKind,
 ): SpendingLayout {
-  if (same) return screenLayout(layout, keep);
+  // Computers keep their arrangement, whichever tab's sections are kept. Phones have none.
+  if (same) {
+    const kept = sectionsOf(screenLayout(layout, keep));
+    return layout.arrangement === undefined
+      ? kept
+      : { ...kept, arrangement: layout.arrangement };
+  }
   return layout.phone === undefined
-    ? { ...layout, phone: screenLayout(layout, "wide") }
+    ? { ...layout, phone: sectionsOf(layout) }
     : layout;
 }
 
@@ -532,6 +564,7 @@ export function isDefault(layout: ScreenLayout): boolean {
     normal.order.join() === DEFAULT_LAYOUT.order.join() &&
     normal.hidden.toSorted().join() ===
       DEFAULT_LAYOUT.hidden.toSorted().join() &&
+    normal.arrangement === DEFAULT_ARRANGEMENT &&
     sameAsDefault("pace", settings.pace) &&
     sameAsDefault("categories", settings.categories) &&
     sameAsDefault("accounts", settings.accounts) &&

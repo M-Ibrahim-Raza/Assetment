@@ -2,6 +2,7 @@
 
 import { CalendarRange } from "lucide-react";
 import {
+  createContext,
   Fragment,
   type MouseEvent,
   type PointerEvent,
@@ -25,6 +26,7 @@ import {
   INK,
   PAD,
 } from "@proto/screens/dashboard/parts";
+import { arrange, type Row } from "./arrange";
 import { BreakdownDonut } from "./breakdown-donut";
 import {
   CustomizeButton,
@@ -34,6 +36,7 @@ import {
 import {
   type BreakdownSettings,
   type CalendarSettings,
+  DEFAULT_ARRANGEMENT,
   DEFAULT_LAYOUT,
   type EntriesSettings,
   isShown,
@@ -73,6 +76,7 @@ import {
 import type { Spending, SpendingFilters, SpendingViewProps } from "./scenarios";
 import { useScreen } from "./use-screen";
 import { type SpendingParams, useSpendingParams } from "./use-spending-params";
+import { useStickyTop } from "./use-sticky-top";
 
 // Monday first, as Pakistani calendars print it.
 const WEEKDAYS = [
@@ -91,13 +95,12 @@ const SWIPE_PX = 50;
 // How many categories or accounts show before "Show all".
 const TOP_ROWS = 5;
 
-// Sections that take the full width on desktop. The rest pair up in two columns.
-const WIDE: readonly SectionKey[] = ["pace"];
-
 /**
  * Days: the month's total and answer on ink, always first. Under it, the sections the person
  * chose, in their order: the pace chart, the biggest categories, the month as a calendar shaded by
- * what was spent, and the entries. Customize, in the header, shows, hides and moves them.
+ * what was spent, and the entries. Customize, in the header, shows, hides and moves them. On a
+ * computer they sit in rows by shape, with the entries beside a sticky side column or on a row of
+ * their own, a choice in Customize.
  */
 export function Days(props: SpendingViewProps) {
   if (props.status === "ready" && !isFirstUse(props.spending)) {
@@ -157,22 +160,96 @@ function scrollToEntries() {
   });
 }
 
-type Run = { wide: SectionKey } | { pair: SectionKey[] };
+// Two columns from this width of the sections area, not the window's: the sidebar takes room.
+const TWO_COLUMNS = "flex flex-col gap-3 @min-[44rem]:grid";
+
+/** A row's two columns: halves, or 3 of 5 for the wider one, the first or the second. */
+function columns(wider: 0 | 1 | null): string {
+  if (wider === null) return "@min-[44rem]:grid-cols-2";
+  return wider === 0
+    ? "@min-[44rem]:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]"
+    : "@min-[44rem]:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]";
+}
 
 /**
- * Groups the shown sections for desktop: a wide one on its own row, and the others in runs that
- * share two columns, the first half (at least one) stacked on the left and the rest on the right.
- * Phones show them in order either way.
+ * The sections in rows by shape. Cards in a row stretch to one height. On phones and
+ * narrow windows, the same rows stack in one column, in the person's order.
  */
-function runs(keys: readonly SectionKey[]): Run[] {
-  const out: Run[] = [];
-  for (const key of keys) {
-    const last = out.at(-1);
-    if (WIDE.includes(key)) out.push({ wide: key });
-    else if (last !== undefined && "pair" in last) last.pair.push(key);
-    else out.push({ pair: [key] });
-  }
-  return out;
+function SectionRows({
+  rows,
+  sections,
+}: {
+  rows: readonly Row[];
+  sections: Record<SectionKey, ReactNode>;
+}) {
+  return (
+    <div className="@container flex flex-col gap-3">
+      {rows.map((row) => {
+        if (row.kind === "wide" || row.kind === "full") {
+          return <Fragment key={row.key}>{sections[row.key]}</Fragment>;
+        }
+        if (row.kind === "list") {
+          return (
+            <ListRow
+              key={[row.key, ...row.side].join("-")}
+              row={row}
+              sections={sections}
+            />
+          );
+        }
+        const [first, second] = row.keys;
+        return (
+          <div
+            key={row.keys.join("-")}
+            className={cn(TWO_COLUMNS, columns(row.wider))}
+          >
+            {sections[first]}
+            {sections[second]}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Whether the entries sit beside a side column, where their head stays in view too. */
+const BesideSideColumn = createContext(false);
+
+/**
+ * The entries in one column, and tiles in the other, which stays in view while the list scrolls.
+ * It's first in the page when it's on the left, so Tab follows the screen.
+ */
+function ListRow({
+  row,
+  sections,
+}: {
+  row: Extract<Row, { kind: "list" }>;
+  sections: Record<SectionKey, ReactNode>;
+}) {
+  const column = useRef<HTMLDivElement>(null);
+  const top = useStickyTop(column);
+  const side = (
+    // `top` does nothing until the column is sticky, from two columns.
+    <div
+      ref={column}
+      style={{ top }}
+      className="flex flex-col gap-3 @min-[44rem]:sticky @min-[44rem]:self-start"
+    >
+      {row.side.map((key) => (
+        <Fragment key={key}>{sections[key]}</Fragment>
+      ))}
+    </div>
+  );
+  const left = row.at === "left";
+  // The wider column, 0 or 1: the side column's place if it's wider, else the entries'.
+  const wider = (row.wider === "side") === left ? 0 : 1;
+  return (
+    <div className={cn(TWO_COLUMNS, columns(wider))}>
+      {left && side}
+      <BesideSideColumn value>{sections[row.key]}</BesideSideColumn>
+      {!left && side}
+    </div>
+  );
 }
 
 function Ready({
@@ -319,35 +396,13 @@ function Ready({
     >
       <div className="flex flex-col gap-3">
         <SummaryBlock spending={spending} summary={summary} params={params} />
-        {runs(shown).map((run) => {
-          if ("wide" in run) {
-            return <Fragment key={run.wide}>{sections[run.wide]}</Fragment>;
-          }
-          // With 4 sections, By category and By account sit on the left, so neither column runs
-          // far past the other.
-          const half = Math.max(1, Math.floor(run.pair.length / 2));
-          const left = run.pair.slice(0, half);
-          const right = run.pair.slice(half);
-          if (right.length === 0) {
-            return left.map((key) => (
-              <Fragment key={key}>{sections[key]}</Fragment>
-            ));
-          }
-          return (
-            <div
-              key={run.pair.join("-")}
-              className="flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:items-start"
-            >
-              {[left, right].map((column) => (
-                <div key={column.join("-")} className="flex flex-col gap-3">
-                  {column.map((key) => (
-                    <Fragment key={key}>{sections[key]}</Fragment>
-                  ))}
-                </div>
-              ))}
-            </div>
-          );
-        })}
+        <SectionRows
+          rows={arrange(shown, {
+            sideColumn:
+              (here.arrangement ?? DEFAULT_ARRANGEMENT) === "side-column",
+          })}
+          sections={sections}
+        />
       </div>
 
       <CustomizeSheet
@@ -382,6 +437,7 @@ function EntriesSection({
   onCustomize: () => void;
 }) {
   const { month, days } = summary;
+  const pinned = use(BesideSideColumn);
 
   return (
     <section
@@ -389,32 +445,46 @@ function EntriesSection({
       aria-labelledby="entries-heading"
       className={cn("flex scroll-mt-3 flex-col gap-4 bg-card py-6", BLOCK, PAD)}
     >
-      <div className="flex items-center justify-between gap-2">
-        <h2
-          id="entries-heading"
-          className={cn(DISPLAY, "text-2xl font-extrabold tracking-tight")}
-        >
-          {days === null ? `All of ${month.name}` : daysLabel(month, days)}
-        </h2>
-        <SectionCustomizeButton
-          name="Entries"
-          onClick={onCustomize}
-          className="-my-2 -mr-2"
-        />
-      </div>
-      {days !== null && (
-        <Button
-          variant="outline"
-          size="lg"
-          className="h-11 self-start"
-          onClick={() => {
-            params.setDays(undefined);
-          }}
-        >
-          See all of {month.name}
-        </Button>
-      )}
-      <EntriesList summary={summary} params={params} options={options} />
+      <EntriesList
+        summary={summary}
+        params={params}
+        options={options}
+        pinned={pinned}
+        head={
+          <>
+            <div className="flex items-center justify-between gap-2">
+              <h2
+                id="entries-heading"
+                className={cn(
+                  DISPLAY,
+                  "text-2xl font-extrabold tracking-tight",
+                )}
+              >
+                {days === null
+                  ? `All of ${month.name}`
+                  : daysLabel(month, days)}
+              </h2>
+              <SectionCustomizeButton
+                name="Entries"
+                onClick={onCustomize}
+                className="-my-2 -mr-2"
+              />
+            </div>
+            {days !== null && (
+              <Button
+                variant="outline"
+                size="lg"
+                className="h-11 self-start"
+                onClick={() => {
+                  params.setDays(undefined);
+                }}
+              >
+                See all of {month.name}
+              </Button>
+            )}
+          </>
+        }
+      />
     </section>
   );
 }
@@ -553,17 +623,20 @@ function BreakdownSection({
         )}
       </div>
       {chart ? (
-        <BreakdownDonut
-          summary={summary}
-          rows={rows}
-          by={by}
-          plural={plural}
-          selected={selected}
-          onSelect={onSelect}
-          usual={usual}
-          options={donut}
-          actions={actions}
-        />
+        // In a card stretched to its neighbour's height, the chart sits in the middle of the room.
+        <div className="flex flex-1 flex-col justify-center">
+          <BreakdownDonut
+            summary={summary}
+            rows={rows}
+            by={by}
+            plural={plural}
+            selected={selected}
+            onSelect={onSelect}
+            usual={usual}
+            options={donut}
+            actions={actions}
+          />
+        </div>
       ) : (
         <BreakdownRows
           summary={summary}
@@ -648,6 +721,12 @@ function useSwipe(onSwipe: (by: 1 | -1) => void) {
 function between(one: number, two: number): DayRange {
   return { from: Math.min(one, two), to: Math.max(one, two) };
 }
+
+/**
+ * A day's cell: square, and shorter than square when the calendar is wide, alone on a row, so the
+ * month isn't 800 px tall.
+ */
+const CELL_SHAPE = "aspect-square @min-[40rem]:aspect-3/2";
 
 /** With week totals, from tablet width: seven days, then a wider column for the week's total. */
 const WEEK_GRID =
@@ -778,7 +857,12 @@ function Calendar({
     if (day > month.through) {
       return (
         <li key={day}>
-          <span className="flex aspect-square w-full items-start rounded-lg p-1.5 text-xs text-muted-foreground/60 @min-[30rem]:text-sm">
+          <span
+            className={cn(
+              "flex w-full items-start rounded-lg p-1.5 text-xs text-muted-foreground/60 @min-[30rem]:text-sm",
+              CELL_SHAPE,
+            )}
+          >
             <span className="sr-only">{name}, still to come</span>
             <span aria-hidden="true">{day}</span>
           </span>
@@ -803,7 +887,8 @@ function Calendar({
             tap(day, event);
           }}
           className={cn(
-            "relative flex aspect-square w-full flex-col justify-between overflow-hidden rounded-lg p-1.5 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+            "relative flex w-full flex-col justify-between overflow-hidden rounded-lg p-1.5 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+            CELL_SHAPE,
             shade(amount, largest),
             picked && "ring-2 ring-foreground ring-offset-1 ring-offset-card",
           )}
@@ -1008,7 +1093,64 @@ function CellAmount({ value }: { value: number }) {
   );
 }
 
-/** Shaped like the default layout: the ink summary, the categories, then the calendar. */
+/** A breakdown's card while loading: its heading and five rows. */
+function BreakdownSkeleton() {
+  return (
+    <div className={cn("flex flex-col gap-4 bg-card py-6", BLOCK, PAD)}>
+      <Skeleton className="h-8 w-40" />
+      {[0, 1, 2, 3, 4].map((line) => (
+        <div key={line} className="flex flex-col gap-2">
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-2.5 w-full" />
+          <Skeleton className="h-4 w-44" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// The skeleton for each section, for the rows of d and e.
+const SKELETONS: Record<SectionKey, ReactNode> = {
+  pace: (
+    <div className={cn("flex flex-col gap-4 py-6", INK, BLOCK, PAD)}>
+      <Skeleton className="h-8 w-40 bg-(--ink-foreground)/20" />
+      <Skeleton className="h-48 w-full bg-(--ink-foreground)/20" />
+    </div>
+  ),
+  categories: <BreakdownSkeleton />,
+  accounts: <BreakdownSkeleton />,
+  calendar: (
+    <div className={cn("flex flex-col gap-3 bg-card px-3 py-5 md:px-6", BLOCK)}>
+      <Skeleton className="h-8 w-48" />
+      <div className="@container">
+        <div className="grid grid-cols-7 gap-1">
+          {Array.from({ length: 35 }, (_, cell) => (
+            <Skeleton
+              key={`cell-${String(cell)}`}
+              className={cn("w-full", CELL_SHAPE)}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  ),
+  entries: (
+    <div className={cn("flex flex-col gap-4 bg-card py-6", BLOCK, PAD)}>
+      <Skeleton className="h-8 w-48" />
+      <Skeleton className="h-11 w-full" />
+      {[0, 1, 2, 3, 4, 5].map((line) => (
+        <Skeleton key={line} className="h-11 w-full" />
+      ))}
+    </div>
+  ),
+};
+
+// The sections shown before anything is customized.
+const DEFAULT_SHOWN = DEFAULT_LAYOUT.order.filter((key) =>
+  isShown(DEFAULT_LAYOUT, key),
+);
+
+/** Shaped like the default layout: the ink summary, then the default sections in their rows. */
 function Loading() {
   return (
     <div aria-busy="true" className="flex flex-col gap-3">
@@ -1019,31 +1161,12 @@ function Loading() {
         <Skeleton className="h-5 w-full max-w-md bg-(--ink-foreground)/20" />
         <Skeleton className="h-5 w-full max-w-xs bg-(--ink-foreground)/20" />
       </div>
-      <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:items-start">
-        <div className={cn("flex flex-col gap-4 bg-card py-6", BLOCK, PAD)}>
-          <Skeleton className="h-8 w-40" />
-          {[0, 1, 2, 3, 4].map((line) => (
-            <div key={line} className="flex flex-col gap-2">
-              <Skeleton className="h-5 w-full" />
-              <Skeleton className="h-2.5 w-full" />
-              <Skeleton className="h-4 w-44" />
-            </div>
-          ))}
-        </div>
-        <div
-          className={cn("flex flex-col gap-3 bg-card px-3 py-5 md:px-6", BLOCK)}
-        >
-          <Skeleton className="h-8 w-48" />
-          <div className="grid grid-cols-7 gap-1">
-            {Array.from({ length: 35 }, (_, cell) => (
-              <Skeleton
-                key={`cell-${String(cell)}`}
-                className="aspect-square w-full"
-              />
-            ))}
-          </div>
-        </div>
-      </div>
+      <SectionRows
+        rows={arrange(DEFAULT_SHOWN, {
+          sideColumn: DEFAULT_ARRANGEMENT === "side-column",
+        })}
+        sections={SKELETONS}
+      />
     </div>
   );
 }
