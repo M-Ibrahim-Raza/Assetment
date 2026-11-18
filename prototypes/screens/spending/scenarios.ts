@@ -198,10 +198,12 @@
 //   share a row and a height: two breakdowns half each, the calendar 3 of 5, so day amounts fit.
 //   A donut chart sits in the middle of a stretched card, and lists keep to the top. A calendar
 //   on its own row has cells shorter than square, so the month isn't 800 px tall.
-//   Tried as d and e, both kept: Customize has "Layout on computers" under the switch for the
-//   phone's layout, Side column (the default) or Rows, two buttons with icons like "Show as",
-//   with a line on the one picked. It isn't on the Phone tab: phones stack the sections. It's
-//   saved with the computers' layout, and Reset there sets it back.
+//   Tried as d and e, both kept: Entries' Options in Customize start with "Layout on computers",
+//   Side column (the default) or Rows, two buttons with icons like "Show as", with a line on the
+//   one picked. It sat at the top of the sheet, under the switch for the phone's layout, until
+//   later on 2026-11-18: it only moves the entries, and their own Customize button now opens
+//   right at it. It isn't on the Phone tab: phones stack the sections. It's saved with the
+//   computers' layout, and Reset there sets it back.
 //   Side column: the entries take one column and tiles next to them the other, which sticks
 //   while the list scrolls (scrolling to its bottom first when it's taller than the window).
 //   The entries' head (heading, search, sort and count) stays at the top too, and the day

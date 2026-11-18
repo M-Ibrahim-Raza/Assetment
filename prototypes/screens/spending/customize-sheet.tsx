@@ -87,6 +87,8 @@ interface Option {
   on: boolean;
   /** The screen's layout with this setting switched. */
   switched: (on: boolean) => ScreenLayout;
+  /** What the change says after the section's name, if not the setting's name and way. */
+  said?: (on: boolean) => string;
 }
 
 /**
@@ -114,9 +116,37 @@ function options<Key extends SetKey>(
     }));
 }
 
-/** The rows under a section's Options. */
-function optionsOf(layout: ScreenLayout, key: SectionKey): Option[] {
-  return options(layout, key, sectionSettings(layout, key));
+/**
+ * Where the entries sit on a computer: beside a side column, or on a row of their own. It's a
+ * choice of the screen's, not the entries' own setting, so it's saved with the computers' layout.
+ */
+function arrangementOption(layout: ScreenLayout): Option {
+  const rows = (layout.arrangement ?? DEFAULT_ARRANGEMENT) === "rows";
+  return {
+    name: "Layout on computers",
+    about: rows
+      ? "Entries take a row of their own, under the other sections."
+      : "Entries sit beside a column of sections that stays in view.",
+    ways: ["Side column", "Rows"],
+    on: rows,
+    switched: (on) => ({ ...layout, arrangement: on ? "rows" : "side-column" }),
+    said: (on) => `${on ? "rows" : "side column"} layout`,
+  };
+}
+
+/**
+ * The rows under a section's Options. The entries' start with the layout on computers, where
+ * there is one: phones stack the sections.
+ */
+function optionsOf(
+  layout: ScreenLayout,
+  key: SectionKey,
+  computers: boolean,
+): Option[] {
+  const own = options(layout, key, sectionSettings(layout, key));
+  return key === "entries" && computers
+    ? [arrangementOption(layout), ...own]
+    : own;
 }
 
 /**
@@ -193,7 +223,6 @@ export function CustomizeSheet({
   const tab = split ? (picked ?? screen) : screen;
   // The layout being changed: the tab's, or the shared one.
   const current = screenLayout(layout, tab);
-  const rows = (current.arrangement ?? DEFAULT_ARRANGEMENT) === "rows";
   // ", on phones" after each change while the two differ, so it's clear which one changed.
   const where = split
     ? tab === "phone"
@@ -291,30 +320,6 @@ export function CustomizeSheet({
                 );
               }}
             />
-            {/* Phones always stack the sections, so the Phone tab has no such choice. */}
-            {!(split && tab === "phone") && (
-              <div className="border-t">
-                <WaysRow
-                  name="Layout on computers"
-                  ways={["Side column", "Rows"]}
-                  about={
-                    rows
-                      ? "Entries take a row of their own, under the other sections."
-                      : "Entries sit beside a column of sections that stays in view."
-                  }
-                  on={rows}
-                  onChange={(on) => {
-                    apply(
-                      withScreen(layout, tab, {
-                        ...current,
-                        arrangement: on ? "rows" : "side-column",
-                      }),
-                      `Layout on computers: ${on ? "rows" : "side column"}.`,
-                    );
-                  }}
-                />
-              </div>
-            )}
           </div>
           <div className="flex items-center gap-3 rounded-2xl bg-muted px-4 py-3">
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -345,13 +350,15 @@ export function CustomizeSheet({
                   moveSection(key, by);
                 }}
                 focused={key === focus}
-                options={optionsOf(current, key)}
+                // The Phone tab has no layout on computers.
+                options={optionsOf(current, key, !(split && tab === "phone"))}
                 onOption={(option, on) => {
                   // "By category: Show as donut chart." for a choice, "By category: Sorting off."
                   const what =
-                    option.ways === undefined
+                    option.said?.(on) ??
+                    (option.ways === undefined
                       ? `${option.name} ${on ? "on" : "off"}`
-                      : `${option.name} ${option.ways[on ? 1 : 0].toLowerCase()}`;
+                      : `${option.name} ${option.ways[on ? 1 : 0].toLowerCase()}`);
                   apply(
                     withScreen(layout, tab, option.switched(on)),
                     `${SECTIONS[key].name}: ${what}${where}.`,
@@ -634,6 +641,7 @@ function SectionRow({
                 key={option.name}
                 name={option.name}
                 ways={option.ways}
+                {...(option.about === undefined ? {} : { about: option.about })}
                 on={option.on}
                 onChange={(on) => {
                   onOption(option, on);
