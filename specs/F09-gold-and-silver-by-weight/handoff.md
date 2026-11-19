@@ -15,8 +15,8 @@
 - Today's value shows under the weight as it's typed, with the rate and its date. Old rates say today's isn't out yet. With no rate at all, a piece saves by weight, reads "Priced once today's rate is in", and stays out of net worth until then. That state isn't in the prototype yet.
 - "I don't know the exact weight" opens a pop-up: "Enter the exact weight if you can", with the receipt, a jeweller and a kitchen scale as ways to find it. "Use a rough weight" opens typical pieces, from a ring at ½ tola to a bridal set at 10 tola, or the user's own guess. Check these weights with a jeweller before launch.
 - A rough weight is marked ≈, counts in net worth, and adds "Get your wedding set weighed" to Home's Things to check. F03 builds that item.
-- When it was bought (optional): the month and year, both or neither, with Today. Then the price paid.
-- A typed price is the cost. Without one, the cost is the weight at that month's average Sarafa rate, marked ≈. How far back past rates go is for the spec.
+- When it was bought (optional): "Date bought", a day, month and year side by side. The day is optional: "Just the month and year is fine." Then the price paid. The property form (F11) uses the same date field.
+- A typed price is the cost. Without one, the cost is the weight at that month's average Sarafa rate, marked ≈, even when the day is known. How far back past rates go is for the spec.
 - With no price and no date, the piece counts as bought the day it's added. Its cost is its value that day, after any deduction, so profit starts at Rs 0 and Portfolio tracks it from then.
 - As the price is typed, the hint gives what that month's rate puts it at. A price under half or over 3 times that warns "Check for a missing zero" or an extra one, and still saves.
 - Deduction (optional): a % per piece, for jewellery only, starting at the last % used. Bars and coins always get the full rate.

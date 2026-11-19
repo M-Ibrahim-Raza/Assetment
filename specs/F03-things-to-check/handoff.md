@@ -14,3 +14,4 @@
 - Long names wrap, and a slow save shows "Saving…".
 - "Still right" is outlined, so Add stays the only primary button.
 - How old a balance must be before it becomes a check is left to the spec.
+- A property's value gets a check 6 months after it was typed: "Update the value of 10 marla house, DHA Phase 6, Lahore", with Still right and Update value ([F11](../F11-property-at-your-own-value/handoff.md)).

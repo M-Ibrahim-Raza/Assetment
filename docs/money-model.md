@@ -89,6 +89,19 @@ Money lent works like a loan in reverse. The user owns it, so it counts in Portf
 - Profit is value minus cost. Net worth moves with each day's prices.
 - Dividends, bonus and right shares stay out of setup. Later ones come through Add trade.
 
+## Property
+
+A property counts at the value the user gives it. There's no price feed.
+
+- Its value is what the whole property would sell for today. Only the user's share counts in Portfolio: all of it, a half, a third, a quarter, or another %.
+- The price paid is the user's own money. Profit is their share of the value minus the price paid. Without a price, it counts from the day it's added, so it starts at Rs 0.
+- A plot or file still being paid for counts at its value. What's left to pay is a loan in Debts, "Instalments for 1 kanal plot, DHA Phase 9 Prism, Lahore". Net worth moves by the share's value minus what's left.
+- For such a plot, the price paid is the full price on the plan, with every instalment.
+- The property and its loan save together and are removed together. The loan is changed only through the property, and it can't be removed on its own.
+- The loan keeps the instalment and how often it's due: every month or every 3 months. DHA and Bahria plans are often quarterly.
+- A file, a society booking with no plot number yet, counts at the file rate dealers quote, not at what's been paid in.
+- Rent is Received, logged in Quick add. It never changes the property's value.
+
 ## New debts after setup
 
 "Add debt" is on the Debts tab, with a link under Quick add's Save. It asks where the money went:
@@ -129,5 +142,6 @@ Quick add warns "More than you owe." and says what will happen:
 - **Card:** a few days after the due day, a check to match the statement.
 - **Loan with a fixed monthly amount:** every 6 months, a check that the instalment and the amount owed are still right. Banks reset KIBOR-based rates, so these drift.
 - **Loan without one, and money lent:** on the "repay by" or "back by" date. With no date, once it's 3 months old.
+- **Property:** 6 months after its value was typed, a check that it's still right.
 
-All of them use Still right and Update, as in [F03](../specs/F03-things-to-check/handoff.md). Update follows the [Corrections](#corrections) rules.
+All of them use Still right and Update, as in [F03](../specs/F03-things-to-check/handoff.md). For a debt, Update follows the [Corrections](#corrections) rules. For a property, it's "Update value": the new value changes net worth and isn't Spent or Received.
