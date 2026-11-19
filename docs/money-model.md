@@ -80,6 +80,15 @@ Money lent works like a loan in reverse. The user owns it, so it counts in Portf
 - If some of it won't come back, the user lowers the amount, and net worth drops.
 - It never shows in "Paid from" or "Received into".
 
+## Stocks and funds
+
+- A holding is one share, ETF or fund. A share or ETF is a holding for each place it's held, such as a broker or the CDC Investor Account.
+- Its value is how many it holds × the day's PSX close or the fund's NAV. A fund the user added by name uses the NAV they typed until they change it.
+- Its cost is what its buys cost, or how many × the average price. The price is the broker or fund app's figure, and no charges are added. A sales load counts when the price includes it.
+- "Use today's price" makes the cost its value today, so the profit starts at Rs 0.
+- Profit is value minus cost. Net worth moves with each day's prices.
+- Dividends, bonus and right shares stay out of setup. Later ones come through Add trade.
+
 ## New debts after setup
 
 "Add debt" is on the Debts tab, with a link under Quick add's Save. It asks where the money went:
