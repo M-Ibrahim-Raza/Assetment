@@ -18,8 +18,11 @@ export const STEP_CARD = cn(
 export const BIG =
   "h-12 px-5 text-base has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4";
 
-/** The bottom of a step card: a hairline, then the button that leaves the step. */
-export const STEP_FOOTER = "flex flex-wrap gap-2 border-t pt-6";
+/**
+ * The bottom of a step card: a hairline, then the button that leaves the step, on the right, where
+ * a wizard's way forward sits. Every step's is in the same place.
+ */
+export const STEP_FOOTER = "flex flex-wrap justify-end gap-2 border-t pt-6";
 
 /** A text field as tall as the main button. `md:` repeats the size, or Input shrinks the text there. */
 export const TALL_FIELD = "h-12 text-base md:text-base";

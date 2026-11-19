@@ -117,14 +117,14 @@ interface AddAnotherProps {
 }
 
 /**
- * Adds one more row to the list above it. A quiet text button, so the button that leaves the step
- * stays the only strong one. It sits flush with the rows' text.
+ * Adds one more row to the list above it. An outline button: plainly a button, and a step below
+ * the filled one that leaves the step, which stays the only strong one. It lines up with the rows.
  */
 export function AddAnother({ label, onClick }: AddAnotherProps) {
   return (
     <Button
-      variant="ghost"
-      className={cn(BIG, "-ml-4 self-start")}
+      variant="outline"
+      className={cn(BIG, "self-start")}
       onClick={onClick}
     >
       <Plus data-icon="inline-start" />
