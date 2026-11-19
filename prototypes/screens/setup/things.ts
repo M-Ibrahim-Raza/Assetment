@@ -25,7 +25,8 @@ export const GROUP_HELP: Readonly<Record<SetupGroup, string>> = {
 /** The group an item belongs to. Loans, cards and committees are all debts. */
 export const ITEM_GROUP: Readonly<Record<ItemKind, SetupGroup>> = {
   metals: "metals",
-  stocks: "stocks",
+  shares: "stocks",
+  funds: "stocks",
   property: "property",
   loan: "debts",
   card: "debts",
@@ -62,10 +63,15 @@ export const THINGS: Readonly<
     plural: "Gold and silver",
     hint: "Jewellery, bars, coins",
   },
-  stocks: {
-    label: "Stocks or funds",
-    plural: "Stocks and funds",
-    hint: "PSX shares, mutual funds",
+  shares: {
+    label: "Shares or ETFs",
+    plural: "Shares and ETFs",
+    hint: "On PSX: Lucky, Meezan Bank…",
+  },
+  funds: {
+    label: "Mutual funds",
+    plural: "Mutual funds",
+    hint: "Meezan, NBP, Mahaana…",
   },
   property: {
     label: "Property",
@@ -94,7 +100,8 @@ export const OWNED_THINGS: readonly Thing[] = [
   "wallet",
   "cash",
   "metals",
-  "stocks",
+  "shares",
+  "funds",
   "property",
 ];
 export const OWED_THINGS: readonly Thing[] = ["loan", "card", "committee"];

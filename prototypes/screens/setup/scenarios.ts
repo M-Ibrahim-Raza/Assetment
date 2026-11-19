@@ -2,8 +2,8 @@
 // A welcome, a board to tick what they have, then one question at a time about those only, and
 // their net worth at the end. The place is in the URL (`?step=`). Features F07 and F08.
 //
-// The accounts step and the gold and silver step are working forms. Stocks, property and debts are
-// stand-ins that add sample data, until their forms are designed here (F10 to F12).
+// The accounts, gold and silver, and stocks and funds steps are working forms. Property and debts
+// are stand-ins that add sample data, until their forms are designed here (F11 and F12).
 //
 // F09, gold and silver by weight: "Add a piece" (it was variant d) won over Jeweller's slip, One at a
 // time and Piece by piece (prototypes/components/metals/). The `gold-` scenarios open on its step.
@@ -36,6 +36,113 @@
 // - With no price and no date, profit counts from the day it's added: the cost is its value that
 //   day, after any deduction, so it starts at Rs 0.
 //
+// F10, stocks and funds: finalized on 2026-11-19 (specs/F10-stocks-and-funds-as-buys/). "Add a
+// holding" (it was stocks-a, prototypes/components/stocks/) is the gold form's panel, and the
+// `stocks-` scenarios open on it. b "Copy from your broker app" (a ledger, one line per holding) and
+// c "Pick, then fill" (tick what's held, then one at a time on big lines) were dropped and deleted.
+// Decided before building:
+// - A share or ETF is entered buy by buy (the exact day, how many, the price a share), or as its
+//   total and average price, as the broker app shows it. "Separate buys | One average" (a
+//   full-width segmented control under its heading, set as a field label) switches, and keeps
+//   what was typed. Buys of the same share join one holding, whose average works itself out.
+//   The buys' labels show once, over columns, and each buy is one row of boxes with × at its end,
+//   like a spreadsheet. On phones, where three boxes don't fit across, each buy keeps its labels.
+//   (Tried and dropped: finished buys folding to a line, and tighter rows that keep their labels.)
+//   Under the buys: a full-width dashed "Add another buy", where the next one goes, so it looks
+//   unlike the step's own "Add another". Then a total row in a shaded band: "Total", then each
+//   figure large under its own column ("150 / shares in all", "Rs 1,020 / average a share").
+//   "Where do I find these numbers?" sits beside "Enter your shares as", by the question that
+//   asks for them. (Tried and dropped: the sum beside Add under a hairline, the same in a shaded
+//   bar, and the help under the buys.)
+//   An average shows in whole rupees, under the buys and on a saved row. Typed prices, and the
+//   average box, keep their paisa, so the cost and profit stay exact.
+//   Today's value, the investment (what was paid, called that and not "cost") and the profit
+//   show once, at the end of the panel, no longer also under the inputs. They read as a sum on a
+//   receipt: today's value with how it's worked out ("150 shares at Rs 1,125.00, the PSX closing
+//   price on 12 Nov"; a fund's "the fund's NAV on 12 Nov"), less the investment, then the profit
+//   under a rule, large, signed and coloured.
+//   No lakh note under today's value (dropped by choice). Until a quantity is in, a line says
+//   they'll show there. (Tried and dropped: the profit first and large, value and profit side by
+//   side, and plain sentences.)
+//   "Held at (optional)": where a share or ETF is held, a broker or the CDC Investor Account,
+//   in one searchable list. Typing finds a place; a broker that isn't there is added from the
+//   list's last choice, "Add “…” as your broker", and offered as "Added by you" after that.
+//   Clearing it leaves it not set. (Tried and dropped: the phone's own list, with a separate box
+//   for another broker's name.) A new holding starts at the last one's place, since most people
+//   keep everything at one broker. A share held in two places is a holding for each. The search
+//   marks one added with where it's held ("Added · AKD Securities"), and picking it again starts
+//   a new holding for another place: "You have … at AKD Securities. This one is for another
+//   place.", with "Change the one at AKD Securities instead". Its place starts empty if the
+//   prefill is where it's held already, and the same share twice at one place is an error. A fund
+//   picked again opens the one added. (Changed: picking an added share used to open it, with a
+//   hidden "Add it for another place".) Saved holdings list as a broker app does: from tablet
+//   width, column heads once ("Shares", "Avg price", "Today's value"; a fund's "Units" in place
+//   of "Shares"), each figure under its own; on phones the figures sit under the name. Rows name the
+//   place, under the name, only when holdings are in more than one place. (Changed: the shares and
+//   average were a grey line under the name.)
+//   A share held in more than one place is entered in one go, its places as tabs with one in
+//   view, each with its own "Held at" and buys or average. "+ Add place" ends the row of place
+//   tabs, or sits by "Held at" while there's one place; "Remove place" sits by an extra place's
+//   "Held at". Each place saves as its own holding, and the summary adds them all up. (Tried and
+//   dropped: the places one under another, and one place at a time with "Save, then add another
+//   place".)
+//   Funds don't ask: their AMC holds them. (Not chosen: asking once for the whole step, or not
+//   tracking it. Later, maybe: brokers as accounts, with any idle cash at the broker.)
+//   Later buys and sells go through Add trade (J4). (Changed after the first build: it was the
+//   average only.)
+// - Step 1 of the improvements (decided 2026-11-18): buys stay first. A buy's day uses the phone's
+//   own date box. Each buy needs its price. For someone who doesn't know what they paid, a link
+//   inside the last buy's hint, "Use today's price, Rs …", fills in today's close and today's
+//   day, so the profit counts from today. An empty step starts on its search, "Which share do you
+//   hold?" or "Which fund do you hold?", and a pick opens the panel with it. Once it has
+//   something, its "Add" opens the panel. (Tried and dropped: the shares panel open on arrival, as Gold's, and chips of the commonly held, as Accounts' banks. With
+//   hundreds of shares and funds, a few chips rarely hold the one you own.) "Where do I find these
+//   numbers?" opens a pop-up, like Gold's weight help.
+// - When both kinds shared one screen, each section's heading was its title with the subtotal and a
+//   quiet count line ("Title and count", picked over a rule, small capitals and a side column). Once
+//   they became their own steps, the step's title and the totals under the rows say the same, so the
+//   section heading went.
+// - A fund is entered as a share is (decided 2026-11-19): "Enter your units as: Separate buys |
+//   One average". Each buy is its day, the units (up to 4 decimals) and the "NAV paid", in the same
+//   columns, dashed "Add another buy" and total row as a share's. One average is the units held
+//   and the "Average price", the average NAV paid a unit. Its help is about the fund app, and
+//   "Use today's NAV, Rs …" is there for someone who doesn't know what they paid. Saved funds show
+//   "Units" and "Avg price", as shares do. (Changed: a fund took its units, then what went in, as
+//   one total, one by one or a monthly amount (a SIP). Before that, the value the app shows could
+//   be typed instead of the units. Also tried and dropped: the units and what went in side by
+//   side, as a fund app's card, and the value first, big, as a question.)
+// - A fund that isn't on the list is added by name, as a broker is (decided 2026-11-19): typing
+//   its name makes the search's last choice "Add “…” as a fund", with "Not on our list. You'll
+//   enter its NAV." under it. Its panel asks for "Today's NAV" first, since the day's prices
+//   don't have it, and it stays at that NAV until the user changes it. It's offered again as
+//   "Added by you", and the totals say "and the NAVs you entered". (Not chosen: its value today
+//   in rupees, or no value until its NAV is known.) Later: matching it to MUFAP's list, and a
+//   reminder in Things to check to update its NAV.
+// - A share's price is needed either way it's entered, each buy's or the average, with "Use
+//   today's price, Rs …" for someone who doesn't know it: then it counts from today, as gold does,
+//   and profit starts at 0. (Changed: the average was optional, which buys weren't.) A fund's is
+//   the same, with "Use today's NAV, Rs …". (Changed: what went into a fund was optional.)
+// - Shares and ETFs, and mutual funds, are their own things, as banks and wallets are: two tiles on
+//   the board ("Shares or ETFs", "Mutual funds"), and two parts of the Stocks and funds step, each
+//   with its own pill, screen, search, rows and total. Someone with only funds never sees shares.
+//   (Changed twice after the first build: it was one search for both, then two sections on one
+//   screen.)
+// - ETFs are entered like a share, priced at the PSX close.
+// - Dividends, bonus and right shares stay out of setup. The quantity includes bonus and right
+//   shares, and later ones come through J4.
+// - A fund's units are the total across every account, and searching for one already added opens
+//   it. A share's are per place, a holding for each.
+// Decided when finalizing (2026-11-19):
+// - Charges (brokerage, its tax, CDC, NCCPL and SECP fees): the price is the broker or fund app's
+//   figure as it is, with no charges added, so the profit matches the app. The spec checks what
+//   the main brokers include.
+// - A money market fund pays its profit as new units, which Separate buys miss, since they
+//   weren't bought. Left for the spec, with MUFAP's fund types, and for J4 to keep units current.
+// - Where a share is held is asked: "Held at (optional)", above.
+// - A sales load: the fund help says to enter the price paid with the load, the statement's offer
+//   price, so a new fund shows a small loss at first, and says why.
+// - Where prices come from and when they refresh each day is for the spec and an ADR.
+//
 // Open questions: None.
 
 import {
@@ -57,6 +164,21 @@ import {
   type MetalRates,
 } from "@proto/fixtures/metals";
 import type { Scenarios } from "@proto/kit/scenarios";
+import type { HoldingDraft } from "@proto/components/stocks/form";
+import {
+  displayName,
+  GROUP_OF,
+  securityOf,
+  valueOf as holdingValue,
+} from "@proto/components/stocks/holding";
+import {
+  type Holding,
+  holdings,
+  SAMPLE_COUNT,
+  staleStockPrices,
+  type StockPrices,
+  stockPrices,
+} from "@proto/fixtures/stocks";
 
 /** The five things setup asks about, in order. */
 export const GROUPS = [
@@ -73,7 +195,7 @@ export type SetupPlace = "start" | SetupGroup | "done";
 
 /** Something owned or owed that isn't an account. Its step is a stand-in in this build. */
 export type ItemKind =
-  "metals" | "stocks" | "property" | "loan" | "card" | "committee";
+  "metals" | "shares" | "funds" | "property" | "loan" | "card" | "committee";
 
 export interface SetupItem {
   id: string;
@@ -83,6 +205,8 @@ export interface SetupItem {
   amount: number;
   /** Gold and silver only: the piece by weight. Its amount is its value at the day's rate. */
   piece?: MetalPiece;
+  /** Stocks and funds only: the holding. Its amount is its value at the day's price. */
+  holding?: Holding;
 }
 
 /** What the user can tick on the board. */
@@ -117,6 +241,11 @@ export interface Setup {
   metalDeduction: number;
   /** A gold or silver piece whose save failed, or is still saving. Its form shows it again. */
   metalsDraft: { piece: MetalPiece; status: "failed" | "saving" } | null;
+  /**
+   * The stocks and funds step: the day's prices, a holding whose save failed or is still saving,
+   * and a search typed before the form opened. Left out, the step uses today's prices.
+   */
+  stocks?: { prices: StockPrices; draft: HoldingDraft | null; search: string };
 }
 
 /** The View's props. Loading and error are states the View shows, so they are props too. */
@@ -168,12 +297,8 @@ const gold = pieceItem({
 // The same values Home's Portfolio uses, so a finished setup adds up to Home's net worth.
 const samples: SetupItem[] = [
   gold,
-  {
-    id: "item-stocks",
-    kind: "stocks",
-    name: "PSX stocks and funds",
-    amount: worth("stocks"),
-  },
+  // Four shares and ETFs and a fund, which add up to Home's Stocks and funds.
+  ...holdings(5).map((holding) => holdingItem(holding)),
   {
     id: "item-plot",
     kind: "property",
@@ -188,7 +313,8 @@ const EVERYTHING: Thing[] = [
   "wallet",
   "cash",
   "metals",
-  "stocks",
+  "shares",
+  "funds",
   "property",
   "loan",
   "card",
@@ -226,12 +352,7 @@ const heavy: Setup = {
   accounts: accounts(12),
   items: [
     ...metalPieces(3).map((piece) => pieceItem(piece)),
-    {
-      id: "item-stocks",
-      kind: "stocks",
-      name: "PSX stocks and funds",
-      amount: 6_850_300,
-    },
+    ...holdings(15).map((holding) => holdingItem(holding)),
     {
       id: "item-house",
       kind: "property",
@@ -257,7 +378,7 @@ const halfWay: Setup = {
   accounts: accounts(3),
   items: [gold],
   answered: ["accounts", "metals"],
-  ticked: ["bank", "wallet", "metals", "stocks", "card"],
+  ticked: ["bank", "wallet", "metals", "shares", "funds", "card"],
   resumed: true,
 };
 
@@ -289,6 +410,47 @@ const bangles: MetalPiece = {
   paid: 980_000,
   cut: null,
   bought: "2025-08",
+};
+
+// The stocks and funds step, for comparing its forms. Typical's accounts are in, and the bar shows
+// Accounts, Gold and silver, Stocks and funds, and Debts.
+const onStocks: Setup = {
+  ...typical,
+  at: "stocks",
+  ticked: [...typical.ticked, "shares", "funds"],
+};
+
+/**
+ * A holding as a setup item, worth its quantity at the given prices. Shares and ETFs, and mutual
+ * funds, are ticked and added apart, as banks and wallets are.
+ */
+function holdingItem(
+  holding: Holding,
+  prices: StockPrices = stockPrices,
+): SetupItem {
+  return {
+    id: holding.id,
+    kind:
+      GROUP_OF[securityOf(holding.symbol).kind] === "funds"
+        ? "funds"
+        : "shares",
+    name: displayName(securityOf(holding.symbol)),
+    amount: holdingValue(holding, prices),
+    holding,
+  };
+}
+
+// The first five add up to Home's Stocks and funds.
+const fiveHoldings = holdings(5).map((holding) => holdingItem(holding));
+
+// 200 Systems Limited shares at an average of Rs 610, typed in full, whose save didn't go through.
+const systems: Holding = {
+  id: "holding-draft",
+  symbol: "SYS",
+  quantity: 200,
+  averagePrice: 610,
+  buys: null,
+  heldAt: "akd",
 };
 
 export const scenarios = {
@@ -337,6 +499,60 @@ export const scenarios = {
       ...onGold,
       items: metalPieces(2).map((piece) => pieceItem(piece, staleMetalRates)),
       metalRates: staleMetalRates,
+    },
+  },
+  "stocks-empty": { status: "ready", setup: onStocks },
+  "stocks-default": {
+    status: "ready",
+    setup: { ...onStocks, items: fiveHoldings },
+  },
+  "stocks-many": {
+    status: "ready",
+    setup: {
+      ...onStocks,
+      items: holdings(SAMPLE_COUNT).map((holding) => holdingItem(holding)),
+    },
+  },
+  "stocks-saving": {
+    status: "ready",
+    setup: {
+      ...onStocks,
+      items: fiveHoldings,
+      stocks: {
+        prices: stockPrices,
+        draft: { holding: systems, status: "saving" },
+        search: "",
+      },
+    },
+  },
+  "stocks-save-error": {
+    status: "ready",
+    setup: {
+      ...onStocks,
+      items: fiveHoldings,
+      stocks: {
+        prices: stockPrices,
+        draft: { holding: systems, status: "failed" },
+        search: "",
+      },
+    },
+  },
+  "stocks-stale-price": {
+    status: "ready",
+    setup: {
+      ...onStocks,
+      items: holdings(5).map((holding) =>
+        holdingItem(holding, staleStockPrices),
+      ),
+      stocks: { prices: staleStockPrices, draft: null, search: "" },
+    },
+  },
+  "stocks-not-found": {
+    status: "ready",
+    setup: {
+      ...onStocks,
+      items: fiveHoldings,
+      stocks: { prices: stockPrices, draft: null, search: "Lucky Cemnt" },
     },
   },
   error: {

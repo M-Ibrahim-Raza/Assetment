@@ -13,6 +13,7 @@ import { ScreenLink } from "@proto/components/screen-link";
 import type { Account, AccountKind } from "@proto/fixtures/accounts";
 import { BIG, STEP_CARD, STEP_FOOTER } from "./look";
 import { MetalsStep } from "./metals-step";
+import { StocksStep } from "./stocks-step";
 import {
   AmountQuestion,
   type Draft,
@@ -108,7 +109,8 @@ const ITEM_QUESTION: Readonly<
   Record<ItemKind, { title: string; help: string }>
 > = {
   metals: { title: "Your gold and silver", help: GROUP_HELP.metals },
-  stocks: { title: "Your stocks and funds", help: GROUP_HELP.stocks },
+  shares: { title: "Your shares and ETFs", help: GROUP_HELP.stocks },
+  funds: { title: "Your mutual funds", help: GROUP_HELP.stocks },
   property: { title: "Your property", help: GROUP_HELP.property },
   loan: { title: "Your loans", help: "From a bank, a company or a person." },
   card: { title: "Your credit cards", help: "What you owe on each today." },
@@ -212,6 +214,8 @@ function Wizard({ setup }: { setup: Setup }) {
   const state = useSetup(setup);
   // A piece whose save failed or is saving. Once saved, coming back doesn't show it again.
   const [metalsDraft, setMetalsDraft] = useState(setup.metalsDraft);
+  // The same for a holding.
+  const [stocksDraft, setStocksDraft] = useState(setup.stocks?.draft ?? null);
   const {
     place: wanted,
     go,
@@ -433,6 +437,28 @@ function Wizard({ setup }: { setup: Setup }) {
         nextLabel={nextLabel(thing)}
         onSaved={() => {
           setMetalsDraft(null);
+        }}
+        onDone={() => {
+          moveOn(thing);
+        }}
+      />,
+    );
+  }
+
+  if (thing === "shares" || thing === "funds") {
+    return step(
+      thing,
+      back,
+      <StocksStep
+        key={thing}
+        kind={thing}
+        state={state}
+        stocks={setup.stocks}
+        draft={stocksDraft}
+        heading={heading}
+        nextLabel={nextLabel(thing)}
+        onSaved={() => {
+          setStocksDraft(null);
         }}
         onDone={() => {
           moveOn(thing);

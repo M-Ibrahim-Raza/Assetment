@@ -103,6 +103,15 @@ export function useSetup(initial: Setup) {
     );
   };
 
+  /** Adds an item, or changes the one with its id. The form has worked out its amount. */
+  const saveItem = (item: SetupItem) => {
+    setItems((current) =>
+      current.some((row) => row.id === item.id)
+        ? current.map((row) => (row.id === item.id ? item : row))
+        : [...current, item],
+    );
+  };
+
   const removeItem = (item: SetupItem) => {
     const index = items.findIndex((row) => row.id === item.id);
     setItems((current) => current.filter((row) => row.id !== item.id));
@@ -147,6 +156,7 @@ export function useSetup(initial: Setup) {
     metalRates: rates,
     deduction,
     saveMetal,
+    saveItem,
     saveAccount,
     removeAccount,
     addSamples,

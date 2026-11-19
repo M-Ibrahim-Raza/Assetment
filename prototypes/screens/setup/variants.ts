@@ -8,6 +8,9 @@ import { SetupView } from "./setup";
 //
 // F09's gold and silver form: "Add a piece" (it was variant d) won over Jeweller's slip, One at a
 // time and Piece by piece. Their forms were deleted.
+//
+// F10's stocks and funds form: "Add a holding" (it was stocks-a) won over Copy from your broker app
+// and Pick, then fill. Their forms were deleted.
 export const variants = {
   a: { name: "Tick what you have", View: SetupView },
 } satisfies Variants<SetupViewProps>;
