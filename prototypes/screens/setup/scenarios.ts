@@ -2,8 +2,8 @@
 // A welcome, a board to tick what they have, then one question at a time about those only, and
 // their net worth at the end. The place is in the URL (`?step=`). Features F07 and F08.
 //
-// The accounts, gold and silver, and stocks and funds steps are working forms. Property and debts
-// are stand-ins that add sample data, until their forms are designed here (F11 and F12).
+// The accounts, gold and silver, stocks and funds, and property steps are working forms. Debts is
+// a stand-in that adds sample data, until its form is designed here (F12).
 //
 // F09, gold and silver by weight: "Add a piece" (it was variant d) won over Jeweller's slip, One at a
 // time and Piece by piece (prototypes/components/metals/). The `gold-` scenarios open on its step.
@@ -12,7 +12,8 @@
 //   ratti, or grams. Today's value shows under the weight as it's typed.
 // - "I don't know the exact weight" opens a pop-up that asks for the exact weight first. A rough
 //   weight is the quieter way out: marked ≈, counted, and a Things to check reminder.
-// - When it was bought: the month and year (both or neither, with Today), then the price paid.
+// - When it was bought: an exact date or just the month and year (the day is optional), then the
+//   price paid. The date field is shared with the property form (prototypes/components/).
 //   The month's average Sarafa rate shows as the price is typed. A price under half or over 3
 //   times that gets a warning that never blocks saving.
 // - A deduction per piece, for jewellery only, starting at the last % typed.
@@ -144,6 +145,47 @@
 // - Where prices come from and when they refresh each day is for the spec and an ADR.
 //
 // Open questions: None.
+//
+// F11, property: finalized on 2026-11-19 (specs/F11-property-at-your-own-value/). "Size × rate" (it
+// was property-c, prototypes/components/property/) won over Add a property and Value first, then
+// was reworked into an address-first form. The `property-` scenarios open on its step.
+// - The order people describe a property in: what it is, where it is, its size and share, how it
+//   was bought (when, the price, instalments), then what it would sell for and the profit.
+// - Where it is: the city (required, a select with "Somewhere else") and the area (required),
+//   then optional lines. Each kind asks in its own words, from KIND_FORM in value.ts: a house's
+//   area or society, block and house no.; a flat's area, building name, block or phase and flat
+//   no.; a plot's society or scheme, block and plot no.; a file's society and phase, with no
+//   number until balloting; a shop's market, plaza and shop no.; land's nearest city, village and
+//   tehsil and khasra no.
+// - Each kind's size has its own units: marla, kanal or sq yd for a house, plot or file; sq ft or
+//   sq yd for a flat or shop; acres or kanal for land. Land has no instalments.
+// - The name is built from the address: "10 marla house, DHA Phase 6, Lahore". No name field.
+// - The size is required and stays in its unit. The city picks the usual unit: square yards in
+//   Karachi and Hyderabad, marla elsewhere, acres for land, square feet for a flat or shop.
+// - The value is typed as a whole: a building isn't priced per marla. Plots, files and land can
+//   work it out from a rate per unit instead.
+// - When you bought it is an open section: the date (an exact day, or just the month and year),
+//   the price paid, and the "Still paying instalments?" switch, which shows the instalment
+//   fields when it's on.
+// Decided before building:
+// - The value is the user's own: what the whole property would sell for today. There's no price
+//   feed. Zameen's price index is a link for someone unsure. Sizes stay in the unit typed.
+// - Only the user's share counts: Whole, Half, A third, A quarter, or another %. What they paid is
+//   their own money.
+// - A plot or file still being paid for adds a loan for what's left to Debts, in this step. They
+//   save and go together. A file without a plot number is valued at its file rate.
+// - A typed value gets a check in Things to check every 6 months (F03 builds the item).
+// - Rent stays out: it's Received in Quick add.
+//
+// Decided when finalizing (2026-11-19):
+// - The instalments loan in Debts opens its property, and can't be changed or removed on its own.
+//   Removing the property, or turning its instalments off, removes it. F12's loan model needs
+//   instalments every 3 months.
+// - The kinds stay House, Flat, Plot, File, Shop and Land, with Plot picked first.
+// - When you bought it stays optional: inherited or gifted property has no price, and profit then
+//   counts from today, as with gold.
+//
+// Open questions: None.
 
 import {
   accounts,
@@ -164,6 +206,13 @@ import {
   type MetalRates,
 } from "@proto/fixtures/metals";
 import type { Scenarios } from "@proto/kit/scenarios";
+import type { PropertyDraft } from "@proto/components/property/form";
+import { rowsOf } from "@proto/components/property/value";
+import {
+  properties,
+  type Property,
+  sampleProperty,
+} from "@proto/fixtures/property";
 import type { HoldingDraft } from "@proto/components/stocks/form";
 import {
   displayName,
@@ -207,6 +256,8 @@ export interface SetupItem {
   piece?: MetalPiece;
   /** Stocks and funds only: the holding. Its amount is its value at the day's price. */
   holding?: Holding;
+  /** Property only: what it is. Its amount is the user's share of the value they gave it. */
+  property?: Property;
 }
 
 /** What the user can tick on the board. */
@@ -246,6 +297,8 @@ export interface Setup {
    * and a search typed before the form opened. Left out, the step uses today's prices.
    */
   stocks?: { prices: StockPrices; draft: HoldingDraft | null; search: string };
+  /** The property step: a property whose save failed or is saving, or one opened in place. */
+  property?: { draft: PropertyDraft | null };
 }
 
 /** The View's props. Loading and error are states the View shows, so they are props too. */
@@ -294,17 +347,21 @@ const gold = pieceItem({
   bought: "2023-04",
 });
 
+// The plot Home's Portfolio counts: worth Rs 30 lakh today, bought for Rs 25 lakh.
+const homePlot: Property = {
+  ...sampleProperty(1),
+  id: "item-plot",
+  rate: null,
+  value: worth("property"),
+  paid: groups.find((group) => group.kind === "property")?.cost ?? null,
+};
+
 // The same values Home's Portfolio uses, so a finished setup adds up to Home's net worth.
 const samples: SetupItem[] = [
   gold,
   // Four shares and ETFs and a fund, which add up to Home's Stocks and funds.
   ...holdings(5).map((holding) => holdingItem(holding)),
-  {
-    id: "item-plot",
-    kind: "property",
-    name: "Plot in Bahria Town",
-    amount: worth("property"),
-  },
+  ...rowsOf(homePlot),
   ...debtItems(3),
 ];
 
@@ -353,18 +410,9 @@ const heavy: Setup = {
   items: [
     ...metalPieces(3).map((piece) => pieceItem(piece)),
     ...holdings(15).map((holding) => holdingItem(holding)),
-    {
-      id: "item-house",
-      kind: "property",
-      name: "10 marla house in DHA Phase 6, Lahore (half share with Bhai)",
-      amount: 42_500_000,
-    },
-    {
-      id: "item-plot",
-      kind: "property",
-      name: "Plot in Bahria Town",
-      amount: 3_000_000,
-    },
+    // The half share with Bhai, and Home's plot.
+    ...rowsOf({ ...sampleProperty(6), id: "item-house" }),
+    ...rowsOf(homePlot),
     ...debtItems(4),
   ],
   answered: [...GROUPS],
@@ -452,6 +500,23 @@ const systems: Holding = {
   buys: null,
   heldAt: "akd",
 };
+
+// The property step, for comparing its forms. Typical's accounts are in, and the bar shows
+// Accounts, Gold and silver, Property, and Debts. A property on instalments adds its loan to Debts.
+const onProperty: Setup = {
+  ...typical,
+  at: "property",
+  ticked: [...typical.ticked, "property"],
+};
+const propertyRows = (list: readonly Property[]): SetupItem[] =>
+  list.flatMap(rowsOf);
+const house = sampleProperty(0);
+const halfShare = sampleProperty(6);
+const onInstalments = sampleProperty(4);
+const twoProperties = propertyRows(properties(2));
+
+// A flat in Karachi, typed in full, whose save didn't go through.
+const flat: Property = { ...sampleProperty(2), id: "property-draft" };
 
 export const scenarios = {
   default: { status: "ready", setup: typical },
@@ -553,6 +618,47 @@ export const scenarios = {
       ...onStocks,
       items: fiveHoldings,
       stocks: { prices: stockPrices, draft: null, search: "Lucky Cemnt" },
+    },
+  },
+  "property-empty": { status: "ready", setup: onProperty },
+  "property-default": {
+    status: "ready",
+    setup: { ...onProperty, items: twoProperties },
+  },
+  "property-many": {
+    status: "ready",
+    setup: { ...onProperty, items: propertyRows(properties(8)) },
+  },
+  "property-saving": {
+    status: "ready",
+    setup: {
+      ...onProperty,
+      items: twoProperties,
+      property: { draft: { property: flat, status: "saving" } },
+    },
+  },
+  "property-save-error": {
+    status: "ready",
+    setup: {
+      ...onProperty,
+      items: twoProperties,
+      property: { draft: { property: flat, status: "failed" } },
+    },
+  },
+  "property-shared": {
+    status: "ready",
+    setup: {
+      ...onProperty,
+      items: propertyRows([house, halfShare]),
+      property: { draft: { property: halfShare, status: "open" } },
+    },
+  },
+  "property-instalments": {
+    status: "ready",
+    setup: {
+      ...onProperty,
+      items: propertyRows([house, onInstalments]),
+      property: { draft: { property: onInstalments, status: "open" } },
     },
   },
   error: {

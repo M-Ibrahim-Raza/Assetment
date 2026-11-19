@@ -11,6 +11,9 @@ import { SetupView } from "./setup";
 //
 // F10's stocks and funds form: "Add a holding" (it was stocks-a) won over Copy from your broker app
 // and Pick, then fill. Their forms were deleted.
+//
+// F11's property form: "Size × rate" (it was property-c) won over Add a property and Value first,
+// then was reworked into an address-first form. The other forms were deleted.
 export const variants = {
   a: { name: "Tick what you have", View: SetupView },
 } satisfies Variants<SetupViewProps>;

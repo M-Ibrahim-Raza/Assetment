@@ -126,6 +126,52 @@ export function useSetup(initial: Setup) {
     });
   };
 
+  /**
+   * Saves several items at once, adding or changing each by its id, and takes out the ids in
+   * `drop`. A property and the loan for its instalments save together.
+   */
+  const saveItems = (
+    rows: readonly SetupItem[],
+    drop: readonly string[] = [],
+  ) => {
+    setItems((current) =>
+      rows.reduce(
+        (list, item) =>
+          list.some((row) => row.id === item.id)
+            ? list.map((row) => (row.id === item.id ? item : row))
+            : [...list, item],
+        current.filter((row) => !drop.includes(row.id)),
+      ),
+    );
+  };
+
+  /** Removes several items at once, such as a property and its loan, with one Undo for them all. */
+  const removeItems = (rows: readonly SetupItem[], name: string) => {
+    const placed = rows
+      .map((row) => ({
+        row,
+        index: items.findIndex((each) => each.id === row.id),
+      }))
+      .toSorted((one, other) => one.index - other.index);
+    setItems((current) =>
+      current.filter((row) => !rows.some((gone) => gone.id === row.id)),
+    );
+    toast(`${name} removed`, {
+      duration: UNDO_MS,
+      action: {
+        label: "Undo",
+        onClick: () => {
+          setItems((current) =>
+            placed.reduce(
+              (list, { row, index }) => restore(list, row, index),
+              [...current],
+            ),
+          );
+        },
+      },
+    });
+  };
+
   /** Marks a group as answered: something was added, or the user has none. */
   const answer = (group: SetupGroup) => {
     setAnswered((current) =>
@@ -161,6 +207,8 @@ export function useSetup(initial: Setup) {
     removeAccount,
     addSamples,
     removeItem,
+    saveItems,
+    removeItems,
     answer,
     toggleTick,
   };

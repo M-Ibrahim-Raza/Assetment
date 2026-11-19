@@ -13,6 +13,7 @@ import { ScreenLink } from "@proto/components/screen-link";
 import type { Account, AccountKind } from "@proto/fixtures/accounts";
 import { BIG, STEP_CARD, STEP_FOOTER } from "./look";
 import { MetalsStep } from "./metals-step";
+import { PropertyStep } from "./property-step";
 import { StocksStep } from "./stocks-step";
 import {
   AmountQuestion,
@@ -214,8 +215,11 @@ function Wizard({ setup }: { setup: Setup }) {
   const state = useSetup(setup);
   // A piece whose save failed or is saving. Once saved, coming back doesn't show it again.
   const [metalsDraft, setMetalsDraft] = useState(setup.metalsDraft);
-  // The same for a holding.
+  // The same for a holding, and a property.
   const [stocksDraft, setStocksDraft] = useState(setup.stocks?.draft ?? null);
+  const [propertyDraft, setPropertyDraft] = useState(
+    setup.property?.draft ?? null,
+  );
   const {
     place: wanted,
     go,
@@ -459,6 +463,26 @@ function Wizard({ setup }: { setup: Setup }) {
         nextLabel={nextLabel(thing)}
         onSaved={() => {
           setStocksDraft(null);
+        }}
+        onDone={() => {
+          moveOn(thing);
+        }}
+      />,
+    );
+  }
+
+  if (thing === "property") {
+    return step(
+      thing,
+      back,
+      <PropertyStep
+        key={thing}
+        state={state}
+        draft={propertyDraft}
+        heading={heading}
+        nextLabel={nextLabel(thing)}
+        onSaved={() => {
+          setPropertyDraft(null);
         }}
         onDone={() => {
           moveOn(thing);
