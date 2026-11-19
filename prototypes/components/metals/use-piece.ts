@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { dateError, dateOf, partsOf } from "@proto/components/bought-date";
 import type {
   Karat,
   Metal,
@@ -39,7 +40,11 @@ export interface PieceFields {
   paid: string;
   /** This piece's own deduction in percent, e.g. "10". Empty uses the user's general one. */
   cut: string;
-  /** When it was bought: a month "1" to "12" and a year "2021". Either may be empty. */
+  /**
+   * When it was bought: a day "1" to "31", a month "1" to "12" and a year "2021". The day is
+   * optional, so just the month and year is fine. All may be empty.
+   */
+  day: string;
   month: string;
   year: string;
 }
@@ -69,7 +74,6 @@ export const percentText = (share: number): string =>
   share === 0 ? "" : String(Math.round(share * 1000) / 10);
 
 export function fieldsOf(piece: MetalPiece): PieceFields {
-  const [year = "", month = ""] = (piece.bought ?? "").split("-");
   return {
     id: piece.id,
     metal: piece.metal,
@@ -79,8 +83,7 @@ export function fieldsOf(piece: MetalPiece): PieceFields {
     estimated: piece.estimated,
     paid: piece.paid === null ? "" : String(piece.paid),
     cut: piece.cut === null ? "" : percentText(piece.cut),
-    month: month === "" ? "" : String(Number(month)),
-    year,
+    ...partsOf(piece.bought),
     ...weightFields(piece.tola, piece.unit),
   };
 }
@@ -96,6 +99,7 @@ export function fieldsFor(kind: PieceKind, unit: WeightUnit): PieceFields {
     estimated: false,
     paid: "",
     cut: "",
+    day: "",
     month: "",
     year: "",
     ...weightFields(0, unit),
@@ -165,14 +169,10 @@ export function pieceOf(fields: PieceFields): MetalPiece {
   };
 }
 
-/** "2021-03", "2021", or null while no year is picked. */
-export function boughtOf({
-  month,
-  year,
-}: Pick<PieceFields, "month" | "year">): string | null {
-  if (year === "" || month === "") return null;
-  return `${year}-${month.padStart(2, "0")}`;
-}
+/** "2021-03", or "2021-03-12" with a day. Null unless the month and the year are both picked. */
+export const boughtOf = (
+  fields: Pick<PieceFields, "day" | "month" | "year">,
+): string | null => dateOf(fields);
 
 /** The largest deduction a jeweller would take, in percent. */
 export const MAX_CUT = 50;
@@ -187,20 +187,11 @@ export function cutError({ form, cut }: PieceFields): string | null {
 }
 
 /**
- * What's wrong with the date it was bought: it needs the month and the year, or neither, and it
- * can't be after `thisMonth` ("2026-11").
+ * What's wrong with the date it was bought: a day or month needs the year, the day must be in that
+ * month, and it can't be after `thisMonth` ("2026-11").
  */
-export function boughtError(
-  fields: PieceFields,
-  thisMonth: string,
-): string | null {
-  if (fields.month !== "" && fields.year === "") return "Pick the year too.";
-  if (fields.year !== "" && fields.month === "") return "Pick the month too.";
-  const bought = boughtOf(fields);
-  return bought !== null && bought > thisMonth
-    ? "That's after this month."
-    : null;
-}
+export const boughtError = (fields: PieceFields, thisMonth: string) =>
+  dateError(fields, thisMonth);
 
 /** Only digits, up to `max` of them, with no leading zeros. */
 export const onlyDigits = (text: string, max: number): string =>

@@ -129,7 +129,8 @@ export function costOf(
   ratesIn: (month: string) => MetalRates | null,
 ): Cost | null {
   if (piece.paid !== null) return { amount: piece.paid, rate: null };
-  const then = piece.bought === null ? null : ratesIn(piece.bought);
+  // A month has one average rate, so the day it was bought doesn't change it.
+  const then = piece.bought === null ? null : ratesIn(piece.bought.slice(0, 7));
   if (then === null) return null;
   const rate = rateOf(piece, then);
   return { amount: Math.round(piece.tola * rate), rate };
@@ -151,9 +152,12 @@ const monthYear = new Intl.DateTimeFormat("en-GB", {
   timeZone: "UTC",
 });
 
-/** The month it was bought, e.g. "March 2021". */
-export const formatBought = (bought: string): string =>
-  monthYear.format(new Date(`${bought}-01T00:00:00Z`));
+/** When it was bought: "March 2021", or "12 March 2021" with a day. */
+export function formatBought(bought: string): string {
+  const [yearMonth, dayPart] = [bought.slice(0, 7), bought.slice(8)];
+  const month = monthYear.format(new Date(`${yearMonth}-01T00:00:00Z`));
+  return dayPart === "" ? month : `${String(Number(dayPart))} ${month}`;
+}
 
 const wholePercent = new Intl.NumberFormat("en-PK", {
   style: "percent",

@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  ChevronDown,
-  ChevronRight,
-  CircleAlert,
-  TriangleAlert,
-} from "lucide-react";
+import { ChevronDown, ChevronRight, TriangleAlert } from "lucide-react";
 import { type SyntheticEvent, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,12 +22,9 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
 import { cn } from "@/lib/utils";
 import { Money } from "@proto/components/amounts";
+import { BoughtDate } from "@proto/components/bought-date";
 import { DISPLAY } from "@proto/components/display";
 import {
   FIRST_RATE_MONTH,
@@ -101,21 +93,6 @@ import {
 // value, when it was bought and what was paid, the jeweller's deduction, and a summary with the
 // profit as of today. The panel is open for the first piece. Saved pieces are rows above it, with
 // a total, and a row opens in place to change it.
-
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-] as const;
 
 /** A small label above a group of fields. */
 const GROUP_LABEL = "text-sm font-medium";
@@ -455,7 +432,7 @@ function PiecePanel({
   );
   const karatWord: Karat | "silver" = karat ?? "silver";
   // What the weight cost at that month's rate: shown while the price is typed, and checked against it.
-  const then = bought === null ? null : monthRates(bought);
+  const then = bought === null ? null : monthRates(bought.slice(0, 7));
   const rateThen =
     then === null ? null : rateOf({ metal: fields.metal, karat }, then);
   const estimate =
@@ -472,7 +449,7 @@ function PiecePanel({
   // Each hint says only what applies to what's filled in.
   const dateHint =
     bought === null
-      ? "We use it to work out your profit."
+      ? "Just the month and year is fine."
       : rateThen === null
         ? "We don't have the Sarafa rate for that month."
         : paid === null
@@ -493,7 +470,7 @@ function PiecePanel({
     const first = errors.weight
       ? weightInputId(id)
       : errors.bought
-        ? `${id}-month`
+        ? `${id}-day`
         : errors.cut
           ? `${id}-cut`
           : null;
@@ -586,13 +563,14 @@ function PiecePanel({
           <p id={`${id}-purchase`} className="font-semibold">
             When you bought it (optional)
           </p>
-          <BoughtField
-            id={id}
-            fields={fields}
-            thisMonth={thisMonth}
+          <BoughtDate
+            id={`${id}-day`}
+            parts={fields}
+            onChange={set}
+            firstYear={Number(FIRST_RATE_MONTH.slice(0, 4))}
+            lastYear={Number(thisMonth.slice(0, 4))}
             error={shown.bought}
             hint={dateHint}
-            onChange={set}
           />
           <div className="flex flex-col gap-2">
             <PaidField
@@ -799,109 +777,6 @@ function WeightHelp({ open, onOpenChange, piece, weightId }: WeightHelpProps) {
   );
 }
 
-interface BoughtFieldProps {
-  id: string;
-  fields: PieceFields;
-  /** "2026-11": the latest month there is, and what Today picks. */
-  thisMonth: string;
-  error: string | null;
-  /** The line under it, which follows what's filled in. */
-  hint: string;
-  onChange: (patch: Partial<PieceFields>) => void;
-}
-
-const SELECT = "[&_select]:h-12 [&_select]:text-base";
-
-/** When it was bought: a month and a year, or neither, and Today for something bought today. */
-function BoughtField({
-  id,
-  fields,
-  thisMonth,
-  error,
-  hint,
-  onChange,
-}: BoughtFieldProps) {
-  const labelId = `${id}-bought`;
-  const noteId = `${id}-bought-note`;
-  const [latest = 2026, current = 1] = thisMonth.split("-").map(Number);
-  // Years there are Sarafa rates for, newest first.
-  const first = Number(FIRST_RATE_MONTH.slice(0, 4));
-  const years = Array.from(
-    { length: latest - first + 1 },
-    (_, index) => latest - index,
-  );
-  return (
-    <div
-      role="group"
-      aria-labelledby={labelId}
-      className="flex flex-col gap-2"
-      data-invalid={error !== null}
-    >
-      {/* Today sits by the label, as Tola and Grams sit by Weight, so month and year fill the row. */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <span id={labelId} className={GROUP_LABEL}>
-          Month and year
-        </span>
-        <Button
-          type="button"
-          variant="outline"
-          className={cn(CHIP, "h-9 px-3")}
-          onClick={() => {
-            onChange({ month: String(current), year: String(latest) });
-          }}
-        >
-          Today
-        </Button>
-      </div>
-      <div className="flex gap-2">
-        <NativeSelect
-          id={`${id}-month`}
-          aria-label="Month"
-          aria-invalid={error !== null}
-          aria-describedby={noteId}
-          value={fields.month}
-          onChange={(event) => {
-            onChange({ month: event.target.value });
-          }}
-          className={cn(SELECT, "min-w-0 flex-1 sm:w-48 sm:flex-none")}
-        >
-          <NativeSelectOption value="">Month</NativeSelectOption>
-          {MONTHS.map((month, index) => (
-            <NativeSelectOption key={month} value={String(index + 1)}>
-              {month}
-            </NativeSelectOption>
-          ))}
-        </NativeSelect>
-        <NativeSelect
-          aria-label="Year"
-          aria-invalid={error !== null}
-          aria-describedby={noteId}
-          value={fields.year}
-          onChange={(event) => {
-            onChange({ year: event.target.value });
-          }}
-          className={cn(SELECT, "w-28 shrink-0")}
-        >
-          <NativeSelectOption value="">Year</NativeSelectOption>
-          {years.map((year) => (
-            <NativeSelectOption key={year} value={String(year)}>
-              {year}
-            </NativeSelectOption>
-          ))}
-        </NativeSelect>
-      </div>
-      {error === null ? (
-        <FieldDescription id={noteId}>{hint}</FieldDescription>
-      ) : (
-        <FieldError id={noteId} className="flex items-center gap-1.5">
-          <CircleAlert aria-hidden="true" className="size-4 shrink-0" />
-          {error}
-        </FieldError>
-      )}
-    </div>
-  );
-}
-
 interface CutFieldProps {
   id: string;
   text: string;
@@ -978,7 +853,7 @@ function priceWarning({
 }: PriceCheck): string | null {
   if (paid === null || paid === 0) return null;
   if (estimate !== null && bought !== null) {
-    const then = `what ${weight} cost in ${formatBought(bought)}, about ${formatPkr(estimate)}`;
+    const then = `what ${weight} cost in ${formatBought(bought.slice(0, 7))}, about ${formatPkr(estimate)}`;
     if (paid < estimate * LOW) {
       return `That's far below ${then}. Check for a missing zero.`;
     }
@@ -1055,7 +930,7 @@ function Summary({ value, cut, cost: known, bought }: SummaryProps) {
                 ? "What you paid"
                 : bought === null
                   ? "Worked out"
-                  : `At the ${formatBought(bought)} rate`}
+                  : `At the ${formatBought(bought.slice(0, 7))} rate`}
           </span>
         </dt>
         <dd className="text-right font-semibold tabular-nums">

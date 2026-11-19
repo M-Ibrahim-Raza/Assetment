@@ -28,7 +28,7 @@ export interface MetalPiece {
   paid: number | null;
   /** This piece's own buy-back deduction, as a share. Null uses the user's general one. */
   cut: number | null;
-  /** The month it was bought, e.g. "2021-03". */
+  /** When it was bought: the month, e.g. "2021-03", or the day, e.g. "2021-03-12". */
   bought: string | null;
 }
 
