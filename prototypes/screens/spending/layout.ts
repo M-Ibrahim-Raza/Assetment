@@ -1,6 +1,6 @@
 /** A part of Spending that the person can show, hide and move. The total and answer always lead. */
 export type SectionKey =
-  "pace" | "categories" | "accounts" | "calendar" | "entries";
+  "pace" | "categories" | "accounts" | "calendar" | "habits" | "entries";
 
 /** The pace chart's own settings, switched in Customize under its Options. */
 export interface PaceSettings {
@@ -44,6 +44,12 @@ export interface CalendarSettings {
   weekTotals: boolean;
 }
 
+/** When you spend's own settings, switched in Customize under its Options. */
+export interface HabitsSettings {
+  /** Each week of the month's share, under the weekdays. */
+  weeks: boolean;
+}
+
 /** The entries list's own settings, switched in Customize under its Options. */
 export interface EntriesSettings {
   /** Each day heading's total, "Yesterday · Rs 17,760". */
@@ -62,6 +68,7 @@ export interface SectionSettings {
   categories: BreakdownSettings;
   accounts: BreakdownSettings;
   calendar: CalendarSettings;
+  habits: HabitsSettings;
   entries: EntriesSettings;
 }
 
@@ -135,6 +142,11 @@ export const SECTIONS: Readonly<Record<SectionKey, Section>> = {
     about:
       "Each day shaded by what you spent. Pick a day, or a few, to see only those.",
   },
+  habits: {
+    name: "When you spend",
+    about:
+      "Which weekdays and which part of the month the money goes, over the last 3 months.",
+  },
   entries: {
     name: "Entries",
     about: "Every expense, with search. Always shown.",
@@ -156,7 +168,8 @@ const CHART_DEFAULTS = {
  * shows where the month may end; the average a day, the daily bars and the usual range are for
  * the few who want more. By account shows shares and sorting, but tags no movers: the headline
  * names categories, not accounts. The calendar shows each day's amount; no-spend days and week
- * totals are extras. Entries show day totals and sorting, in full rows.
+ * totals are extras. When you spend, once shown, has the part of the month. Entries show day totals
+ * and sorting, in full rows.
  */
 export const DEFAULT_SETTINGS: SectionSettings = {
   pace: {
@@ -180,6 +193,7 @@ export const DEFAULT_SETTINGS: SectionSettings = {
     ...CHART_DEFAULTS,
   },
   calendar: { amounts: true, noSpend: false, weekTotals: false },
+  habits: { weeks: true },
   entries: {
     dayTotals: true,
     runningTotal: false,
@@ -350,6 +364,13 @@ export const SETTINGS: {
       about: "What you spent each week, beside it or under the calendar.",
     },
   ],
+  habits: [
+    {
+      key: "weeks",
+      name: "Part of the month",
+      about: "What share went in each week of the month, under the weekdays.",
+    },
+  ],
   entries: [
     {
       key: "dayTotals",
@@ -389,6 +410,7 @@ function allSettings(layout: ScreenLayout): SectionSettings {
     categories: sectionSettings(layout, "categories"),
     accounts: sectionSettings(layout, "accounts"),
     calendar: sectionSettings(layout, "calendar"),
+    habits: sectionSettings(layout, "habits"),
     entries: sectionSettings(layout, "entries"),
   };
 }
@@ -414,28 +436,35 @@ const KEYS: readonly SectionKey[] = [
   "categories",
   "accounts",
   "calendar",
+  "habits",
   "entries",
 ];
 
-/** What everyone sees before customizing: all but the pace chart, with the default settings. */
+/**
+ * What everyone sees before customizing: all but the pace chart and When you spend, with the
+ * default settings.
+ */
 export const DEFAULT_LAYOUT: ScreenLayout = {
   order: KEYS,
-  hidden: ["pace"],
+  hidden: ["pace", "habits"],
   settings: DEFAULT_SETTINGS,
 };
 
 /** Every section once, in a known order, the locked ones never hidden, and every setting set. */
 function normalizeScreen(layout: ScreenLayout): ScreenLayout {
   const order = [...new Set(layout.order.filter((key) => KEYS.includes(key)))];
-  // A section added since the layout was saved goes after the one before it in the default order.
+  // A section added since the layout was saved goes after the one before it in the default order,
+  // shown or hidden as it is by default.
+  const added: SectionKey[] = [];
   for (const [index, key] of KEYS.entries()) {
     if (order.includes(key)) continue;
     const after = KEYS[index - 1];
     order.splice(after === undefined ? 0 : order.indexOf(after) + 1, 0, key);
+    if (DEFAULT_LAYOUT.hidden.includes(key)) added.push(key);
   }
   return {
     order,
-    hidden: layout.hidden.filter(
+    hidden: [...layout.hidden, ...added].filter(
       (key) => KEYS.includes(key) && SECTIONS[key].locked !== true,
     ),
     settings: allSettings(layout),
@@ -569,6 +598,7 @@ export function isDefault(layout: ScreenLayout): boolean {
     sameAsDefault("categories", settings.categories) &&
     sameAsDefault("accounts", settings.accounts) &&
     sameAsDefault("calendar", settings.calendar) &&
+    sameAsDefault("habits", settings.habits) &&
     sameAsDefault("entries", settings.entries)
   );
 }

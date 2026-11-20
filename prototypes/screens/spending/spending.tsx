@@ -27,6 +27,7 @@ import {
   PAD,
 } from "@proto/screens/dashboard/parts";
 import { arrange, type Row } from "./arrange";
+import { HabitsSection } from "./habits-block";
 import { BreakdownDonut } from "./breakdown-donut";
 import {
   CustomizeButton,
@@ -370,6 +371,16 @@ function Ready({
           onCustomize={customize("calendar")}
         />
       </section>
+    ),
+    habits: (
+      <HabitsSection
+        spending={spending}
+        month={params.month}
+        category={params.category}
+        account={params.account}
+        options={sectionSettings(here, "habits")}
+        onCustomize={customize("habits")}
+      />
     ),
     entries: (
       <EntriesSection
@@ -1132,6 +1143,12 @@ const SKELETONS: Record<SectionKey, ReactNode> = {
           ))}
         </div>
       </div>
+    </div>
+  ),
+  habits: (
+    <div className={cn("flex flex-col gap-4 bg-card py-6", BLOCK, PAD)}>
+      <Skeleton className="h-8 w-48" />
+      <Skeleton className="h-24 w-full" />
     </div>
   ),
   entries: (

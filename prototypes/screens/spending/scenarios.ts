@@ -222,6 +222,13 @@
 //   results), fixed zones such as breakdowns always on the left (ignores the person's order), a
 //   size per section, Half or Full (more ways to look broken; only if people ask). Later: a
 //   small map in Customize of where each section lands.
+// - When you spend (2026-11-20), moved here from the Categories work's d: a section of its own,
+//   after the calendar, hidden until switched on in Customize, so the default screen stays as
+//   approved. By amount over the 3 months up to the shown one: the weekdays as bars, and with
+//   its one setting, Part of the month (on), each week of the month's share. A picked category
+//   or account narrows it; picked days don't. A section added later starts as the default has
+//   it, so saved layouts don't suddenly show it. The 2026-11-12 "no weekday bars on the
+//   calendar" still holds: this is its own section. Needs a feature row and handoff note.
 //
 // - Settled at /prototype-finalize (2026-11-17):
 //   - "Usual" stays the name for the average of up to 3 months before.
@@ -309,12 +316,19 @@ export const scenarios = {
     spending: { today, months: shaadiSeasonMonths() },
   },
   many: { status: "ready", spending: { today, months: heavySpendingMonths() } },
-  // Every section shown, the pace chart too.
+  // Every section shown, the pace chart and When you spend too.
   "all-sections": {
     status: "ready",
     spending: { today, months: spendingMonths() },
     layout: {
-      order: ["pace", "categories", "accounts", "calendar", "entries"],
+      order: [
+        "pace",
+        "categories",
+        "accounts",
+        "calendar",
+        "habits",
+        "entries",
+      ],
       hidden: [],
     },
   },

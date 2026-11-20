@@ -2,7 +2,8 @@ import type { SectionKey } from "./layout";
 
 /**
  * How a section sits on a computer. Wide: the pace chart, on a row of its own. Tile: By category,
- * By account and the calendar, two to a row. List: the entries, which grow with the data.
+ * By account, the calendar and When you spend, two to a row. List: the entries, which grow with
+ * the data.
  */
 export type Shape = "wide" | "tile" | "list";
 
