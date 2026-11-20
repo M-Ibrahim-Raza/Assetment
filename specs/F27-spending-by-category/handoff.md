@@ -2,7 +2,7 @@
 
 **What:** where the money went: the biggest categories, each with a bar, a mark for the comparison and the change in words. The top 5 show first, then "Show 14 more · Rs 324,500". Picking a category narrows the whole screen. It can show as a donut chart instead (F33).
 
-**Screens:** `/spending`, with `?category=Groceries` and `?category-order=change`. A picked category offers "See its entries" and "Open Groceries", which opens Category detail (J3 step 3).
+**Screens:** `/spending`, with `?category=Groceries` and `?category-order=change`. A picked category offers "See its entries" and "Open Groceries", which opens its own page (F37). The heading, "By category ›", opens Categories (F35).
 
 **Decisions:** a list of bars, each with a mark for the comparison: sizes and change read at a glance, with the exact amounts in words. Not added: budgets (a v1 non-goal) and category groups (no such data).
 

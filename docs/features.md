@@ -38,3 +38,10 @@ What Assetment does, one row per feature. Columns and statuses: [README.md](READ
 | F32 | Customize Spending | [J3](journeys/J3-where-money-goes.md) | Should | F25 | approved | |
 | F33 | Donut chart for categories and accounts | [J3](journeys/J3-where-money-goes.md) | Should | F27, F32 | approved | |
 | F34 | When you spend | [J3](journeys/J3-where-money-goes.md) | Could | F25, F32 | approved | |
+| F35 | [Categories over the months](../specs/F35-categories-over-the-months/) | [J3](journeys/J3-where-money-goes.md) | Must | F25 | approved | |
+| F36 | [Looking after categories](../specs/F36-looking-after-categories/) | [J3](journeys/J3-where-money-goes.md) | Must | F35 | approved | |
+| F37 | [A category over the months](../specs/F37-a-category-over-the-months/) | [J3](journeys/J3-where-money-goes.md) | Must | F35 | approved | |
+| F38 | Category insights | [J3](journeys/J3-where-money-goes.md) | Should | F37 | approved | |
+| F39 | Auto-file places | [J3](journeys/J3-where-money-goes.md) | Should | F37, F14 | approved | |
+| F40 | Notes on a category's months | [J3](journeys/J3-where-money-goes.md) | Could | F37 | approved | |
+| F41 | Customize the Categories pages | [J3](journeys/J3-where-money-goes.md) | Should | F35, F37, F32 | approved | |
