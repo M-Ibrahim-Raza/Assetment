@@ -132,6 +132,8 @@ interface AppShellProps {
    * and the screen places `ShellActions` itself.
    */
   bleed?: boolean;
+  /** Uses the full width with Home's 12 px gutter, but keeps the header row. Others stay within 1024 px. */
+  wide?: boolean;
   /** The screen's own header buttons, such as Customize. They sit before Hide amounts. */
   actions?: ReactNode;
   children: ReactNode;
@@ -145,6 +147,7 @@ export function AppShell({
   current,
   title,
   bleed = false,
+  wide = false,
   actions,
   children,
 }: AppShellProps) {
@@ -280,7 +283,12 @@ export function AppShell({
           {bleed ? (
             <h1 className="sr-only">{title}</h1>
           ) : (
-            <header className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 pt-4 pb-3 md:px-8 md:pt-6">
+            <header
+              className={cn(
+                "flex w-full items-center justify-between gap-3 pt-4 pb-3 md:pt-6",
+                wide ? "px-3" : "mx-auto max-w-5xl px-4 md:px-8",
+              )}
+            >
               <h1 className="font-(family-name:--font-title) text-2xl font-[650] [font-variation-settings:'SOFT'_100]">
                 {title}
               </h1>
@@ -294,7 +302,10 @@ export function AppShell({
           <main
             className={cn(
               "flex-1 pb-28",
-              !bleed && "mx-auto w-full max-w-5xl px-4 md:px-8",
+              !bleed &&
+                (wide
+                  ? "w-full px-3"
+                  : "mx-auto w-full max-w-5xl px-4 md:px-8"),
             )}
           >
             {children}

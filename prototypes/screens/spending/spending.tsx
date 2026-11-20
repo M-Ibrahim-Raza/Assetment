@@ -114,7 +114,7 @@ export function Days(props: SpendingViewProps) {
     );
   }
   return (
-    <AppShell current="spending" title="Spending">
+    <AppShell current="spending" title="Spending" wide>
       <NotReady {...props} />
     </AppShell>
   );
@@ -397,6 +397,7 @@ function Ready({
     <AppShell
       current="spending"
       title="Spending"
+      wide
       actions={
         <CustomizeButton
           onClick={() => {
