@@ -18,5 +18,5 @@
 - The phone's browser bar takes the page colour of the current theme and mode.
 - Sign up and sign in show the colour saved on the device.
 - At night, link buttons use the theme's pale accent text (`accent-foreground`), not `primary`, which is about 2:1 on dark blocks. It's the one exception to white text on dark backgrounds.
-- The look in numbers: 24 px corners, 12 px gaps, Bricolage Grotesque headings.
+- The look in numbers: 24 px corners, 12 px gaps, Bricolage Grotesque headings, and page titles in Fraunces, the logo's serif (weight 650, Soft 100).
 - Open: on phones, the green top block still shows "Assetment" as typed text. The logo's gold A would be only 2:1 on that green.

@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
+import {
+  Bricolage_Grotesque,
+  Fraunces,
+  Geist,
+  Geist_Mono,
+} from "next/font/google";
 import { PaletteProvider } from "@proto/components/palette-provider";
 import { ThemeProvider } from "@proto/components/theme-provider";
 import "./prototype.css";
@@ -20,6 +25,13 @@ const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
 });
 
+// The logo's serif, for the page title. theme.css sets it as `--font-title`.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  axes: ["SOFT", "opsz"],
+});
+
 export const metadata: Metadata = {
   title: "Assetment prototype",
   description: "Living UI prototype of Assetment",
@@ -31,7 +43,7 @@ export default function PrototypeLayout({ children }: LayoutProps<"/">) {
     // React hydrates.
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable} ${fraunces.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">

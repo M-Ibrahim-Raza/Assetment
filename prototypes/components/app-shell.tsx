@@ -281,7 +281,9 @@ export function AppShell({
             <h1 className="sr-only">{title}</h1>
           ) : (
             <header className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 px-4 pt-4 pb-3 md:px-8 md:pt-6">
-              <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
+              <h1 className="font-(family-name:--font-title) text-2xl font-[650] [font-variation-settings:'SOFT'_100]">
+                {title}
+              </h1>
               <div className="flex items-center gap-1">
                 {actions}
                 <ShellActions />

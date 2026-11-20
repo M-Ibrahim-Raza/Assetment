@@ -5,7 +5,8 @@
  *
  * Bottle green for the headline block, bars and Add; sage for the month block; near-black ink for
  * the sidebar, the Debts tile and totals; white blocks on a mist page (a faint cool green-grey).
- * `--font-display` is the heavy face for headings and headline numbers.
+ * `--font-display` is the heavy face for headings and headline numbers. `--font-title` is the
+ * page title's face: Fraunces, the logo's serif, at the logo's weight 650 and Soft 100.
  *
  * `.dark` is the same look at night. The provider puts it on <html> for Dark, or for Auto on a
  * device set to dark. It sets every colour :root sets, or the light value would show through.
@@ -55,6 +56,7 @@
   /* The corners of the big blocks on a screen, such as Home's net worth and month blocks. */
   --block-radius: 1.5rem;
   --font-display: var(--font-bricolage);
+  --font-title: var(--font-fraunces);
   --sidebar: oklch(0.22 0.025 165);
   --sidebar-foreground: oklch(1 0 0);
   --sidebar-primary: oklch(0.43 0.1 158);
