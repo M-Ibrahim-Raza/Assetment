@@ -128,7 +128,7 @@ export interface CustomizeChoice<Screen> {
   picked: number;
   /** The screen's layout with that way picked. */
   chosen: (index: number) => Screen;
-  /** Not shown: the pressed button and the line under it already say what changed. */
+  /** What the change says, if not the setting's name and way. */
   said?: (index: number) => string;
 }
 
@@ -360,12 +360,13 @@ export function CustomizeSheet<
                       picked={option.picked}
                       icons={model.wayIcons}
                       onChange={(index) => {
-                        // The pressed button and the line under it say what changed, so the
-                        // status line goes back to its usual words.
-                        onChange(
+                        const what =
+                          option.said?.(index) ??
+                          `${option.name} ${(option.ways[index] ?? "").toLowerCase()}`;
+                        apply(
                           model.withScreen(layout, tab, option.chosen(index)),
+                          `${what}${where}.`,
                         );
-                        setStatus(null);
                       }}
                     />
                   </div>
