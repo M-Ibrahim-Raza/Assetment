@@ -21,6 +21,11 @@
 // - Sign up and sign in show the colour saved on the device.
 // - At night, link buttons use the pale accent text, not primary: an exception to white text.
 //
+// The Spending block (2026-11-21): its heading, "Spending ›", opens Spending, in place of "See all
+// spending" at its foot, as By category's heading opens Categories. Each category opens Spending
+// with it picked: Home is about this month, so its categories stay in it, and Spending has the
+// way to each one's own page.
+//
 // Open questions (write them here while exploring, resolve them in /prototype-finalize):
 // None.
 

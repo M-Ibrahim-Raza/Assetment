@@ -17,6 +17,6 @@ export const screenRoutes: Readonly<Partial<Record<string, ScreenRoute>>> = {
   "Reset password": "/reset-password",
   Spending: "/spending",
   Categories: "/spending/categories",
-  // One fixed page per screen name: every "Open <category>" on Spending lands on Groceries for now.
+  // One page per screen name, for the index. Each category's own link uses its own path.
   "Category detail": "/spending/categories/groceries",
 };

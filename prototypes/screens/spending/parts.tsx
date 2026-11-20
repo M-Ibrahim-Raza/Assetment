@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowDown, ArrowUp, Minus, Search, X } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   type ReactNode,
@@ -451,8 +452,8 @@ export function BreakdownRows({
 }
 
 /**
- * Under a picked category or account: a way to its entries, and its detail screen when it has
- * one. `onSeeEntries` brings the entries into view.
+ * Under a picked category or account: a way to its entries, and its own page when it has one.
+ * `onSeeEntries` brings the entries into view.
  */
 export function RowActions({
   row,
@@ -463,7 +464,7 @@ export function RowActions({
   row: BreakdownRow;
   /** Its entries in the list. */
   count: number;
-  /** The screen that opens it, such as Category detail. */
+  /** Its own page, such as /spending/categories/groceries. */
   detail?: string;
   onSeeEntries: () => void;
 }) {
@@ -480,15 +481,15 @@ export function RowActions({
         </Button>
       )}
       {detail !== undefined && (
-        <ScreenLink
-          screen={detail}
+        <Link
+          href={{ pathname: detail }}
           className={cn(
             buttonVariants({ variant: "ghost", size: "lg" }),
             "h-11 underline underline-offset-4",
           )}
         >
           Open {row.name}
-        </ScreenLink>
+        </Link>
       )}
     </div>
   );

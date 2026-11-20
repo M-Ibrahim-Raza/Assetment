@@ -1,14 +1,18 @@
 import { ArrowDown, ArrowUp, Minus } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Money } from "@proto/components/amounts";
-import { ScreenLink } from "@proto/components/screen-link";
+import { HeadingLink } from "@proto/components/heading-link";
 import type { CategorySpend } from "@proto/fixtures/entries";
 import { BLOCK, DISPLAY, HEADING, PAD } from "./parts";
 
 // Home shows the biggest few. The Spending screen has them all.
 const SHOWN = 5;
 
-/** This month's biggest spending categories as solid ink bars, each against the same point last month. */
+/**
+ * This month's biggest spending categories as solid ink bars, each against the same point last
+ * month. Each opens Spending with it picked, where its month, entries and own page are.
+ */
 export function SpendingBlock({
   categories,
 }: {
@@ -28,7 +32,11 @@ export function SpendingBlock({
     <section className={cn("flex flex-col gap-6 bg-card py-8", BLOCK, PAD)}>
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-          <h2 className={HEADING}>Spending</h2>
+          <h2 className={HEADING}>
+            <HeadingLink href="/spending" opens="this month's spending">
+              Spending
+            </HeadingLink>
+          </h2>
           {top.length > 0 && (
             <Money
               value={total}
@@ -49,46 +57,48 @@ export function SpendingBlock({
 
       {top.length > 0 && (
         <>
-          <ul className="flex flex-col gap-5">
+          <ul className="-mx-3 flex flex-col gap-1">
             {top.map((category) => (
-              <li key={category.name} className="flex flex-col gap-1.5">
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="min-w-0 font-semibold wrap-break-word">
-                    {category.name}
-                  </span>
-                  <Money
-                    value={category.spent}
-                    className="shrink-0 font-bold"
-                  />
-                </div>
-                {/* The longest bar is the biggest category. The amount beside it carries the number. */}
-                <div
-                  aria-hidden="true"
-                  className={cn("h-3 overflow-hidden bg-muted", BLOCK)}
+              <li key={category.name}>
+                <Link
+                  href={{
+                    pathname: "/spending",
+                    query: { category: category.name },
+                  }}
+                  className="flex flex-col gap-1.5 rounded-xl px-3 py-2 outline-none hover:bg-foreground/4 focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="min-w-0 font-semibold wrap-break-word">
+                      {category.name}
+                    </span>
+                    <Money
+                      value={category.spent}
+                      className="shrink-0 font-bold"
+                    />
+                  </div>
+                  {/* The longest bar is the biggest category. The amount beside it carries the number. */}
                   <div
-                    className={cn("h-full bg-primary", BLOCK)}
-                    style={{
-                      width: `${String((category.spent / largest) * 100)}%`,
-                    }}
-                  />
-                </div>
-                <Against category={category} />
+                    aria-hidden="true"
+                    className={cn("h-3 overflow-hidden bg-muted", BLOCK)}
+                  >
+                    <div
+                      className={cn("h-full bg-primary", BLOCK)}
+                      style={{
+                        width: `${String((category.spent / largest) * 100)}%`,
+                      }}
+                    />
+                  </div>
+                  <Against category={category} />
+                </Link>
               </li>
             ))}
           </ul>
-          <p className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-sm text-muted-foreground">
-            <span>
-              {more > 0 &&
-                `And ${String(more)} more ${more === 1 ? "category" : "categories"}`}
-            </span>
-            <ScreenLink
-              screen="Spending"
-              className="font-semibold text-foreground underline underline-offset-4"
-            >
-              See all spending
-            </ScreenLink>
-          </p>
+          {/* The heading opens Spending, which has them all. */}
+          {more > 0 && (
+            <p className="text-sm text-muted-foreground">
+              And {more} more {more === 1 ? "category" : "categories"}
+            </p>
+          )}
         </>
       )}
     </section>

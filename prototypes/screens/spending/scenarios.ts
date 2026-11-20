@@ -237,6 +237,14 @@
 //
 // - Entries' sort (2026-11-21): the sort menu moved to the right, on its own row under the
 //   search, so it sits where By category's and By account's do.
+// - Links to the Categories pages (2026-11-21): By category's heading opens Categories, as
+//   "By category ›" (tried against a link at the card's end, a preview of the months, a button
+//   and a text link by the heading). A picked category's "Open Groceries" opens its own page
+//   (before, every one opened Groceries). Home's "Spending ›" heading opens Spending, and its
+//   categories open Spending with one picked.
+// - Spending's tabs (2026-11-21): "Overview | Categories" under the title, on Spending and
+//   Categories, on every screen. A category's page, a level down, has its own way back instead.
+//   The sidebar keeps its five places.
 //
 // - Settled at /prototype-finalize (2026-11-17):
 //   - "Usual" stays the name for the average of up to 3 months before.

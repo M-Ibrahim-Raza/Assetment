@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { AppShell } from "@proto/components/app-shell";
+import { HeadingLink } from "@proto/components/heading-link";
+import { categoryPath } from "@proto/screens/categories/math";
 import { shellWidth } from "@proto/components/page-width";
 import { AmountsContext, Money } from "@proto/components/amounts";
 import { formatDigits } from "@proto/kit/format";
@@ -332,7 +334,8 @@ function Ready({
         rows={summary.categories}
         selected={params.category}
         onSelect={params.setCategory}
-        detail="Category detail"
+        detail={categoryPath}
+        headingOpens="/spending/categories"
         order={params.categoryOrder}
         onOrder={params.setCategoryOrder}
         share={categoryOptions.share}
@@ -527,6 +530,7 @@ function BreakdownSection({
   selected,
   onSelect,
   detail,
+  headingOpens,
   order,
   onOrder,
   share,
@@ -553,8 +557,10 @@ function BreakdownSection({
   rows: readonly BreakdownRow[];
   selected: string | undefined;
   onSelect: (name: string | undefined) => void;
-  /** The screen a picked row opens, if there is one. */
-  detail?: string;
+  /** The page a picked row opens, if it has one: its path, from its name. */
+  detail?: (name: string) => string;
+  /** Where the heading opens, if anywhere: all of them over the months. */
+  headingOpens?: "/spending/categories";
   /** How the rows are sorted: by amount, change, name or entries, either way. */
   order: RowOrder;
   onOrder: (order: RowOrder) => void;
@@ -592,7 +598,7 @@ function BreakdownSection({
     <RowActions
       row={picked}
       count={picked.entries}
-      {...(detail === undefined ? {} : { detail })}
+      {...(detail === undefined ? {} : { detail: detail(picked.name) })}
       onSeeEntries={scrollToEntries}
     />
   );
@@ -614,7 +620,16 @@ function BreakdownSection({
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
           <h2 id={`${id}-heading`} className={HEADING}>
-            {heading}
+            {headingOpens === undefined ? (
+              heading
+            ) : (
+              <HeadingLink
+                href={headingOpens}
+                opens="all categories over the months"
+              >
+                {heading}
+              </HeadingLink>
+            )}
           </h2>
           <SectionCustomizeButton
             name={heading}
