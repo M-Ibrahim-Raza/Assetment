@@ -156,15 +156,13 @@ function HabitsBody({ habits, weeks }: { habits: Habits; weeks: boolean }) {
             ? ` ${sharePercent(busiest)} from the ${week}.`
             : " Spread through the month.")}
       </p>
-      {/* The bars take the card's spare height when it shares a row with a taller card. */}
-      <div
-        aria-hidden="true"
-        className="flex min-h-24 flex-1 items-end gap-1.5"
-      >
+      {/* The bars take the card's spare height when it shares a row with a taller card. Each day
+          stretches to the row's height, so its bar's percentage has a height to work from. */}
+      <div aria-hidden="true" className="flex min-h-24 flex-1 gap-1.5">
         {habits.weekdays.map((share, index) => (
           <div
             key={WEEKDAYS[index]}
-            className="flex h-full flex-1 flex-col items-center justify-end gap-1"
+            className="flex flex-1 flex-col items-center justify-end gap-1"
           >
             <span
               className={cn(
