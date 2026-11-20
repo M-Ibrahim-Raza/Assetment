@@ -37,3 +37,4 @@ What Assetment does, one row per feature. Columns and statuses: [README.md](READ
 | F31 | Pace chart | [J3](journeys/J3-where-money-goes.md) | Should | F26 | approved | |
 | F32 | Customize Spending | [J3](journeys/J3-where-money-goes.md) | Should | F25 | approved | |
 | F33 | Donut chart for categories and accounts | [J3](journeys/J3-where-money-goes.md) | Should | F27, F32 | approved | |
+| F34 | When you spend | [J3](journeys/J3-where-money-goes.md) | Could | F25, F32 | approved | |

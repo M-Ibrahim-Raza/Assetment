@@ -228,12 +228,15 @@
 //   its one setting, Part of the month (on), each week of the month's share. A picked category
 //   or account narrows it; picked days don't. A section added later starts as the default has
 //   it, so saved layouts don't suddenly show it. The 2026-11-12 "no weekday bars on the
-//   calendar" still holds: this is its own section. Needs a feature row and handoff note.
+//   calendar" still holds: this is its own section. Feature F34.
 //
 // - Width (2026-11-21): Full by default, the whole screen, as on Home. "Width on computers" in
 //   Customize, for the whole page, under "Same layout on phone and computer": Focused (1,024 px),
 //   Balanced (1,280 px) or Full, as on Categories. Saved with the computers' layout; phones use
 //   the whole screen.
+//
+// - Entries' sort (2026-11-21): the sort menu moved to the right, on its own row under the
+//   search, so it sits where By category's and By account's do.
 //
 // - Settled at /prototype-finalize (2026-11-17):
 //   - "Usual" stays the name for the average of up to 3 months before.

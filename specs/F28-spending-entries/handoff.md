@@ -9,7 +9,7 @@
 **Edge cases:**
 
 - Search matches names, categories, accounts and amounts, "4250". A result line counts what the list shows: "12 entries · Rs 34,500".
-- Sorting: Date (Newest first, Oldest first), Amount, Name, Category or Account. By date, entries group under days; by category or account, under each one with its total; by amount or name, one list, each row with its day.
+- Sorting: Date (Newest first, Oldest first), Amount, Name, Category or Account. By date, entries group under days; by category or account, under each one with its total; by amount or name, one list, each row with its day. The sort menu sits at the right, on its own row under the search, as on By category and By account.
 - Its settings in Customize: Layout on computers, Side column or Rows (F25), not on the Phone tab. Day totals, on. Running total, off: "Rs 207,470 by then". Compact rows, off: one line per entry. Sorting, on.
 - Day headings stay at the top while their entries scroll. Beside a side column on a computer, the list's head (heading, search, sort and count) stays at the top too, and the day headings stop under it.
 - No results: what caused it, such as "No entries match “Daraz” in Groceries", with Clear filters.
