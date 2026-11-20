@@ -230,6 +230,11 @@
 //   it, so saved layouts don't suddenly show it. The 2026-11-12 "no weekday bars on the
 //   calendar" still holds: this is its own section. Needs a feature row and handoff note.
 //
+// - Width (2026-11-21): Full by default, the whole screen, as on Home. "Width on computers" in
+//   Customize, for the whole page, under "Same layout on phone and computer": Focused (1,024 px),
+//   Balanced (1,280 px) or Full, as on Categories. Saved with the computers' layout; phones use
+//   the whole screen.
+//
 // - Settled at /prototype-finalize (2026-11-17):
 //   - "Usual" stays the name for the average of up to 3 months before.
 //   - A failed save in Customize keeps the change on screen, and the status line says "Couldn't
@@ -436,7 +441,7 @@ export const scenarios = {
     spending: { today, months: spendingMonths() },
     start: { day: "8-10" },
   },
-  // Rows picked in Customize: the entries on a row of their own.
+  // Rows and Balanced width picked in Customize: the entries on a row of their own, in a column.
   rows: {
     status: "ready",
     spending: { today, months: spendingMonths() },
@@ -444,6 +449,7 @@ export const scenarios = {
       order: ["pace", "categories", "accounts", "calendar", "entries"],
       hidden: ["pace"],
       arrangement: "rows",
+      width: "balanced",
     },
   },
   // By category as a donut chart beside By account as a list.

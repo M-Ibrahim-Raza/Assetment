@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AppShell } from "@proto/components/app-shell";
+import { shellWidth } from "@proto/components/page-width";
 import {
   CustomizeButton,
   CustomizeSheet,
@@ -12,6 +13,7 @@ import { useScreen } from "@proto/screens/spending/use-screen";
 import {
   CUSTOMIZE,
   DEFAULT_LAYOUT,
+  DEFAULT_WIDTH,
   type CategoriesLayout,
   type ListSettings,
   normalize,
@@ -44,7 +46,7 @@ export function Mix(props: CategoriesViewProps) {
     );
   }
   return (
-    <AppShell current="spending" title="Categories">
+    <AppShell current="spending" title="Categories" wide="medium">
       {props.status === "loading" ? (
         <div aria-busy="true" className="flex flex-col gap-3">
           <span className="sr-only">Loading your categories</span>
@@ -89,6 +91,8 @@ function Ready({
     <AppShell
       current="spending"
       title="Categories"
+      // The width set in Customize. Phones always use the whole screen.
+      wide={shellWidth(here.width ?? DEFAULT_WIDTH, screen)}
       actions={
         <CustomizeButton
           label="Customize Categories"

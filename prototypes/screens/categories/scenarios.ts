@@ -44,6 +44,11 @@
 //   this month's likely end off. Every category: a bar a month, the Total column, how often,
 //   sorting and the Nothing spent row on; share of spending, this month against usual and compact
 //   rows off. Picking a category from the key, and the Hidden row, aren't optional.
+// - Width (2026-11-21): Balanced by default, a column of up to 1,280 px in the middle.
+//   "Width on computers" in Customize, for the whole page, under "Same layout on phone and
+//   computer": Focused (1,024 px), Balanced or Full (the whole screen, as on Spending and Home),
+//   in that order. Its lines name no sizes. Saved with the computers' layout; phones use the
+//   whole screen. Category detail has the same choice, Balanced by default too.
 //
 // Open questions:
 // - Where Spending links here: an "All categories" link by By category's heading, and "Open
@@ -115,13 +120,14 @@ export const scenarios = {
     status: "ready",
     book: bookOf(categoryHistory(), HIDDEN_SAMPLE),
   },
-  // Set up in Customize: no summary, compact rows with each one's share, and no sort.
+  // Set up in Customize: Full width, no summary, compact rows with each one's share, no sort.
   customized: {
     status: "ready",
     book: bookOf(categoryHistory()),
     layout: {
       order: ["list"],
       hidden: [],
+      width: "full",
       settings: {
         top: { summary: false },
         list: { compact: true, share: true, sorting: false },
@@ -141,13 +147,14 @@ export const scenarios = {
       },
     },
   },
-  // The fewest extras: the big number and the chart, and rows with their averages.
+  // The fewest extras: the big number and the chart, and rows with their averages, Focused.
   minimal: {
     status: "ready",
     book: bookOf(categoryHistory()),
     layout: {
       order: ["list"],
       hidden: [],
+      width: "focused",
       settings: {
         top: {
           summary: false,

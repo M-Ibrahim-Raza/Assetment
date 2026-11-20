@@ -1,3 +1,5 @@
+import type { PageWidth } from "@proto/components/page-width";
+
 /** A part of Spending that the person can show, hide and move. The total and answer always lead. */
 export type SectionKey =
   "pace" | "categories" | "accounts" | "calendar" | "habits" | "entries";
@@ -84,6 +86,9 @@ export type Arrangement = "side-column" | "rows";
 
 export const DEFAULT_ARRANGEMENT: Arrangement = "side-column";
 
+/** The page's width on tablets and computers. Full: the whole screen, as on Home. */
+export const DEFAULT_WIDTH: PageWidth = "full";
+
 export interface ScreenLayout {
   order: readonly SectionKey[];
   hidden: readonly SectionKey[];
@@ -91,6 +96,8 @@ export interface ScreenLayout {
   settings?: { [Key in SetKey]?: Partial<SectionSettings[Key]> };
   /** Computers and tablets only: phones stack the sections. Missing means a side column. */
   arrangement?: Arrangement;
+  /** Computers and tablets only, like `arrangement`. Missing means full. */
+  width?: PageWidth;
 }
 
 /**
@@ -473,24 +480,37 @@ function normalizeScreen(layout: ScreenLayout): ScreenLayout {
 
 /**
  * The layout, and the phone's own if it has one, each made whole by `normalizeScreen`. Only the
- * computers' has an arrangement.
+ * computers' has an arrangement and a width.
  */
 export function normalize(layout: SpendingLayout): SpendingLayout {
   const main = {
     ...normalizeScreen(layout),
     arrangement: layout.arrangement ?? DEFAULT_ARRANGEMENT,
+    width: layout.width ?? DEFAULT_WIDTH,
   };
   return layout.phone === undefined
     ? main
     : { ...main, phone: normalizeScreen(layout.phone) };
 }
 
-/** A layout's sections and their settings, without the computers' arrangement. */
+/** A layout's sections and their settings, without the computers' arrangement and width. */
 function sectionsOf(layout: ScreenLayout): ScreenLayout {
   return {
     order: layout.order,
     hidden: layout.hidden,
     ...(layout.settings === undefined ? {} : { settings: layout.settings }),
+  };
+}
+
+/** The choices only computers and tablets have: the arrangement and the page width. */
+function computersOf(
+  layout: ScreenLayout,
+): Pick<ScreenLayout, "arrangement" | "width"> {
+  return {
+    ...(layout.arrangement === undefined
+      ? {}
+      : { arrangement: layout.arrangement }),
+    ...(layout.width === undefined ? {} : { width: layout.width }),
   };
 }
 
@@ -504,12 +524,7 @@ export function screenLayout(
   layout: SpendingLayout,
   screen: ScreenKind,
 ): ScreenLayout {
-  const main: ScreenLayout = {
-    ...sectionsOf(layout),
-    ...(layout.arrangement === undefined
-      ? {}
-      : { arrangement: layout.arrangement }),
-  };
+  const main: ScreenLayout = { ...sectionsOf(layout), ...computersOf(layout) };
   return screen === "phone" ? (layout.phone ?? main) : main;
 }
 
@@ -534,12 +549,13 @@ export function setSame(
   same: boolean,
   keep: ScreenKind,
 ): SpendingLayout {
-  // Computers keep their arrangement, whichever tab's sections are kept. Phones have none.
+  // Computers keep their arrangement and width, whichever tab's sections are kept. Phones have
+  // neither.
   if (same) {
-    const kept = sectionsOf(screenLayout(layout, keep));
-    return layout.arrangement === undefined
-      ? kept
-      : { ...kept, arrangement: layout.arrangement };
+    return {
+      ...sectionsOf(screenLayout(layout, keep)),
+      ...computersOf(layout),
+    };
   }
   return layout.phone === undefined
     ? { ...layout, phone: sectionsOf(layout) }
@@ -594,6 +610,7 @@ export function isDefault(layout: ScreenLayout): boolean {
     normal.hidden.toSorted().join() ===
       DEFAULT_LAYOUT.hidden.toSorted().join() &&
     normal.arrangement === DEFAULT_ARRANGEMENT &&
+    normal.width === DEFAULT_WIDTH &&
     sameAsDefault("pace", settings.pace) &&
     sameAsDefault("categories", settings.categories) &&
     sameAsDefault("accounts", settings.accounts) &&

@@ -7,6 +7,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { AppShell } from "@proto/components/app-shell";
+import { shellWidth } from "@proto/components/page-width";
 import {
   CustomizeButton,
   CustomizeSheet,
@@ -77,6 +78,7 @@ import {
 import {
   CUSTOMIZE,
   DEFAULT_LAYOUT,
+  DEFAULT_WIDTH,
   type DetailLayout,
   type DetailSectionKey,
   isShown,
@@ -122,7 +124,7 @@ export function MixDetail(props: CategoryDetailViewProps) {
     );
   }
   return (
-    <AppShell current="spending" title="Category">
+    <AppShell current="spending" title="Category" wide="medium">
       {props.status === "loading" ? (
         <div aria-busy="true" className="flex flex-col gap-3">
           <span className="sr-only">Loading this category</span>
@@ -177,7 +179,11 @@ function Ready({
 
   if (shown === undefined) {
     return (
-      <AppShell current="spending" title={deleted ?? start}>
+      <AppShell
+        current="spending"
+        title={deleted ?? start}
+        wide={shellWidth(here.width ?? DEFAULT_WIDTH, screen)}
+      >
         <div className="flex flex-col gap-3">
           <BackToCategories rangeQuery={params.rangeQuery} />
           {deleted === null ? (
@@ -204,6 +210,8 @@ function Ready({
     <AppShell
       current="spending"
       title={shown}
+      // The width set in Customize. Phones always use the whole screen.
+      wide={shellWidth(here.width ?? DEFAULT_WIDTH, screen)}
       actions={
         <div className="flex items-center gap-1">
           <CustomizeButton

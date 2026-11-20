@@ -7,8 +7,10 @@ import {
   type CustomizeOption,
   CustomizeSheet as SharedCustomizeSheet,
 } from "@proto/components/customize-sheet";
+import { WIDTH_ICONS, widthChoice } from "@proto/components/page-width";
 import {
   DEFAULT_ARRANGEMENT,
+  DEFAULT_WIDTH,
   DEFAULT_LAYOUT,
   isDefault,
   isSplit,
@@ -113,6 +115,8 @@ const MODEL: CustomizeModel<SectionKey, ScreenLayout, SpendingLayout> = {
   section: (key) => SECTIONS[key],
   options: (layout, key, computers) =>
     key === null ? undefined : optionsOf(layout, key, computers),
+  pageOptions: (layout, computers) =>
+    computers ? [widthChoice(layout, DEFAULT_WIDTH)] : [],
   defaultLayout: DEFAULT_LAYOUT,
   isDefault,
   toggle,
@@ -126,6 +130,7 @@ const MODEL: CustomizeModel<SectionKey, ScreenLayout, SpendingLayout> = {
     "Donut chart": ChartPie,
     "Side column": Columns2,
     Rows: Rows3,
+    ...WIDTH_ICONS,
   },
 };
 

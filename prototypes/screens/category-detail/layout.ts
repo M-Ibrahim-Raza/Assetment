@@ -4,11 +4,17 @@ import type {
   CustomizeSection,
   ScreenKind,
 } from "@proto/components/customize-sheet";
+import {
+  type PageWidth,
+  WIDTH_ICONS,
+  widthChoice,
+} from "@proto/components/page-width";
 
 // A category's page, as the person sets it up in Customize: which sections show, in what order,
 // and each section's extras. One layout for every category, saved to the account, with a phone
 // layout of its own once "Same layout on phone and computer" is off, as on Spending. Month by
-// month always leads; its extras are switched like any section's.
+// month always leads; its extras are switched like any section's. Its width on computers is a
+// choice for the whole page, Balanced by default, as on Categories.
 
 /** A part of the page that can be shown, hidden and moved. Month by month isn't one: it leads. */
 export type DetailSectionKey =
@@ -62,7 +68,12 @@ export interface DetailScreenLayout {
   order: readonly DetailSectionKey[];
   hidden: readonly DetailSectionKey[];
   settings?: { [Key in SetKey]?: Partial<DetailSettings[Key]> };
+  /** Computers and tablets only: phones always use the whole screen. Missing means balanced. */
+  width?: PageWidth;
 }
+
+/** The page's width on tablets and computers. Balanced: a column up to 1,280 px, in the middle. */
+export const DEFAULT_WIDTH: PageWidth = "balanced";
 
 /** The layout saved to the account, with the phone's own once it has one. */
 export interface DetailLayout extends DetailScreenLayout {
@@ -339,9 +350,12 @@ function normalizeScreen(layout: DetailScreenLayout): DetailScreenLayout {
   };
 }
 
-/** The layout, and the phone's own if it has one, each made whole. */
+/** The layout, and the phone's own if it has one, each made whole. Only the computers' has a width. */
 export function normalize(layout: DetailLayout): DetailLayout {
-  const main = normalizeScreen(layout);
+  const main = {
+    ...normalizeScreen(layout),
+    width: layout.width ?? DEFAULT_WIDTH,
+  };
   return layout.phone === undefined
     ? main
     : { ...main, phone: normalizeScreen(layout.phone) };
@@ -351,7 +365,7 @@ export function isSplit(layout: DetailLayout): boolean {
   return layout.phone !== undefined;
 }
 
-/** A layout's sections and settings, without the phone's. */
+/** A layout's sections and settings, without the phone's or the computers' width. */
 function sectionsOf(layout: DetailScreenLayout): DetailScreenLayout {
   return {
     order: layout.order,
@@ -365,9 +379,11 @@ export function screenLayout(
   layout: DetailLayout,
   screen: ScreenKind,
 ): DetailScreenLayout {
-  return screen === "phone"
-    ? (layout.phone ?? sectionsOf(layout))
-    : sectionsOf(layout);
+  const main: DetailScreenLayout = {
+    ...sectionsOf(layout),
+    ...(layout.width === undefined ? {} : { width: layout.width }),
+  };
+  return screen === "phone" ? (layout.phone ?? main) : main;
 }
 
 /** The layout with one kind of screen's changed. While they're the same, both change. */
@@ -376,10 +392,10 @@ export function withScreen(
   screen: ScreenKind,
   next: DetailScreenLayout,
 ): DetailLayout {
-  if (layout.phone === undefined) return sectionsOf(next);
+  if (layout.phone === undefined) return screenLayout(next, "wide");
   return screen === "phone"
     ? { ...layout, phone: sectionsOf(next) }
-    : { ...sectionsOf(next), phone: layout.phone };
+    : { ...screenLayout(next, "wide"), phone: layout.phone };
 }
 
 /** Turns "Same layout on phone and computer" off, giving phones a copy, or on, keeping `keep`'s. */
@@ -388,7 +404,11 @@ export function setSame(
   same: boolean,
   keep: ScreenKind,
 ): DetailLayout {
-  if (same) return screenLayout(layout, keep);
+  // Computers keep their width, whichever tab's sections are kept. Phones have none.
+  if (same) {
+    const kept = sectionsOf(screenLayout(layout, keep));
+    return layout.width === undefined ? kept : { ...kept, width: layout.width };
+  }
   return layout.phone === undefined
     ? { ...layout, phone: sectionsOf(layout) }
     : layout;
@@ -433,6 +453,7 @@ export function isDefault(layout: DetailScreenLayout): boolean {
   const normal = normalizeScreen(layout);
   // Settings are rebuilt from the defaults, key by key, so the same values read the same.
   return (
+    (layout.width ?? DEFAULT_WIDTH) === DEFAULT_WIDTH &&
     normal.order.join() === KEYS.join() &&
     normal.hidden.toSorted().join() ===
       DEFAULT_LAYOUT.hidden.toSorted().join() &&
@@ -450,6 +471,8 @@ export const CUSTOMIZE: CustomizeModel<
   lead: LEAD,
   section: (key) => SECTIONS[key],
   options: (layout, key) => optionsOf(layout, key),
+  pageOptions: (layout, computers) =>
+    computers ? [widthChoice(layout, DEFAULT_WIDTH)] : [],
   defaultLayout: DEFAULT_LAYOUT,
   isDefault,
   toggle,
@@ -458,4 +481,5 @@ export const CUSTOMIZE: CustomizeModel<
   screenLayout,
   withScreen,
   setSame,
+  wayIcons: WIDTH_ICONS,
 };

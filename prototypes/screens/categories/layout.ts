@@ -4,6 +4,11 @@ import type {
   CustomizeSection,
   ScreenKind,
 } from "@proto/components/customize-sheet";
+import {
+  type PageWidth,
+  WIDTH_ICONS,
+  widthChoice,
+} from "@proto/components/page-width";
 
 // The Categories page, as the person sets it up in Customize: each block's extras. Both blocks
 // always show, Spending by month first, so Customize is mostly their Options. Saved to the account,
@@ -42,11 +47,16 @@ export interface CategoriesSettings {
 
 type SetKey = keyof CategoriesSettings;
 
+/** The page's width on tablets and computers. Balanced: a column up to 1,280 px, in the middle. */
+export const DEFAULT_WIDTH: PageWidth = "balanced";
+
 /** One kind of screen's layout. Missing settings, or a missing setting, mean the default. */
 export interface CategoriesScreenLayout {
   order: readonly CategoriesSectionKey[];
   hidden: readonly CategoriesSectionKey[];
   settings?: { [Key in SetKey]?: Partial<CategoriesSettings[Key]> };
+  /** Computers and tablets only: phones always use the whole screen. Missing means full. */
+  width?: PageWidth;
 }
 
 /** The layout saved to the account, with the phone's own once it has one. */
@@ -238,14 +248,18 @@ function normalizeScreen(
   return { order: KEYS, hidden: [], settings: allSettings(layout) };
 }
 
+/** The layout, and the phone's own if it has one. Only the computers' has a width. */
 export function normalize(layout: CategoriesLayout): CategoriesLayout {
-  const main = normalizeScreen(layout);
+  const main = {
+    ...normalizeScreen(layout),
+    width: layout.width ?? DEFAULT_WIDTH,
+  };
   return layout.phone === undefined
     ? main
     : { ...main, phone: normalizeScreen(layout.phone) };
 }
 
-/** A layout without the phone's. */
+/** A layout's blocks and their settings, without the phone's or the computers' width. */
 function sectionsOf(layout: CategoriesScreenLayout): CategoriesScreenLayout {
   return {
     order: layout.order,
@@ -259,9 +273,11 @@ export function screenLayout(
   layout: CategoriesLayout,
   screen: ScreenKind,
 ): CategoriesScreenLayout {
-  return screen === "phone"
-    ? (layout.phone ?? sectionsOf(layout))
-    : sectionsOf(layout);
+  const main: CategoriesScreenLayout = {
+    ...sectionsOf(layout),
+    ...(layout.width === undefined ? {} : { width: layout.width }),
+  };
+  return screen === "phone" ? (layout.phone ?? main) : main;
 }
 
 /** What Customize needs to know about the Categories page. */
@@ -277,25 +293,35 @@ export const CUSTOMIZE: CustomizeModel<
     key === null
       ? rowsOf(layout, "top", sectionSettings(layout, "top"))
       : rowsOf(layout, "list", sectionSettings(layout, "list")),
+  pageOptions: (layout, computers) =>
+    computers ? [widthChoice(layout, DEFAULT_WIDTH)] : [],
   defaultLayout: DEFAULT_LAYOUT,
   isDefault: (layout) =>
+    (layout.width ?? DEFAULT_WIDTH) === DEFAULT_WIDTH &&
     JSON.stringify(allSettings(normalizeScreen(layout))) ===
-    JSON.stringify(DEFAULT_SETTINGS),
+      JSON.stringify(DEFAULT_SETTINGS),
   // Every category can't be hidden or moved: it's the page.
   toggle: (layout) => layout,
   move: (layout) => layout,
   isSplit: (layout) => layout.phone !== undefined,
   screenLayout,
   withScreen: (layout, screen, next) => {
-    if (layout.phone === undefined) return sectionsOf(next);
+    if (layout.phone === undefined) return screenLayout(next, "wide");
     return screen === "phone"
       ? { ...layout, phone: sectionsOf(next) }
-      : { ...sectionsOf(next), phone: layout.phone };
+      : { ...screenLayout(next, "wide"), phone: layout.phone };
   },
   setSame: (layout, same, keep) => {
-    if (same) return screenLayout(layout, keep);
+    // Computers keep their width, whichever tab's blocks are kept. Phones have none.
+    if (same) {
+      const kept = sectionsOf(screenLayout(layout, keep));
+      return layout.width === undefined
+        ? kept
+        : { ...kept, width: layout.width };
+    }
     return layout.phone === undefined
       ? { ...layout, phone: sectionsOf(layout) }
       : layout;
   },
+  wayIcons: WIDTH_ICONS,
 };

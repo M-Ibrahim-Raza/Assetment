@@ -118,6 +118,20 @@ export interface CustomizeOption<Screen> {
   said?: (on: boolean) => string;
 }
 
+/** A choice of a few ways for the whole page, such as its width: a button for each. */
+export interface CustomizeChoice<Screen> {
+  name: string;
+  /** What the way picked does. */
+  about: string;
+  ways: readonly string[];
+  /** The way picked, by its place in `ways`. */
+  picked: number;
+  /** The screen's layout with that way picked. */
+  chosen: (index: number) => Screen;
+  /** Not shown: the pressed button and the line under it already say what changed. */
+  said?: (index: number) => string;
+}
+
 /** A section as Customize lists it. */
 export interface CustomizeSection {
   name: string;
@@ -147,6 +161,16 @@ export interface CustomizeModel<
     key: Key | null,
     computers: boolean,
   ) => readonly CustomizeOption<Screen>[] | undefined;
+  /**
+   * Settings for the whole page, under "Same layout on phone and computer", such as its width:
+   * switches, or a choice of two or more ways. `computers` is false on the phone tab.
+   */
+  pageOptions?: (
+    layout: Screen,
+    computers: boolean,
+  ) => readonly (
+    (CustomizeOption<Screen> & { about: string }) | CustomizeChoice<Screen>
+  )[];
   defaultLayout: Screen;
   isDefault: (layout: Screen) => boolean;
   toggle: (layout: Screen, key: Key) => Screen;
@@ -305,7 +329,7 @@ export function CustomizeSheet<
         </div>
 
         <div className="-mx-1 flex flex-col gap-2 overflow-y-auto p-1">
-          <div className="rounded-2xl border px-4 py-1">
+          <div className="flex flex-col rounded-2xl border px-4 py-1">
             <SettingRow
               name="Same layout on phone and computer"
               about={
@@ -324,6 +348,60 @@ export function CustomizeSheet<
                 );
               }}
             />
+            {model.pageOptions?.(current, computers).map((option) => {
+              // A choice of a few ways, such as the width, sits under a rule.
+              if ("picked" in option) {
+                return (
+                  <div key={option.name} className="mt-1 border-t pt-1">
+                    <WaysRow
+                      name={option.name}
+                      ways={option.ways}
+                      about={option.about}
+                      picked={option.picked}
+                      icons={model.wayIcons}
+                      onChange={(index) => {
+                        // The pressed button and the line under it say what changed, so the
+                        // status line goes back to its usual words.
+                        onChange(
+                          model.withScreen(layout, tab, option.chosen(index)),
+                        );
+                        setStatus(null);
+                      }}
+                    />
+                  </div>
+                );
+              }
+              const change = (on: boolean) => {
+                const what =
+                  option.said?.(on) ?? `${option.name} ${on ? "on" : "off"}`;
+                apply(
+                  model.withScreen(layout, tab, option.switched(on)),
+                  `${what}${where}.`,
+                );
+              };
+              return option.ways === undefined ? (
+                <SettingRow
+                  key={option.name}
+                  name={option.name}
+                  about={option.about}
+                  on={option.on}
+                  onChange={change}
+                />
+              ) : (
+                <div key={option.name} className="mt-1 border-t pt-1">
+                  <WaysRow
+                    name={option.name}
+                    ways={option.ways}
+                    about={option.about}
+                    picked={option.on ? 1 : 0}
+                    icons={model.wayIcons}
+                    onChange={(index) => {
+                      change(index === 1);
+                    }}
+                  />
+                </div>
+              );
+            })}
           </div>
           <SectionRow
             key={`${tab}-lead`}
@@ -659,10 +737,10 @@ function SectionRow<Screen>({
                 name={option.name}
                 ways={option.ways}
                 {...(option.about === undefined ? {} : { about: option.about })}
-                on={option.on}
+                picked={option.on ? 1 : 0}
                 icons={wayIcons}
-                onChange={(on) => {
-                  onOption(option, on);
+                onChange={(index) => {
+                  onOption(option, index === 1);
                 }}
               />
             ),
@@ -683,20 +761,23 @@ function WaysRow({
   name,
   ways,
   about,
-  on,
+  picked,
   icons,
   onChange,
 }: {
   name: string;
-  ways: readonly [string, string];
+  /** Two, side by side, or three, each with its icon over its name so they fit a phone. */
+  ways: readonly string[];
   /** What the way picked does. */
   about?: string;
-  on: boolean;
+  /** The way picked, by its place in `ways`. */
+  picked: number;
   icons: Readonly<Record<string, LucideIcon>> | undefined;
-  onChange: (on: boolean) => void;
+  onChange: (index: number) => void;
 }) {
   const nameId = useId();
   const aboutId = useId();
+  const three = ways.length > 2;
   return (
     <div className="flex flex-col gap-2 py-2 not-last:mb-1 not-last:border-b not-last:pb-4">
       <p id={nameId} className="text-sm font-medium text-muted-foreground">
@@ -707,20 +788,26 @@ function WaysRow({
         {...(about === undefined ? {} : { "aria-describedby": aboutId })}
         variant="outline"
         spacing={0}
-        value={[on ? "on" : "off"]}
+        value={[String(picked)]}
         onValueChange={(value: readonly unknown[]) => {
-          if (value.includes("on")) onChange(true);
-          else if (value.includes("off")) onChange(false);
+          // Pressing the one already picked leaves it picked.
+          const next = value.find((one) => typeof one === "string");
+          if (typeof next === "string") onChange(Number(next));
         }}
-        className="grid w-full grid-cols-2"
+        className={cn("grid w-full", three ? "grid-cols-3" : "grid-cols-2")}
       >
         {ways.map((way, index) => {
           const Icon = icons?.[way];
           return (
             <ToggleGroupItem
               key={way}
-              value={index === 0 ? "off" : "on"}
-              className="h-11 w-full gap-2 px-3 text-sm aria-pressed:bg-accent aria-pressed:text-accent-foreground"
+              value={String(index)}
+              className={cn(
+                "w-full text-sm aria-pressed:bg-accent aria-pressed:text-accent-foreground",
+                three
+                  ? "h-auto min-h-14 flex-col gap-1 px-1 py-2"
+                  : "h-11 gap-2 px-3",
+              )}
             >
               {Icon !== undefined && (
                 <Icon aria-hidden="true" className="size-4" />

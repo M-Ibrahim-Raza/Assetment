@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { AppShell } from "@proto/components/app-shell";
+import { shellWidth } from "@proto/components/page-width";
 import { AmountsContext, Money } from "@proto/components/amounts";
 import { formatDigits } from "@proto/kit/format";
 import { useProtoAction } from "@proto/kit/use-proto-action";
@@ -39,6 +40,7 @@ import {
   type CalendarSettings,
   DEFAULT_ARRANGEMENT,
   DEFAULT_LAYOUT,
+  DEFAULT_WIDTH,
   type EntriesSettings,
   isShown,
   normalize,
@@ -397,7 +399,7 @@ function Ready({
     <AppShell
       current="spending"
       title="Spending"
-      wide
+      wide={shellWidth(here.width ?? DEFAULT_WIDTH, screen)}
       actions={
         <CustomizeButton
           onClick={() => {
