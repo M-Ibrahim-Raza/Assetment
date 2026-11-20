@@ -116,7 +116,11 @@ export function Days(props: SpendingViewProps) {
     );
   }
   return (
-    <AppShell current="spending" title="Spending" wide>
+    <AppShell
+      current="spending"
+      title="Spending"
+      wide={shellWidth(DEFAULT_WIDTH, "wide")}
+    >
       <NotReady {...props} />
     </AppShell>
   );

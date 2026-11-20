@@ -86,8 +86,8 @@ export type Arrangement = "side-column" | "rows";
 
 export const DEFAULT_ARRANGEMENT: Arrangement = "side-column";
 
-/** The page's width on tablets and computers. Full: the whole screen, as on Home. */
-export const DEFAULT_WIDTH: PageWidth = "full";
+/** The page's width on tablets and computers. Balanced: a column in the middle, as on Categories. */
+export const DEFAULT_WIDTH: PageWidth = "balanced";
 
 export interface ScreenLayout {
   order: readonly SectionKey[];

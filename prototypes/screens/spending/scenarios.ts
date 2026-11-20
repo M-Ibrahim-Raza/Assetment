@@ -230,10 +230,10 @@
 //   it, so saved layouts don't suddenly show it. The 2026-11-12 "no weekday bars on the
 //   calendar" still holds: this is its own section. Feature F34.
 //
-// - Width (2026-11-21): Full by default, the whole screen, as on Home. "Width on computers" in
-//   Customize, for the whole page, under "Same layout on phone and computer": Focused (1,024 px),
-//   Balanced (1,280 px) or Full, as on Categories. Saved with the computers' layout; phones use
-//   the whole screen.
+// - Width (2026-11-21): Balanced by default, a column of up to 1,280 px in the middle, as on
+//   Categories. "Width on computers" in Customize, for the whole page, under "Same layout on
+//   phone and computer": Focused (1,024 px), Balanced or Full (the whole screen, as on Home).
+//   Saved with the computers' layout; phones use the whole screen.
 //
 // - Entries' sort (2026-11-21): the sort menu moved to the right, on its own row under the
 //   search, so it sits where By category's and By account's do.
@@ -444,7 +444,7 @@ export const scenarios = {
     spending: { today, months: spendingMonths() },
     start: { day: "8-10" },
   },
-  // Rows and Balanced width picked in Customize: the entries on a row of their own, in a column.
+  // Rows and Full width picked in Customize: the entries on a row of their own, edge to edge.
   rows: {
     status: "ready",
     spending: { today, months: spendingMonths() },
@@ -452,7 +452,7 @@ export const scenarios = {
       order: ["pace", "categories", "accounts", "calendar", "entries"],
       hidden: ["pace"],
       arrangement: "rows",
-      width: "balanced",
+      width: "full",
     },
   },
   // By category as a donut chart beside By account as a list.
