@@ -13,6 +13,8 @@ import {
   ReceiptText,
 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   type ComponentPropsWithRef,
   createContext,
@@ -139,8 +141,19 @@ interface AppShellProps {
   wide?: boolean | "medium";
   /** The screen's own header buttons, such as Customize. They sit before Hide amounts. */
   actions?: ReactNode;
+  /** The way back up, such as a breadcrumb, over the title on a page inside a tab. */
+  above?: ReactNode;
+  /**
+   * The screen's own heading row, in place of the plain title: a back button beside it, say. It
+   * holds the page's h1, set in `PAGE_TITLE`.
+   */
+  heading?: ReactNode;
   children: ReactNode;
 }
+
+/** The page title's look: Fraunces, the logo's serif, at the logo's weight. */
+export const PAGE_TITLE =
+  "font-(family-name:--font-title) text-2xl font-[650] [font-variation-settings:'SOFT'_100]";
 
 /**
  * The frame around every signed-in screen: a bottom tab bar on phones, a sidebar from tablet width
@@ -152,10 +165,25 @@ export function AppShell({
   bleed = false,
   wide = false,
   actions,
+  above,
+  heading,
   children,
 }: AppShellProps) {
   const [amountsHidden, setAmountsHidden] = useState(false);
   const [collapsed, setCollapsed] = useSidebarCollapsed();
+  // Spending's two pages show its tabs under the title, on every screen. The places stay five. A
+  // category's page is a level down: it has its own way back, so no tabs.
+  const pathname = usePathname();
+  const inCategories = pathname === "/spending/categories";
+  const showTabs =
+    !bleed && (pathname === "/spending" || pathname === "/spending/categories");
+  // The column the header, the tabs and the page share.
+  const column =
+    wide === "medium"
+      ? "mx-auto max-w-7xl px-4 md:px-8"
+      : wide
+        ? "px-3"
+        : "mx-auto max-w-5xl px-4 md:px-8";
   const toggleLabel = collapsed ? "Expand sidebar" : "Collapse sidebar";
   const shortcut = useShortcutLabel();
 
@@ -289,34 +317,30 @@ export function AppShell({
             <header
               className={cn(
                 "flex w-full items-center justify-between gap-3 pt-4 pb-3 md:pt-6",
-                wide === "medium"
-                  ? "mx-auto max-w-7xl px-4 md:px-8"
-                  : wide
-                    ? "px-3"
-                    : "mx-auto max-w-5xl px-4 md:px-8",
+                column,
               )}
             >
-              <h1 className="font-(family-name:--font-title) text-2xl font-[650] [font-variation-settings:'SOFT'_100]">
-                {title}
-              </h1>
-              <div className="flex items-center gap-1">
+              <div className="flex flex-col">
+                {above}
+                {heading ?? <h1 className={PAGE_TITLE}>{title}</h1>}
+              </div>
+              {/* Under a breadcrumb, the buttons line up with the title. */}
+              <div
+                className={cn(
+                  "flex items-center gap-1",
+                  above !== undefined && "self-end",
+                )}
+              >
                 {actions}
                 <ShellActions />
               </div>
             </header>
           )}
+          {showTabs && (
+            <SpendingTabs inCategories={inCategories} className={column} />
+          )}
           {/* The bottom padding keeps the last block clear of the tab bar, and of the ProtoBar on wide screens. */}
-          <main
-            className={cn(
-              "flex-1 pb-28",
-              !bleed &&
-                (wide === "medium"
-                  ? "mx-auto w-full max-w-7xl px-4 md:px-8"
-                  : wide
-                    ? "w-full px-3"
-                    : "mx-auto w-full max-w-5xl px-4 md:px-8"),
-            )}
-          >
+          <main className={cn("flex-1 pb-28", !bleed && cn("w-full", column))}>
             {children}
           </main>
         </div>
@@ -441,6 +465,45 @@ function SideNavItem({ tab, current, collapsed }: SideNavItemProps) {
       </span>
       <span className="max-w-full truncate">{tab.label}</span>
     </ScreenLink>
+  );
+}
+
+/**
+ * Spending's two pages as tabs under the title, on every screen: the month's overview, and every
+ * category over the months. A category's own page, a level down, has a way back instead.
+ */
+function SpendingTabs({
+  inCategories,
+  className,
+}: {
+  inCategories: boolean;
+  className: string;
+}) {
+  const tabs = [
+    { href: "/spending", label: "Overview", on: !inCategories },
+    { href: "/spending/categories", label: "Categories", on: inCategories },
+  ] as const;
+  return (
+    <nav aria-label="Spending" className={cn("w-full pb-3", className)}>
+      <ul className="flex gap-2 border-b border-foreground/10">
+        {tabs.map((tab) => (
+          <li key={tab.href}>
+            <Link
+              href={tab.href}
+              aria-current={tab.on ? "page" : undefined}
+              className={cn(
+                "-mb-px inline-flex min-h-11 items-center rounded-t-md border-b-2 px-3 text-sm font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                tab.on
+                  ? "border-foreground text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {tab.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }
 

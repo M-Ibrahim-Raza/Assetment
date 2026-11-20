@@ -177,6 +177,26 @@ export function scenariosFor(slug: string) {
         },
       },
     },
+    // Rows picked in Customize: the cards two to a row, then the entries on a row of their own.
+    rows: {
+      status: "ready",
+      book: withCategory(book, category),
+      category,
+      notes: notesFor(category),
+      layout: {
+        order: [
+          "why",
+          "places",
+          "repeats",
+          "unusual",
+          "paid",
+          "years",
+          "entries",
+        ],
+        hidden: ["paid", "years"],
+        arrangement: "rows",
+      },
+    },
     loading: { status: "loading" },
     error: { status: "error", message: ERROR_MESSAGE },
   } satisfies Scenarios<CategoryDetailViewProps>;

@@ -16,23 +16,24 @@ import {
   sharePercent,
   totalSize,
 } from "@proto/screens/spending/parts";
-import { EntriesLink, entriesWord } from "../manage";
-import { type BookSummary, type CategoryLine, spentInLabel } from "../math";
-import { RangeChoice } from "../parts";
-import type { TopSettings } from "../layout";
+import { EntriesLink, entriesWord } from "./manage";
+import { type BookSummary, type CategoryLine, spentInLabel } from "./math";
+import { RangeChoice } from "./parts";
+import type { TopSettings } from "./layout";
 import { forecastOf, typicalOf } from "@proto/screens/category-detail/insights";
 import { SectionCustomizeButton } from "@proto/components/customize-sheet";
-import type { CategoryBook } from "../scenarios";
-import type { CategoriesParams } from "../use-categories-params";
+import type { CategoryBook } from "./scenarios";
+import type { CategoriesParams } from "./use-categories-params";
 import {
   ByMonthChart,
   type Colours,
   fillOf,
   LINK_BUTTON,
   monthRanking,
+  MonthOnSpending,
   OpenLink,
   Swatch,
-} from "../month-chart";
+} from "./month-chart";
 import {
   AgainstAverage,
   ClearChip,
@@ -40,15 +41,15 @@ import {
   SURFACE,
   spanOf,
   STRIPES,
-} from "../chart-parts";
-import { Answer } from "../list";
+} from "./chart-parts";
+import { Answer } from "./list";
 import {
   monthsWord,
   rangeTitle,
   CARD_HEADING,
   BIG_NUMBER,
   useSpoken,
-} from "../look";
+} from "./look";
 
 /** Side by side from 46rem of block: the numbers on the left, the chart on the right. */
 export const SPLIT =
@@ -113,7 +114,8 @@ export function SpendingByMonth({
     >
       {/* The heading, then the range, then Customize at the right; on phones the range takes a row. */}
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-3 @min-[28rem]/top:grid-cols-[minmax(0,1fr)_auto_auto]">
-        <div className="flex min-w-0 flex-col gap-1">
+        {/* Pinned to the first row, or the range, placed there on wider screens, takes its cell. */}
+        <div className="row-start-1 flex min-w-0 flex-col gap-1">
           <h2 id={headingId} className={CARD_HEADING}>
             Spending by month
           </h2>
@@ -552,6 +554,7 @@ function MonthPicked({
           )}
         </div>
       )}
+      <MonthOnSpending month={month} />
     </>
   );
 }

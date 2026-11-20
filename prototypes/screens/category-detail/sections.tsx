@@ -1,7 +1,17 @@
 "use client";
 
 import { ArrowDown, ArrowUp, Plus, Search, StickyNote } from "lucide-react";
-import { type ReactNode, type SyntheticEvent, useId, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  type RefObject,
+  type SyntheticEvent,
+  use,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -28,7 +38,7 @@ import {
 } from "@proto/screens/categories/math";
 import type { CategoryBook } from "@proto/screens/categories/scenarios";
 import { monthHeading, SURFACE } from "@proto/screens/categories/chart-parts";
-import { Stat } from "@proto/screens/categories/variants/mix-top";
+import { Stat } from "@proto/screens/categories/spending-by-month";
 import { CARD_HEADING } from "@proto/screens/categories/look";
 import { SHEET, SHEET_TITLE } from "@proto/components/customize-sheet";
 import {
@@ -54,18 +64,18 @@ import {
   usualEntry,
   yearBefore,
   yearsOf,
-} from "../insights";
+} from "./insights";
 import type {
   EntriesSettings,
   PlacesSettings,
   RepeatsSettings,
   WhySettings,
-} from "../layout";
+} from "./layout";
 
 // d's Category detail: the cards under the months, then the month's entries. A card says what it
 // needs when there isn't enough data yet; Out of the ordinary shows only when something is.
 
-/** A card: a title, what it covers, then its body. Cards flow down two columns from tablet width. */
+/** A card: a title, what it covers, then its body. Two to a row from tablet width, at one height. */
 function Section({
   title,
   about,
@@ -82,7 +92,7 @@ function Section({
   return (
     <section
       aria-labelledby={id}
-      className={cn(SURFACE, "mb-3 flex break-inside-avoid flex-col gap-3")}
+      className={cn(SURFACE, "flex flex-col gap-3")}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 flex-col gap-0.5">
@@ -310,7 +320,7 @@ export function Places({
   const more = settings.allPlaces ? 0 : stories.length - PLACES_SHOWN;
 
   return (
-    <Section title="Where it goes" about={period} onCustomize={onCustomize}>
+    <Section title="Where it went" about={period} onCustomize={onCustomize}>
       {stories.length === 0 ? (
         <Needs>Nothing spent here in {period.toLowerCase()}.</Needs>
       ) : (
@@ -533,10 +543,53 @@ function EntryLine({
   );
 }
 
+/** Whether the entries sit beside a side column, where their head stays in view too. */
+export const BesideSideColumn = createContext(false);
+
+// Where a pinned head stops: the gap between blocks below the window's top, as the side column.
+const PIN_GAP = 12;
+
+/**
+ * A pinned head, as on Spending: from two columns, it sticks a gap below the window's top. It
+ * starts at the card's top edge, so the card's padding goes with it, and a strip of page above it
+ * hides the rows that scroll past in the gap.
+ */
+const PINNED_HEAD =
+  "@min-[44rem]:sticky @min-[44rem]:top-3 @min-[44rem]:z-20 @min-[44rem]:-mt-5 @min-[44rem]:bg-card @min-[44rem]:pt-5 @min-[44rem]:before:absolute @min-[44rem]:before:-inset-x-10 @min-[44rem]:before:bottom-full @min-[44rem]:before:h-3 @min-[44rem]:before:bg-background";
+
+/**
+ * While `on`, keeps `--entries-head` on the card at where its month headings stop: under the
+ * pinned head, which changes height as the search's results come and go.
+ */
+function usePinnedHead(
+  card: RefObject<HTMLElement | null>,
+  head: RefObject<HTMLElement | null>,
+  on: boolean,
+) {
+  useEffect(() => {
+    const root = card.current;
+    const top = head.current;
+    if (!on || root === null || top === null) return;
+    const observer = new ResizeObserver(() => {
+      root.style.setProperty(
+        "--entries-head",
+        `${String(PIN_GAP + top.offsetHeight)}px`,
+      );
+    });
+    observer.observe(top);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty("--entries-head");
+    };
+  }, [card, head, on]);
+}
+
 /**
  * Entries, every month of the range (or the picked month), as on Spending: search, the sort menu
  * and a count, then a heading and total for each month, newest first. Sorted by amount, name or
- * account, one list across the months. Search and sort live in the URL, as on Spending.
+ * account, one list across the months. Search and sort live in the URL, as on Spending. Beside a
+ * side column, the head stays at the top while the list scrolls, and the month headings stop
+ * under it.
  */
 export function RangeEntries({
   book,
@@ -555,6 +608,10 @@ export function RangeEntries({
 }) {
   const headingId = useId();
   const searchId = useId();
+  const pinned = use(BesideSideColumn);
+  const cardRef = useRef<HTMLElement>(null);
+  const headRef = useRef<HTMLDivElement>(null);
+  usePinnedHead(cardRef, headRef, pinned);
   const params = useSpendingParams(book);
   // Without the sort menu, the list keeps the usual order: newest first.
   const order: SortOrder<EntryKey> =
@@ -591,60 +648,71 @@ export function RangeEntries({
 
   return (
     <section
+      ref={cardRef}
       aria-labelledby={headingId}
       className={cn(SURFACE, "flex flex-col gap-4")}
     >
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-        <h2 id={headingId} className={CARD_HEADING}>
-          Entries · {period}
-        </h2>
-        <div className="flex items-center gap-1">
-          <EntriesLink
-            category={name}
-            className="inline-flex min-h-11 items-center px-1 text-sm font-semibold underline underline-offset-4"
-          >
-            Open in Entries
-          </EntriesLink>
-          <SectionCustomizeButton
-            name="Entries"
-            onClick={onCustomize}
-            className="-mr-2"
-          />
+      <div
+        ref={headRef}
+        className={cn("flex flex-col gap-4", pinned && PINNED_HEAD)}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+          <h2 id={headingId} className={CARD_HEADING}>
+            Entries · {period}
+          </h2>
+          <div className="flex items-center gap-1">
+            <EntriesLink
+              category={name}
+              className="inline-flex min-h-11 items-center px-1 text-sm font-semibold underline underline-offset-4"
+            >
+              Open in Entries
+            </EntriesLink>
+            <SectionCustomizeButton
+              name="Entries"
+              onClick={onCustomize}
+              className="-mr-2"
+            />
+          </div>
         </div>
-      </div>
-      <div className="flex flex-col gap-2">
-        <label htmlFor={searchId} className="text-sm font-medium">
-          Search entries
-        </label>
-        <div className="relative">
-          <Search
-            aria-hidden="true"
-            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-          />
-          <Input
-            id={searchId}
-            type="search"
-            inputMode="search"
-            enterKeyHint="search"
-            autoComplete="off"
-            value={params.q}
-            onChange={(event) => {
-              params.setQuery(event.target.value);
-            }}
-            className="h-11 bg-background pl-9 text-base"
-          />
+        <div className="flex flex-col gap-2">
+          <label htmlFor={searchId} className="text-sm font-medium">
+            Search entries
+          </label>
+          <div className="relative">
+            <Search
+              aria-hidden="true"
+              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+            />
+            <Input
+              id={searchId}
+              type="search"
+              inputMode="search"
+              enterKeyHint="search"
+              autoComplete="off"
+              value={params.q}
+              onChange={(event) => {
+                params.setQuery(event.target.value);
+              }}
+              className="h-11 bg-background pl-9 text-base"
+            />
+          </div>
         </div>
+        {settings.sorting && (
+          <SortMenu
+            fields={ENTRY_SORTS}
+            keys={ENTRY_KEYS}
+            order={order}
+            onOrder={params.setSort}
+            label="Sort entries"
+            className="-mr-2 self-end"
+          />
+        )}
+        {shown.length > 0 && (
+          <p aria-live="polite" className="text-sm font-semibold">
+            {entriesWord(shown.length)} · <Money value={total} />
+          </p>
+        )}
       </div>
-      {settings.sorting && (
-        <SortMenu
-          fields={ENTRY_SORTS}
-          keys={ENTRY_KEYS}
-          order={order}
-          onOrder={params.setSort}
-          label="Sort entries"
-          className="-mr-2 self-end"
-        />
-      )}
       {shown.length === 0 ? (
         <div className="flex flex-col items-start gap-3 rounded-2xl border border-dashed p-5">
           <p className="font-semibold">No entries match “{params.q}”</p>
@@ -660,14 +728,11 @@ export function RangeEntries({
         </div>
       ) : (
         <>
-          <p aria-live="polite" className="text-sm font-semibold">
-            {entriesWord(shown.length)} · <Money value={total} />
-          </p>
           {order.by === "date" ? (
             <div className="flex flex-col gap-4">
               {byMonth.map(({ month, items }) => (
                 <section key={month.key} aria-label={monthHeading(month)}>
-                  <h3 className="flex items-baseline justify-between gap-3 border-b border-foreground/10 pb-1.5 text-sm font-semibold">
+                  <h3 className="sticky top-0 z-10 flex items-baseline justify-between gap-3 border-b border-foreground/10 bg-card pt-2 pb-1.5 text-sm font-semibold @min-[44rem]:top-(--entries-head,0px)">
                     {monthHeading(month)}
                     {settings.monthTotals && (
                       <Money

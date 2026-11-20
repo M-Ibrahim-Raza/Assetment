@@ -1,7 +1,7 @@
 "use client";
 
 import { MoveRight, TrendingDown, TrendingUp } from "lucide-react";
-import { Fragment, type ReactNode, useId, useState } from "react";
+import { Fragment, type ReactNode, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -30,7 +30,6 @@ import {
   spentInLabel,
 } from "@proto/screens/categories/math";
 import {
-  BackToCategories,
   ErrorBlock,
   NotFoundBlock,
   RangeChoice,
@@ -41,6 +40,7 @@ import {
   useCategoriesParams,
 } from "@proto/screens/categories/use-categories-params";
 import {
+  MonthOnSpending,
   ByMonthChart,
   type Colours,
 } from "@proto/screens/categories/month-chart";
@@ -58,7 +58,7 @@ import {
   SPLIT,
   SpendingByMonthSkeleton,
   Stat,
-} from "@proto/screens/categories/variants/mix-top";
+} from "@proto/screens/categories/spending-by-month";
 import {
   monthsWord,
   rangeTitle,
@@ -66,6 +66,8 @@ import {
 } from "@proto/screens/categories/look";
 import { Headline, joinAnd } from "@proto/screens/spending/parts";
 import { useScreen } from "@proto/screens/spending/use-screen";
+import { useStickyTop } from "@proto/screens/spending/use-sticky-top";
+import { arrange, type DetailRow } from "./arrange";
 import {
   forecastOf,
   sitsIn,
@@ -73,10 +75,13 @@ import {
   trendOf,
   type Typical,
   typicalOf,
+  unusualOf,
+  usualEntry,
   yearBefore,
-} from "../insights";
+} from "./insights";
 import {
   CUSTOMIZE,
+  DEFAULT_ARRANGEMENT,
   DEFAULT_LAYOUT,
   DEFAULT_WIDTH,
   type DetailLayout,
@@ -87,11 +92,13 @@ import {
   normalize,
   screenLayout,
   sectionSettings,
-} from "../layout";
-import type { CategoryDetailViewProps } from "../scenarios";
-import { useShownCategory } from "../use-shown-category";
+} from "./layout";
+import type { CategoryDetailViewProps } from "./scenarios";
+import { useShownCategory } from "./use-shown-category";
+import { headerOf } from "./header";
 import {
   AutoFileDialog,
+  BesideSideColumn,
   MonthNote,
   PaidWith,
   RangeEntries,
@@ -100,7 +107,7 @@ import {
   Unusual,
   WhyItChanged,
   Years,
-} from "./mix-sections";
+} from "./sections";
 
 /**
  * Mix (d) for one category, in d's Categories look. On top, its months: the average a month with
@@ -124,7 +131,12 @@ export function MixDetail(props: CategoryDetailViewProps) {
     );
   }
   return (
-    <AppShell current="spending" title="Category" wide="medium">
+    <AppShell
+      current="spending"
+      title="Category"
+      wide="medium"
+      {...headerOf({ name: "Category", rangeQuery: {} })}
+    >
       {props.status === "loading" ? (
         <div aria-busy="true" className="flex flex-col gap-3">
           <span className="sr-only">Loading this category</span>
@@ -183,9 +195,12 @@ function Ready({
         current="spending"
         title={deleted ?? start}
         wide={shellWidth(here.width ?? DEFAULT_WIDTH, screen)}
+        {...headerOf({
+          name: deleted ?? start,
+          rangeQuery: params.rangeQuery,
+        })}
       >
         <div className="flex flex-col gap-3">
-          <BackToCategories rangeQuery={params.rangeQuery} />
           {deleted === null ? (
             <NotFoundBlock name={start} />
           ) : (
@@ -205,6 +220,8 @@ function Ready({
       : `${picked.month.name} ${String(picked.month.year)}`;
   const dated = entriesOf(book, shown, months);
   const rangeDated = entriesOf(book, shown, params.months);
+  // Out of the ordinary shows only when something is, so it's left out before the rows are made.
+  const anyUnusual = unusualOf(dated, usualEntry(rangeDated)).length > 0;
 
   return (
     <AppShell
@@ -212,6 +229,14 @@ function Ready({
       title={shown}
       // The width set in Customize. Phones always use the whole screen.
       wide={shellWidth(here.width ?? DEFAULT_WIDTH, screen)}
+      {...headerOf({
+        name: shown,
+        rangeQuery: params.rangeQuery,
+        // The others to go to: those in use, and this one even if it's hidden.
+        categories: book.categories.filter(
+          (category) => category === shown || !book.hidden.includes(category),
+        ),
+      })}
       actions={
         <div className="flex items-center gap-1">
           <CustomizeButton
@@ -236,7 +261,6 @@ function Ready({
       }
     >
       <div className="@container flex flex-col gap-3">
-        <BackToCategories rangeQuery={params.rangeQuery} />
         {book.hidden.includes(shown) && (
           <p className="text-sm text-muted-foreground">
             Hidden: it doesn&apos;t show when you add an entry. Its history
@@ -269,8 +293,17 @@ function Ready({
                 });
               }}
             />
-            <SectionRuns
-              order={here.order.filter((key) => isShown(here, key))}
+            <SectionRows
+              rows={arrange(
+                here.order.filter(
+                  (key) =>
+                    isShown(here, key) && (key !== "unusual" || anyUnusual),
+                ),
+                {
+                  sideColumn:
+                    (here.arrangement ?? DEFAULT_ARRANGEMENT) === "side-column",
+                },
+              )}
               cards={{
                 why: (
                   <WhyItChanged
@@ -363,44 +396,76 @@ function Ready({
   );
 }
 
+// Two columns from this width of the page's area, not the window's: the sidebar takes room.
+const TWO_COLUMNS =
+  "flex flex-col gap-3 @min-[44rem]:grid @min-[44rem]:grid-cols-2";
+
 /**
- * The shown cards in the person's order: a run of cards flows down two columns from tablet width,
- * and the entries, a list that grows, take the full width where they come.
+ * The cards in rows, as on Spending: two to a row at one height, the entries on a row of their
+ * own or beside a side column. On phones and narrow windows, the same rows stack in one column,
+ * in the person's order.
  */
-function SectionRuns({
-  order,
+function SectionRows({
+  rows,
   cards,
 }: {
-  order: readonly DetailSectionKey[];
+  rows: readonly DetailRow[];
   cards: Readonly<Record<DetailSectionKey, ReactNode>>;
 }) {
-  const runs: DetailSectionKey[][] = [];
-  for (const key of order) {
-    const last = runs.at(-1);
-    if (key === "entries" || last === undefined || last[0] === "entries") {
-      runs.push([key]);
-    } else {
-      last.push(key);
-    }
-  }
   return (
     <>
-      {runs.map((run) =>
-        run[0] === "entries" ? (
-          <div key="entries">{cards.entries}</div>
-        ) : (
-          // Each card keeps a gap under it; the run takes back the last one's.
-          <div
-            key={run.join("-")}
-            className="-mb-3 columns-1 gap-3 @min-[46rem]:columns-2"
-          >
-            {run.map((key) => (
-              <Fragment key={key}>{cards[key]}</Fragment>
-            ))}
+      {rows.map((row) => {
+        if (row.kind === "full") {
+          return <Fragment key={row.key}>{cards[row.key]}</Fragment>;
+        }
+        if (row.kind === "list") {
+          return <ListRow key={row.side.join("-")} row={row} cards={cards} />;
+        }
+        const [first, second] = row.keys;
+        return (
+          <div key={row.keys.join("-")} className={TWO_COLUMNS}>
+            {cards[first]}
+            {cards[second]}
           </div>
-        ),
-      )}
+        );
+      })}
     </>
+  );
+}
+
+/**
+ * The entries in one column, and cards in the other, which stays in view while the list scrolls
+ * (scrolling to its bottom first when it's taller than the window). It's first in the page when
+ * it's on the left, so Tab follows the screen.
+ */
+function ListRow({
+  row,
+  cards,
+}: {
+  row: Extract<DetailRow, { kind: "list" }>;
+  cards: Readonly<Record<DetailSectionKey, ReactNode>>;
+}) {
+  const column = useRef<HTMLDivElement>(null);
+  const top = useStickyTop(column);
+  const side = (
+    // `top` does nothing until the column is sticky, from two columns.
+    <div
+      ref={column}
+      style={{ top }}
+      className="flex flex-col gap-3 @min-[44rem]:sticky @min-[44rem]:self-start"
+    >
+      {row.side.map((key) => (
+        <Fragment key={key}>{cards[key]}</Fragment>
+      ))}
+    </div>
+  );
+  const left = row.at === "left";
+  return (
+    <div className={TWO_COLUMNS}>
+      {left && side}
+      <BesideSideColumn value>{cards.entries}</BesideSideColumn>
+      {!left && side}
+    </div>
   );
 }
 
@@ -452,7 +517,8 @@ function MonthsBlock({
     >
       {/* The heading, then the range, then Customize at the right; on phones the range takes a row. */}
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-3 @min-[28rem]/top:grid-cols-[minmax(0,1fr)_auto_auto]">
-        <div className="flex min-w-0 flex-col gap-1">
+        {/* Pinned to the first row, or the range, placed there on wider screens, takes its cell. */}
+        <div className="row-start-1 flex min-w-0 flex-col gap-1">
           <h2 id={headingId} className={CARD_HEADING}>
             Month by month
           </h2>
@@ -683,6 +749,7 @@ function PickedMonth({
           <Money value={lastYear.spent} className="font-semibold" />
         </p>
       )}
+      <MonthOnSpending month={month} category={line.name} />
       {settings.notes && (
         <MonthNote
           key={month.key}

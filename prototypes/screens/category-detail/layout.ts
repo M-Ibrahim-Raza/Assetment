@@ -1,3 +1,4 @@
+import { Columns2, Rows3 } from "lucide-react";
 import type {
   CustomizeModel,
   CustomizeOption,
@@ -14,7 +15,8 @@ import {
 // and each section's extras. One layout for every category, saved to the account, with a phone
 // layout of its own once "Same layout on phone and computer" is off, as on Spending. Month by
 // month always leads; its extras are switched like any section's. Its width on computers is a
-// choice for the whole page, Balanced by default, as on Categories.
+// choice for the whole page, Balanced by default, as on Categories. Where the entries sit on a
+// computer, Side column or Rows, is the entries' first option, as on Spending.
 
 /** A part of the page that can be shown, hidden and moved. Month by month isn't one: it leads. */
 export type DetailSectionKey =
@@ -70,7 +72,17 @@ export interface DetailScreenLayout {
   settings?: { [Key in SetKey]?: Partial<DetailSettings[Key]> };
   /** Computers and tablets only: phones always use the whole screen. Missing means balanced. */
   width?: PageWidth;
+  /** Computers and tablets only: phones stack the cards. Missing means a side column. */
+  arrangement?: Arrangement;
 }
+
+/**
+ * Where the entries sit on a screen wide enough for two columns. Side column: beside a column of
+ * cards that stays in view. Rows: on a row of their own.
+ */
+export type Arrangement = "side-column" | "rows";
+
+export const DEFAULT_ARRANGEMENT: Arrangement = "side-column";
 
 /** The page's width on tablets and computers. Balanced: a column up to 1,280 px, in the middle. */
 export const DEFAULT_WIDTH: PageWidth = "balanced";
@@ -94,7 +106,7 @@ export const SECTIONS: Readonly<Record<DetailSectionKey, CustomizeSection>> = {
       "Recent months against earlier ones: paying more each time, or going more often.",
   },
   places: {
-    name: "Where it goes",
+    name: "Where it went",
     about: "Each place's share, how often, and what each time costs.",
   },
   repeats: {
@@ -350,11 +362,15 @@ function normalizeScreen(layout: DetailScreenLayout): DetailScreenLayout {
   };
 }
 
-/** The layout, and the phone's own if it has one, each made whole. Only the computers' has a width. */
+/**
+ * The layout, and the phone's own if it has one, each made whole. Only the computers' has a width
+ * and an arrangement.
+ */
 export function normalize(layout: DetailLayout): DetailLayout {
   const main = {
     ...normalizeScreen(layout),
     width: layout.width ?? DEFAULT_WIDTH,
+    arrangement: layout.arrangement ?? DEFAULT_ARRANGEMENT,
   };
   return layout.phone === undefined
     ? main
@@ -365,12 +381,24 @@ export function isSplit(layout: DetailLayout): boolean {
   return layout.phone !== undefined;
 }
 
-/** A layout's sections and settings, without the phone's or the computers' width. */
+/** A layout's sections and settings, without the phone's or the computers' own choices. */
 function sectionsOf(layout: DetailScreenLayout): DetailScreenLayout {
   return {
     order: layout.order,
     hidden: layout.hidden,
     ...(layout.settings === undefined ? {} : { settings: layout.settings }),
+  };
+}
+
+/** The choices only computers and tablets have: the width and where the entries sit. */
+function computersOf(
+  layout: DetailScreenLayout,
+): Pick<DetailScreenLayout, "width" | "arrangement"> {
+  return {
+    ...(layout.width === undefined ? {} : { width: layout.width }),
+    ...(layout.arrangement === undefined
+      ? {}
+      : { arrangement: layout.arrangement }),
   };
 }
 
@@ -381,7 +409,7 @@ export function screenLayout(
 ): DetailScreenLayout {
   const main: DetailScreenLayout = {
     ...sectionsOf(layout),
-    ...(layout.width === undefined ? {} : { width: layout.width }),
+    ...computersOf(layout),
   };
   return screen === "phone" ? (layout.phone ?? main) : main;
 }
@@ -404,10 +432,13 @@ export function setSame(
   same: boolean,
   keep: ScreenKind,
 ): DetailLayout {
-  // Computers keep their width, whichever tab's sections are kept. Phones have none.
+  // Computers keep their width and arrangement, whichever tab's sections are kept. Phones have
+  // neither.
   if (same) {
-    const kept = sectionsOf(screenLayout(layout, keep));
-    return layout.width === undefined ? kept : { ...kept, width: layout.width };
+    return {
+      ...sectionsOf(screenLayout(layout, keep)),
+      ...computersOf(layout),
+    };
   }
   return layout.phone === undefined
     ? { ...layout, phone: sectionsOf(layout) }
@@ -454,11 +485,32 @@ export function isDefault(layout: DetailScreenLayout): boolean {
   // Settings are rebuilt from the defaults, key by key, so the same values read the same.
   return (
     (layout.width ?? DEFAULT_WIDTH) === DEFAULT_WIDTH &&
+    (layout.arrangement ?? DEFAULT_ARRANGEMENT) === DEFAULT_ARRANGEMENT &&
     normal.order.join() === KEYS.join() &&
     normal.hidden.toSorted().join() ===
       DEFAULT_LAYOUT.hidden.toSorted().join() &&
     JSON.stringify(allSettings(normal)) === JSON.stringify(DEFAULT_SETTINGS)
   );
+}
+
+/**
+ * Where the entries sit on a computer: beside a side column, or on a row of their own. It's a
+ * choice of the screen's, not the entries' own setting, so it's saved with the computers' layout.
+ */
+function arrangementOption(
+  layout: DetailScreenLayout,
+): CustomizeOption<DetailScreenLayout> {
+  const rows = (layout.arrangement ?? DEFAULT_ARRANGEMENT) === "rows";
+  return {
+    name: "Layout on computers",
+    about: rows
+      ? "Entries take a row of their own, under the other sections."
+      : "Entries sit beside a column of sections that stays in view.",
+    ways: ["Side column", "Rows"],
+    on: rows,
+    switched: (on) => ({ ...layout, arrangement: on ? "rows" : "side-column" }),
+    said: (on) => `${on ? "rows" : "side column"} layout`,
+  };
 }
 
 /** What Customize needs to know about a category's page. */
@@ -470,7 +522,11 @@ export const CUSTOMIZE: CustomizeModel<
   title: "Customize this page",
   lead: LEAD,
   section: (key) => SECTIONS[key],
-  options: (layout, key) => optionsOf(layout, key),
+  // The entries' start with the layout on computers, where there is one: phones stack the cards.
+  options: (layout, key, computers) =>
+    key === "entries" && computers
+      ? [arrangementOption(layout), ...(optionsOf(layout, key) ?? [])]
+      : optionsOf(layout, key),
   pageOptions: (layout, computers) =>
     computers ? [widthChoice(layout, DEFAULT_WIDTH)] : [],
   defaultLayout: DEFAULT_LAYOUT,
@@ -481,5 +537,5 @@ export const CUSTOMIZE: CustomizeModel<
   screenLayout,
   withScreen,
   setSame,
-  wayIcons: WIDTH_ICONS,
+  wayIcons: { ...WIDTH_ICONS, "Side column": Columns2, Rows: Rows3 },
 };

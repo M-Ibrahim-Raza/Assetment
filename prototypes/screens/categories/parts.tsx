@@ -1,6 +1,5 @@
 "use client";
 
-import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
@@ -74,29 +73,6 @@ export function NotFoundBlock({ name }: { name: string }) {
         See all categories
       </Link>
     </section>
-  );
-}
-
-/** Back to the list, keeping the range: "All categories". */
-export function BackToCategories({
-  rangeQuery,
-  className,
-}: {
-  /** From the page's params, so the list opens on the same range. */
-  rangeQuery: Readonly<Record<string, string>>;
-  className?: string;
-}) {
-  return (
-    <Link
-      href={{ pathname: "/spending/categories", query: rangeQuery }}
-      className={cn(
-        "-ml-2 inline-flex h-11 items-center gap-1 self-start rounded-full px-2 text-sm font-semibold outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50 dark:text-accent-foreground",
-        className,
-      )}
-    >
-      <ChevronLeft aria-hidden="true" className="size-4" />
-      All categories
-    </Link>
   );
 }
 

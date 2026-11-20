@@ -393,6 +393,28 @@ export function OpenLink({
   );
 }
 
+/**
+ * "See August on Spending": that month on Spending, where it has its pace, calendar and entries.
+ * With a category, Spending opens with it picked. This month is Spending's own, so it isn't named.
+ */
+export function MonthOnSpending({
+  month,
+  category,
+}: {
+  month: MonthInfo;
+  category?: string;
+}) {
+  const query = {
+    ...(month.current ? {} : { month: month.key }),
+    ...(category === undefined ? {} : { category }),
+  };
+  return (
+    <Link href={{ pathname: "/spending", query }} className={LINK_BUTTON}>
+      See {month.name} on Spending
+    </Link>
+  );
+}
+
 /** A link drawn as an outline button, as "Open Groceries" is, so links side by side match. */
 export const LINK_BUTTON = cn(
   buttonVariants({ variant: "outline", size: "lg" }),

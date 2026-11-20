@@ -1,7 +1,8 @@
 // Categories: every spending category over the months (J3 step 3), with Category detail for one
 // category (step 4). Both pages share this book of data. Three paired variants were tried, a
 // (Ledger), b (Story) and c (Chart and panel); d (Mix), built from parts of them, was picked on
-// 2026-11-20 for both pages, and a, b and c were deleted.
+// 2026-11-20 for both pages, and a, b and c were deleted. Finalized on 2026-11-21: F35 to F41,
+// with handoff notes for F35, F36 and F37 in specs/.
 //
 // Settled before building (2026-11-19), after research (Monarch, Copilot, Monzo, Revolut, YNAB,
 // Lunch Money, Actual, Quicken, PocketSmith, Emma, Simplifi):
@@ -36,8 +37,24 @@
 //   on phone and computer". Month by month always leads, with its extras: usual range, trend,
 //   totals, biggest month and the likely end on; same month last year and notes off. Cards show,
 //   hide and move: Paid with and By year start hidden. Extras: Why it changed's figures, Where it
-//   goes' share bars, cost each time and tags on, every place off; Comes back every month's due
+//   went's share bars, cost each time and tags on, every place off; Comes back every month's due
 //   status on; Entries' month totals and sorting on, compact rows off.
+// - A category's page on a computer (2026-11-21), placed as on Spending: cards two to a row at one
+//   height, read left to right (before, they flowed down two columns). Entries' Options start
+//   with "Layout on computers": Side column (the default) or Rows, saved with the computers'
+//   layout. Side column: the entries beside a column of cards that stays in view, with their head
+//   (heading, search, sort, count) pinned and the month headings stopping under it. The entries
+//   run across months, so every card on their side of the order joins the column (Spending's
+//   takes one): cards after them on the right, else the ones before on the left. "Where it goes"
+//   is now "Where it went".
+// - Moving between the pages (2026-11-21): Home's "Spending ›" heading opens Spending, and its
+//   categories open Spending with one picked; Spending's "By category ›" heading opens
+//   Categories, and a picked category's "Open Groceries" opens its own page. Spending's pages have tabs under the title,
+//   "Overview | Categories", on every screen (2026-11-21, picked over Categories in the
+//   sidebar: Spending opening into two, or under Spending with an icon or a line, which phones
+//   couldn't show, and the places stay five). A category's page, a level down, has no tabs:
+//   its own way back, over its name, keeps the range. A picked month, on either
+//   page, has "See August on Spending": that month, with the category picked on its page.
 // - Customize on this page (2026-11-20): the same shared sheet, in the header and on each block.
 //   Both blocks always show, Spending by month first, so it's their Options. Spending by month:
 //   summary, figures, totals, biggest month and the share in a picked month on; usual range and
@@ -50,14 +67,22 @@
 //   in that order. Its lines name no sizes. Saved with the computers' layout; phones use the
 //   whole screen. Category detail has the same choice, Balanced by default too.
 //
+// Settled at /prototype-finalize (2026-11-21):
+// - A category's page: "‹ Categories" over its name, and the name opens the list of categories, to
+//   go straight to another, the current one ticked; the range is kept either way. Picked over the
+//   back link alone, "Categories / Groceries" on one line, a round back button, and the
+//   breadcrumb "Spending › Categories", whose first step repeated Spending's tabs.
+// - "Open in Entries", on a category's page, and "See its entries in April", on Categories, go to
+//   the Entries page, narrowed by category, place and month. Until another session builds it, they
+//   render as "not built"; J3 needs it as a screen.
+// - After a rename or a merge, the old address forwards to the new one. In the prototype, a page
+//   opened by URL starts from the fixture, so a category added on Categories opens empty, and a
+//   rename or merge isn't carried to other pages.
+// - Later, not in v1: an icon or colour per category, category groups, a place's own page with
+//   moving all its entries to another category, a median line, export.
+//
 // Open questions:
-// - Where Spending links here: an "All categories" link by By category's heading, and "Open
-//   Groceries" carrying the picked category's slug. Spending isn't edited in this work.
-// - The Entries page's screen name and URL (another session). Until it exists, "See all" and a
-//   place's link render as "not built".
-// - In the prototype, a page opened by URL starts from the fixture: a category added on Categories
-//   opens empty, and a rename or merge isn't carried to other pages. Production moves to the new
-//   slug after a rename and to the target after a merge, and redirects the old slug.
+// None.
 
 import type { CategoriesLayout } from "./layout";
 import {

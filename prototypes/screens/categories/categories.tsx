@@ -19,19 +19,19 @@ import {
   normalize,
   screenLayout,
   sectionSettings,
-} from "../layout";
-import { CategoryRows, CategorySort, countNote, groupLines } from "../list";
-import { CARD, CARD_HEADING, monthsWord, RowsSkeleton } from "../look";
-import { AddCategoryButton, type BookState, useBook } from "../manage";
-import { type BookSummary, isEmptyBook, summarizeBook } from "../math";
-import { coloursOf } from "../month-chart";
-import { ErrorBlock, FirstUseBlock } from "../parts";
-import type { CategoriesViewProps, CategoryBook } from "../scenarios";
+} from "./layout";
+import { CategoryRows, CategorySort, countNote, groupLines } from "./list";
+import { CARD, CARD_HEADING, monthsWord, RowsSkeleton } from "./look";
+import { AddCategoryButton, type BookState, useBook } from "./manage";
+import { type BookSummary, isEmptyBook, summarizeBook } from "./math";
+import { coloursOf } from "./month-chart";
+import { ErrorBlock, FirstUseBlock } from "./parts";
+import type { CategoriesViewProps, CategoryBook } from "./scenarios";
 import {
   type CategoriesParams,
   useCategoriesParams,
-} from "../use-categories-params";
-import { SpendingByMonth, SpendingByMonthSkeleton } from "./mix-top";
+} from "./use-categories-params";
+import { SpendingByMonth, SpendingByMonthSkeleton } from "./spending-by-month";
 
 /**
  * Mix (d), the Categories page: "Spending by month" on top (the answer, the figures and the chart
