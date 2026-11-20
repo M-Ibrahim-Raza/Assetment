@@ -673,7 +673,7 @@ export function EntriesList({
             order={order}
             onOrder={params.setSort}
             label="Sort entries"
-            className="-ml-2 self-start"
+            className="-mr-2 self-end"
           />
         )}
 
