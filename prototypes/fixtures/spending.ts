@@ -159,7 +159,7 @@ const PATTERNS: Readonly<Record<string, readonly Slot[]>> = {
 /** A category's amount for a month: one sum, or what was spent up to today's day and after it. */
 type Amount = number | { early: number; late: number };
 
-interface MonthPlan {
+export interface MonthPlan {
   month: string;
   amounts: Readonly<Record<string, Amount>>;
   /** Exact amounts for some entries, by category and day, so they match Home. */
@@ -368,7 +368,7 @@ const november: MonthPlan = {
   moved: NOVEMBER_MOVED,
 };
 
-function build(plans: readonly MonthPlan[]): SpendMonth[] {
+export function build(plans: readonly MonthPlan[]): SpendMonth[] {
   return plans.map((plan) =>
     buildMonth(
       plan,
