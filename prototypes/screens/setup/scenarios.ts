@@ -1,9 +1,9 @@
-// Setup: the wizard a new user goes through right after sign-up (J1 steps 2–6), ending on Home.
+// Setup: the wizard a new user goes through right after sign-up (J1 steps 2–7), ending on Home.
 // A welcome, a board to tick what they have, then one question at a time about those only, and
 // their net worth at the end. The place is in the URL (`?step=`). Features F07 and F08.
 //
-// The accounts, gold and silver, stocks and funds, and property steps are working forms. Debts is
-// a stand-in that adds sample data, until its form is designed here (F12).
+// The accounts, gold and silver, stocks and funds, and property steps are working forms. Debts and
+// money lent are being designed (F12, F20, below). Variant a keeps their stand-ins, which add samples.
 //
 // F09, gold and silver by weight: "Add a piece" (it was variant d) won over Jeweller's slip, One at a
 // time and Piece by piece (prototypes/components/metals/). The `gold-` scenarios open on its step.
@@ -186,13 +186,53 @@
 //   counts from today, as with gold.
 //
 // Open questions: None.
+//
+// F12 and F20, debts and money lent: being designed (started 2026-11-20). "Add a debt" (debts-a, the
+// gold form's panel, ending on its sum) won on 2026-11-22 over b "Timeline" (a drawing of the debt
+// over time first, the fields under it) and c "In a sentence" (fill in the blanks), which were
+// deleted. It's swapped into the same View through DebtFormsContext (prototypes/components/debts/)
+// until it's finalized. The `debts-` and `lent-` scenarios open on its step.
+// Decided before building:
+// - Loan: what's owed today, then "Do you pay a fixed instalment?" Yes: the instalment, how often
+//   (every month, or every 3 months with "Next one due", as property's instalments), the
+//   instalments left, the day and the account it's paid from. No: an optional "repay by" date. The
+//   app works out what's left to pay, the markup with its yearly rate, and the end month. The user
+//   never types a rate.
+// - "Paid from" starts on the first bank account added, usually where the salary lands, then on the
+//   last one picked. With no account added, the loan saves without one.
+// - Card: what's owed (Rs 0 is fine), the bill's due day and the credit limit. The limit is
+//   required: Quick add's "left on the card" and its warning need it. Over the limit warns, and
+//   still saves.
+// - Committee: the monthly amount, the people in it, the start month, the turns paid (the months
+//   since the start, until the user changes it), whether their turn has come, and its number if
+//   known. The app works out the pot, what's paid in, what's still to pay and the end month. Before
+//   the turn, what's paid in counts in what you own, apart from the Debts total, with its own line
+//   under it. After it, the turns left count in Debts.
+// - Money lent is its own step, "Money you've lent": one item per person ("Lent to Ali bhai"), the
+//   amount still to come back, and an optional "back by" date. Its tile is the last of what you
+//   own, so its step comes before Debts, and Setup can show 6 steps.
+// - Names are required: Quick add and the Debts list need them.
+// - A property's instalments show under Loans, and open the property (F11).
+//
+// Open questions:
+// - Does this month's payment count in the starting turns paid? It starts at the whole months since
+//   the start month, as the money model says.
+// - Should a loan show its yearly markup rate ("about 11% a year"), or only the markup in rupees?
+// - A committee with every turn paid: show it as paid off in Setup, or not allow it there?
 
 import {
   accounts,
   type Account,
   type AccountKind,
 } from "@proto/fixtures/accounts";
+import type { DebtDraft } from "@proto/components/debts/forms";
+import {
+  type DebtPlan,
+  debtPlans,
+  samplePlan,
+} from "@proto/fixtures/debt-plans";
 import { debts } from "@proto/fixtures/debts";
+import { type LentPlan, lentPlans } from "@proto/fixtures/lent";
 import {
   portfolioGroups,
   type PortfolioGroupKind,
@@ -228,13 +268,15 @@ import {
   type StockPrices,
   stockPrices,
 } from "@proto/fixtures/stocks";
+import { lentItem, planItem } from "./debt-items";
 
-/** The five things setup asks about, in order. */
+/** The six things setup asks about, in order. */
 export const GROUPS = [
   "accounts",
   "metals",
   "stocks",
   "property",
+  "lent",
   "debts",
 ] as const;
 export type SetupGroup = (typeof GROUPS)[number];
@@ -244,7 +286,14 @@ export type SetupPlace = "start" | SetupGroup | "done";
 
 /** Something owned or owed that isn't an account. Its step is a stand-in in this build. */
 export type ItemKind =
-  "metals" | "shares" | "funds" | "property" | "loan" | "card" | "committee";
+  | "metals"
+  | "shares"
+  | "funds"
+  | "property"
+  | "lent"
+  | "loan"
+  | "card"
+  | "committee";
 
 export interface SetupItem {
   id: string;
@@ -258,6 +307,10 @@ export interface SetupItem {
   holding?: Holding;
   /** Property only: what it is. Its amount is the user's share of the value they gave it. */
   property?: Property;
+  /** A loan, card or committee entered with its plan. Its amount is what it counts at. */
+  plan?: DebtPlan;
+  /** Money lent to one person. Its amount is what's still to come back. */
+  lent?: LentPlan;
 }
 
 /** What the user can tick on the board. */
@@ -299,6 +352,8 @@ export interface Setup {
   stocks?: { prices: StockPrices; draft: HoldingDraft | null; search: string };
   /** The property step: a property whose save failed or is saving, or one opened in place. */
   property?: { draft: PropertyDraft | null };
+  /** The debts step: a debt whose save failed or is saving, or one opened in place. */
+  debts?: { draft: DebtDraft | null };
 }
 
 /** The View's props. Loading and error are states the View shows, so they are props too. */
@@ -373,6 +428,7 @@ const EVERYTHING: Thing[] = [
   "shares",
   "funds",
   "property",
+  "lent",
   "loan",
   "card",
   "committee",
@@ -386,7 +442,8 @@ const fresh: Setup = {
   items: [],
   answered: [],
   ticked: ["bank"],
-  samples,
+  // Money lent's stand-in adds one person. It isn't on Home yet, so the finish leaves it out.
+  samples: [...samples, ...lentPlans(1).map(lentItem)],
   failedDraft: null,
   resumed: false,
   metalRates,
@@ -413,6 +470,7 @@ const heavy: Setup = {
     // The half share with Bhai, and Home's plot.
     ...rowsOf({ ...sampleProperty(6), id: "item-house" }),
     ...rowsOf(homePlot),
+    ...lentPlans(4).map(lentItem),
     ...debtItems(4),
   ],
   answered: [...GROUPS],
@@ -517,6 +575,37 @@ const twoProperties = propertyRows(properties(2));
 
 // A flat in Karachi, typed in full, whose save didn't go through.
 const flat: Property = { ...sampleProperty(2), id: "property-draft" };
+
+// The debts step, for comparing its forms. Typical's accounts are in, and the bar shows Accounts,
+// Gold and silver, and Debts, with Loan, Credit card and Committee as its parts.
+const onDebts: Setup = {
+  ...typical,
+  at: "debts",
+  ticked: [...typical.ticked, "loan", "committee"],
+};
+// A car loan, a card and an office committee after the turn.
+const threeDebts = debtPlans(3).map(planItem);
+// A personal loan, typed in full, whose save didn't go through.
+const personalLoan: DebtPlan = { ...samplePlan(7), id: "debt-draft" };
+// Only Committee ticked, so the step opens on it.
+const onCommittee: Setup = {
+  ...typical,
+  at: "debts",
+  ticked: ["bank", "wallet", "metals", "committee"],
+};
+// 8 of 10 turns paid, and the turn is the last one, in December.
+const family = samplePlan(4);
+const beforeTurn: DebtPlan =
+  family.kind === "committee" ? { ...family, turn: 10 } : family;
+const afterTurn = samplePlan(2);
+const fromChacha = samplePlan(3);
+
+// The money lent step: Typical's things, and Money lent.
+const onLent: Setup = {
+  ...typical,
+  at: "lent",
+  ticked: [...typical.ticked, "lent"],
+};
 
 export const scenarios = {
   default: { status: "ready", setup: typical },
@@ -660,6 +749,60 @@ export const scenarios = {
       items: propertyRows([house, onInstalments]),
       property: { draft: { property: onInstalments, status: "open" } },
     },
+  },
+  "debts-empty": { status: "ready", setup: onDebts },
+  "debts-default": {
+    status: "ready",
+    setup: { ...onDebts, items: threeDebts },
+  },
+  "debts-many": {
+    status: "ready",
+    setup: { ...onDebts, items: debtPlans(10).map(planItem) },
+  },
+  "debts-saving": {
+    status: "ready",
+    setup: {
+      ...onDebts,
+      items: threeDebts,
+      debts: { draft: { plan: personalLoan, status: "saving" } },
+    },
+  },
+  "debts-save-error": {
+    status: "ready",
+    setup: {
+      ...onDebts,
+      items: threeDebts,
+      debts: { draft: { plan: personalLoan, status: "failed" } },
+    },
+  },
+  "debts-committee-before-turn": {
+    status: "ready",
+    setup: {
+      ...onCommittee,
+      items: [planItem(beforeTurn)],
+      debts: { draft: { plan: beforeTurn, status: "open" } },
+    },
+  },
+  "debts-committee-after-turn": {
+    status: "ready",
+    setup: {
+      ...onCommittee,
+      items: [planItem(afterTurn)],
+      debts: { draft: { plan: afterTurn, status: "open" } },
+    },
+  },
+  "debts-loan-no-fixed-amount": {
+    status: "ready",
+    setup: {
+      ...onDebts,
+      items: [planItem(samplePlan(0)), planItem(fromChacha)],
+      debts: { draft: { plan: fromChacha, status: "open" } },
+    },
+  },
+  "lent-empty": { status: "ready", setup: onLent },
+  "lent-default": {
+    status: "ready",
+    setup: { ...onLent, items: lentPlans(3).map(lentItem) },
   },
   error: {
     status: "error",

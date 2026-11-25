@@ -12,6 +12,8 @@ import { DISPLAY } from "@proto/components/display";
 import { ScreenLink } from "@proto/components/screen-link";
 import type { Account, AccountKind } from "@proto/fixtures/accounts";
 import { BIG, STEP_CARD, STEP_FOOTER } from "./look";
+import { DebtsStep } from "./debts-step";
+import { LentStep } from "./lent-step";
 import { MetalsStep } from "./metals-step";
 import { PropertyStep } from "./property-step";
 import { StocksStep } from "./stocks-step";
@@ -19,7 +21,6 @@ import {
   AmountQuestion,
   type Draft,
   NameQuestion,
-  StandInQuestion,
   TITLE,
 } from "./question-parts";
 import { AccountRows, AddAnother } from "./rows";
@@ -45,6 +46,7 @@ import {
   GROUP_HELP,
   GROUP_LABEL,
   isAccountKind,
+  isDebt,
   ITEM_GROUP,
   KIND_LABEL,
   OWED_THINGS,
@@ -113,11 +115,12 @@ const ITEM_QUESTION: Readonly<
   shares: { title: "Your shares and ETFs", help: GROUP_HELP.stocks },
   funds: { title: "Your mutual funds", help: GROUP_HELP.stocks },
   property: { title: "Your property", help: GROUP_HELP.property },
+  lent: { title: "Money you've lent", help: GROUP_HELP.lent },
   loan: { title: "Your loans", help: "From a bank, a company or a person." },
   card: { title: "Your credit cards", help: "What you owe on each today." },
   committee: {
     title: "Your committees",
-    help: "The turns you still have to pay.",
+    help: "What you pay in each month, and when your turn comes.",
   },
 };
 
@@ -148,6 +151,8 @@ interface Entered {
 interface Added {
   count: number;
   total: number;
+  /** Paid into committees before the user's turn: owned, so apart from a debt tile's total. */
+  owned: number;
 }
 
 /**
@@ -220,6 +225,8 @@ function Wizard({ setup }: { setup: Setup }) {
   const [propertyDraft, setPropertyDraft] = useState(
     setup.property?.draft ?? null,
   );
+  // The same for a debt.
+  const [debtsDraft, setDebtsDraft] = useState(setup.debts?.draft ?? null);
   const {
     place: wanted,
     go,
@@ -240,7 +247,7 @@ function Wizard({ setup }: { setup: Setup }) {
       : place,
   );
 
-  // The step bar shows the groups with something on the path, at most five.
+  // The step bar shows the groups with something on the path, at most six.
   const groups = GROUPS.filter((group) =>
     path.some((thing) => groupOf(thing) === group),
   );
@@ -285,12 +292,23 @@ function Wizard({ setup }: { setup: Setup }) {
 
   /** What is added under a tile: how many, and what they add up to. */
   const addedUnder = (thing: Thing): Added => {
-    const amounts = isAccountKind(thing)
-      ? rowsOf(thing).map((account) => account.balance)
-      : state.items
-          .filter((item) => item.kind === thing)
-          .map((item) => item.amount);
-    return { count: amounts.length, total: sum(amounts) };
+    if (isAccountKind(thing)) {
+      const amounts = rowsOf(thing).map((account) => account.balance);
+      return { count: amounts.length, total: sum(amounts), owned: 0 };
+    }
+    const items = state.items.filter((item) => item.kind === thing);
+    // A committee before the user's turn is owned, so it stays out of what Debts adds up to.
+    const apart =
+      groupOf(thing) === "debts" ? items.filter((item) => !isDebt(item)) : [];
+    return {
+      count: items.length,
+      total: sum(
+        items
+          .filter((item) => !apart.includes(item))
+          .map((item) => item.amount),
+      ),
+      owned: sum(apart.map((item) => item.amount)),
+    };
   };
   const isAdded = (thing: Thing) => addedUnder(thing).count > 0;
 
@@ -491,22 +509,43 @@ function Wizard({ setup }: { setup: Setup }) {
     );
   }
 
-  if (!isAccountKind(thing)) {
+  if (thing === "loan" || thing === "card" || thing === "committee") {
     return step(
       thing,
       back,
-      <StandInQuestion
+      <DebtsStep
         key={thing}
+        kind={thing}
         title={ITEM_QUESTION[thing].title}
         help={ITEM_QUESTION[thing].help}
-        kinds={[thing]}
+        state={state}
+        draft={debtsDraft?.plan.kind === thing ? debtsDraft : null}
+        heading={heading}
+        nextLabel={nextLabel(thing)}
+        onSaved={() => {
+          setDebtsDraft(null);
+        }}
+        onDone={() => {
+          moveOn(thing);
+        }}
+        onOpenProperty={() => {
+          go("property");
+        }}
+      />,
+    );
+  }
+
+  if (thing === "lent") {
+    return step(
+      thing,
+      back,
+      <LentStep
+        key={thing}
+        title={ITEM_QUESTION.lent.title}
+        help={ITEM_QUESTION.lent.help}
         state={state}
         heading={heading}
-        labels={{
-          yes: "Add a sample",
-          no: "Skip for now",
-          next: nextLabel(thing),
-        }}
+        nextLabel={nextLabel(thing)}
         onDone={() => {
           moveOn(thing);
         }}
@@ -729,10 +768,15 @@ function Tiles({ label, things, state, addedUnder, onOpen }: TilesProps) {
               <TileHead label={THINGS[thing].label} ticked />
               <span className="text-sm font-semibold">
                 {added.count} added ·{" "}
-                <Money
-                  value={owed ? -added.total : added.total}
-                  signed={owed}
-                />
+                {/* Only committees before the turn: what's paid in, which is owned. */}
+                {owed && added.total === 0 && added.owned > 0 ? (
+                  <Money value={added.owned} signed />
+                ) : (
+                  <Money
+                    value={owed ? -added.total : added.total}
+                    signed={owed}
+                  />
+                )}
               </span>
             </Button>
           );

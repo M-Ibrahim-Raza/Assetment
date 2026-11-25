@@ -9,6 +9,7 @@ export const GROUP_LABEL: Readonly<Record<SetupGroup, string>> = {
   metals: "Gold and silver",
   stocks: "Stocks and funds",
   property: "Property",
+  lent: "Money lent",
   debts: "Debts",
 };
 
@@ -19,15 +20,17 @@ export const GROUP_HELP: Readonly<Record<SetupGroup, string>> = {
     "Jewellery, bars and coins. Enter the weight and we work out today's value.",
   stocks: "PSX shares and mutual funds, as buys.",
   property: "A house, a plot or a shop, at the value you give it.",
+  lent: "Money family or friends will pay you back.",
   debts: "Loans, card balances and committees.",
 };
 
-/** The group an item belongs to. Loans, cards and committees are all debts. */
+/** The group an item belongs to. Loans, cards and committees are all debts. Money lent is owned. */
 export const ITEM_GROUP: Readonly<Record<ItemKind, SetupGroup>> = {
   metals: "metals",
   shares: "stocks",
   funds: "stocks",
   property: "property",
+  lent: "lent",
   loan: "debts",
   card: "debts",
   committee: "debts",
@@ -78,6 +81,11 @@ export const THINGS: Readonly<
     plural: "Property",
     hint: "A house, a plot, a shop",
   },
+  lent: {
+    label: "Money lent",
+    plural: "Money lent",
+    hint: "To family or friends",
+  },
   loan: {
     label: "Loan",
     plural: "Loans",
@@ -103,6 +111,7 @@ export const OWNED_THINGS: readonly Thing[] = [
   "shares",
   "funds",
   "property",
+  "lent",
 ];
 export const OWED_THINGS: readonly Thing[] = ["loan", "card", "committee"];
 
@@ -111,8 +120,10 @@ const ACCOUNT_KINDS: readonly string[] = ["bank", "wallet", "cash"];
 export const isAccountKind = (thing: string): thing is AccountKind =>
   ACCOUNT_KINDS.includes(thing);
 
+/** True for what's owed. A committee before the user's turn is owned: it counts in Portfolio. */
 export const isDebt = (item: SetupItem): boolean =>
-  ITEM_GROUP[item.kind] === "debts";
+  ITEM_GROUP[item.kind] === "debts" &&
+  !(item.plan?.kind === "committee" && !item.plan.hadTurn);
 
 /** The amounts of the given rows, added up. */
 export const sum = (amounts: readonly number[]): number =>
