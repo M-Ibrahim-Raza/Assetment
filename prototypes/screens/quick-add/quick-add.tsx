@@ -64,9 +64,13 @@ function QuickAddBody({ form }: BodyProps) {
 // The most used few. Phones swipe through them, wider screens wrap them.
 const ROW_SIZE = 8;
 
-function QuickAddForm({ form }: BodyProps) {
+/**
+ * The form itself: the kind, the usuals, the amount on its colour block, the details and Save.
+ * Editing a saved entry uses it too, without the usuals, the receipt scan or the restored note.
+ */
+export function QuickAddForm({ form }: BodyProps) {
   const { draft } = form;
-  const usuals = form.usuals.slice(0, ROW_SIZE);
+  const usuals = form.editing ? [] : form.usuals.slice(0, ROW_SIZE);
   const current = currentUsual(draft, usuals);
   // The usual the user tapped. Its last amount is offered only then, not when the form just opened on it.
   const [tappedId, setTappedId] = useState<string | null>(null);
@@ -98,7 +102,9 @@ function QuickAddForm({ form }: BodyProps) {
         )}
       >
         {/* In the corner, level with the Amount label: the other way to fill this form. At 200% zoom the two don't fit on one line, so it sits above. */}
-        <ScanReceiptLink className="max-[279px]:-ml-2 min-[280px]:absolute min-[280px]:top-2.5 min-[280px]:right-2" />
+        {!form.editing && (
+          <ScanReceiptLink className="max-[279px]:-ml-2 min-[280px]:absolute min-[280px]:top-2.5 min-[280px]:right-2" />
+        )}
         <AmountField
           id={form.amountId}
           label="Amount"
@@ -140,12 +146,15 @@ function QuickAddForm({ form }: BodyProps) {
  */
 function caption(form: EntryForm): string {
   const { draft, from, to } = form;
-  const note = draft.note.trim();
+  const name = draft.name.trim();
   const fromName = from?.name ?? "";
+  const category = form.split
+    ? `split in ${String(draft.parts.length)}`
+    : draft.category;
   const what =
     draft.kind === "transfer"
-      ? [note, `${fromName} to ${to?.name ?? ""}`]
-      : [note === "" ? draft.category : note, fromName];
+      ? [name, `${fromName} to ${to?.name ?? ""}`]
+      : [name === "" ? category : name, fromName];
   const day = draft.day === TODAY ? [] : [dayLabel(draft.day)];
   return [...what, ...day].filter((part) => part !== "").join(" · ");
 }

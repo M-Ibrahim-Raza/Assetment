@@ -10,4 +10,5 @@
 | 2 | Compare with last month, the usual month or one you pick | Spending | F26, F31 |
 | 3 | See every category over the months | Categories | F35, F36, F41 |
 | 4 | Open a category to see its months, places and entries | Category detail | F37, F36, F38, F39, F40, F41 |
-| 5 | Edit or delete an entry | Entry detail | |
+| 5 | Find any entry across the months, check it, or fix many at once | Entries | |
+| 6 | Open an entry to check, edit or delete it | Entry detail | |

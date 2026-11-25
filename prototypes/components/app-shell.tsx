@@ -171,12 +171,22 @@ export function AppShell({
 }: AppShellProps) {
   const [amountsHidden, setAmountsHidden] = useState(false);
   const [collapsed, setCollapsed] = useSidebarCollapsed();
-  // Spending's two pages show its tabs under the title, on every screen. The places stay five. A
-  // category's page is a level down: it has its own way back, so no tabs.
+  // Spending's three pages show its tabs under the title, on every screen. The places stay five. A
+  // category's page is a level down: it has its own way back, so no tabs. An open entry sits
+  // beside the list on computers, under the tabs; on phones it is a page a level down, so no tabs.
   const pathname = usePathname();
-  const inCategories = pathname === "/spending/categories";
+  const inEntries = pathname === "/entries" || pathname.startsWith("/entries/");
+  const page: SpendingPage =
+    pathname === "/spending/categories"
+      ? "categories"
+      : inEntries
+        ? "entries"
+        : "overview";
   const showTabs =
-    !bleed && (pathname === "/spending" || pathname === "/spending/categories");
+    !bleed &&
+    (pathname === "/spending" ||
+      pathname === "/spending/categories" ||
+      inEntries);
   // The column the header, the tabs and the page share.
   const column =
     wide === "medium"
@@ -337,7 +347,13 @@ export function AppShell({
             </header>
           )}
           {showTabs && (
-            <SpendingTabs inCategories={inCategories} className={column} />
+            <SpendingTabs
+              page={page}
+              className={cn(
+                column,
+                pathname.startsWith("/entries/") && "max-lg:hidden",
+              )}
+            />
           )}
           {/* The bottom padding keeps the last block clear of the tab bar, and of the ProtoBar on wide screens. */}
           <main className={cn("flex-1 pb-28", !bleed && cn("w-full", column))}>
@@ -468,20 +484,28 @@ function SideNavItem({ tab, current, collapsed }: SideNavItemProps) {
   );
 }
 
+type SpendingPage = "overview" | "categories" | "entries";
+
 /**
- * Spending's two pages as tabs under the title, on every screen: the month's overview, and every
- * category over the months. A category's own page, a level down, has a way back instead.
+ * Spending's three pages as tabs under the title, on every screen: the month's overview, every
+ * category over the months, and every entry. A category's own page, a level down, has a way back
+ * instead.
  */
 function SpendingTabs({
-  inCategories,
+  page,
   className,
 }: {
-  inCategories: boolean;
+  page: SpendingPage;
   className: string;
 }) {
   const tabs = [
-    { href: "/spending", label: "Overview", on: !inCategories },
-    { href: "/spending/categories", label: "Categories", on: inCategories },
+    { href: "/spending", label: "Overview", on: page === "overview" },
+    {
+      href: "/spending/categories",
+      label: "Categories",
+      on: page === "categories",
+    },
+    { href: "/entries", label: "Entries", on: page === "entries" },
   ] as const;
   return (
     <nav aria-label="Spending" className={cn("w-full pb-3", className)}>

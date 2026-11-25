@@ -1,7 +1,7 @@
 "use client";
 
-import { Camera, TriangleAlert } from "lucide-react";
-import { type ReactNode, useId } from "react";
+import { Camera, ChevronDown, Plus, TriangleAlert, X } from "lucide-react";
+import { type ReactNode, useId, useState } from "react";
 import {
   Alert,
   AlertAction,
@@ -12,12 +12,14 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
   FieldLegend,
   FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   NativeSelect,
   NativeSelectOptGroup,
@@ -29,6 +31,7 @@ import { Money } from "@proto/components/amounts";
 import { INK } from "@proto/components/blocks";
 import { ScreenLink } from "@proto/components/screen-link";
 import type { EntryKind } from "@proto/fixtures/entries";
+import { formatDigits } from "@proto/kit/format";
 import { BIG, CHIP, TALL_FIELD } from "@proto/screens/setup/look";
 import { TODAY, YESTERDAY } from "./days";
 import type { Place } from "./places";
@@ -306,6 +309,87 @@ function BalanceLine({ place, after }: BalanceLineProps) {
   );
 }
 
+interface NameFieldProps {
+  name: string;
+  onName: (name: string) => void;
+}
+
+function NameField({ name, onName }: NameFieldProps) {
+  const id = useId();
+  return (
+    <Field>
+      <FieldLabel htmlFor={id}>Name</FieldLabel>
+      <Input
+        id={id}
+        value={name}
+        onChange={(event) => {
+          onName(event.target.value);
+        }}
+        autoComplete="off"
+        autoCapitalize="sentences"
+        maxLength={80}
+        aria-describedby={`${id}-hint`}
+        className={TALL_FIELD}
+      />
+      <FieldDescription id={`${id}-hint`}>
+        Optional, such as Imtiaz Super Market.
+      </FieldDescription>
+    </Field>
+  );
+}
+
+/**
+ * The rarer details, folded away so Quick add stays type-and-Save: a note, tags and, for spent
+ * money, a split. Closed, it says what it holds. It opens by itself when the entry has any.
+ */
+function MoreDetails({ form }: BodyProps) {
+  const { draft } = form;
+  const regionId = useId();
+  const open = form.detailsOpen;
+  const holds = [
+    draft.note.trim() === "" ? null : "Note",
+    draft.tags.length === 0
+      ? null
+      : `${String(draft.tags.length)} ${draft.tags.length === 1 ? "tag" : "tags"}`,
+    form.split ? `Split in ${String(draft.parts.length)}` : null,
+  ].filter((part) => part !== null);
+  return (
+    <div className="flex min-w-0 flex-col gap-5">
+      <Button
+        type="button"
+        variant="ghost"
+        aria-expanded={open}
+        aria-controls={regionId}
+        onClick={() => {
+          form.setDetailsOpen(!open);
+        }}
+        className="-mx-2 h-auto min-h-11 justify-between gap-3 p-2 text-left text-base font-semibold whitespace-normal"
+      >
+        <span className="flex min-w-0 flex-col">
+          More details
+          <span className="text-sm font-normal text-muted-foreground">
+            {holds.length > 0 ? holds.join(" · ") : "Note, tags, split"}
+          </span>
+        </span>
+        <ChevronDown
+          aria-hidden="true"
+          className={cn(
+            "size-5 shrink-0 transition-transform motion-reduce:transition-none",
+            open && "rotate-180",
+          )}
+        />
+      </Button>
+      {open && (
+        <div id={regionId} className="flex min-w-0 flex-col gap-6">
+          <NoteField note={draft.note} onNote={form.setNote} />
+          <TagsField form={form} />
+          {draft.kind === "expense" && <SplitField form={form} />}
+        </div>
+      )}
+    </div>
+  );
+}
+
 interface NoteFieldProps {
   note: string;
   onNote: (note: string) => void;
@@ -316,22 +400,270 @@ function NoteField({ note, onNote }: NoteFieldProps) {
   return (
     <Field>
       <FieldLabel htmlFor={id}>Note</FieldLabel>
-      <Input
+      <Textarea
         id={id}
         value={note}
         onChange={(event) => {
           onNote(event.target.value);
         }}
-        autoComplete="off"
         autoCapitalize="sentences"
-        maxLength={80}
+        maxLength={500}
+        rows={3}
+        className="min-h-24 text-base md:text-base"
+      />
+    </Field>
+  );
+}
+
+/**
+ * Tags, such as a trip or a wedding, that cut across categories. Typed and added with Enter or a
+ * comma, or picked from the ones already in use. Each has its own ✕.
+ */
+function TagsField({ form }: BodyProps) {
+  const id = useId();
+  const [typed, setTyped] = useState("");
+  const { tags } = form.draft;
+  const add = (text: string) => {
+    const tag = text.trim().replace(/,$/, "");
+    setTyped("");
+    if (tag === "") return;
+    if (tags.some((one) => one.toLowerCase() === tag.toLowerCase())) return;
+    form.setTags([...tags, tag]);
+  };
+  const offered = form.knownTags
+    .filter((tag) => !tags.includes(tag))
+    .slice(0, 6);
+  return (
+    <Field className="min-w-0">
+      <FieldLabel htmlFor={id}>Tags</FieldLabel>
+      {tags.length > 0 && (
+        <ul className="flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <li
+              key={tag}
+              className="inline-flex max-w-full items-center gap-1 rounded-full bg-accent py-1 pr-1 pl-3 text-sm font-medium text-accent-foreground"
+            >
+              <span className="min-w-0 truncate">{tag}</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Remove tag: ${tag}`}
+                className="rounded-full"
+                onClick={() => {
+                  form.setTags(tags.filter((one) => one !== tag));
+                }}
+              >
+                <X />
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <Input
+        id={id}
+        value={typed}
+        onChange={(event) => {
+          const text = event.target.value;
+          if (text.endsWith(",")) add(text);
+          else setTyped(text);
+        }}
+        onKeyDown={(event) => {
+          // Enter adds the tag rather than saving the form.
+          if (event.key === "Enter") {
+            event.preventDefault();
+            add(typed);
+          }
+        }}
+        onBlur={() => {
+          add(typed);
+        }}
+        enterKeyHint="done"
+        autoComplete="off"
+        maxLength={30}
         aria-describedby={`${id}-hint`}
         className={TALL_FIELD}
       />
       <FieldDescription id={`${id}-hint`}>
-        Optional. It becomes the entry&apos;s name, such as Imtiaz Super Market.
+        Optional. Such as a trip or a wedding. Enter adds it.
       </FieldDescription>
+      {offered.length > 0 && (
+        <div
+          role="group"
+          aria-label="Tags you use"
+          className="flex flex-wrap gap-2"
+        >
+          {offered.map((tag) => (
+            <Button
+              key={tag}
+              type="button"
+              variant="outline"
+              className="h-10 max-w-full rounded-full"
+              onClick={() => {
+                add(tag);
+              }}
+            >
+              <Plus data-icon="inline-start" aria-hidden="true" />
+              <span className="min-w-0 truncate">{tag}</span>
+            </Button>
+          ))}
+        </div>
+      )}
     </Field>
+  );
+}
+
+/**
+ * One bill across categories, such as Groceries and Personal care. Each part has a category and
+ * an amount, and the parts must add up to the amount. A line says what is left to share out.
+ */
+function SplitField({ form }: BodyProps) {
+  const { draft } = form;
+  if (!form.split) {
+    return (
+      <FieldSet className="min-w-0 gap-2">
+        <FieldLegend variant="label">Split</FieldLegend>
+        <FieldDescription>
+          Optional. One bill across categories, such as groceries and personal
+          care.
+        </FieldDescription>
+        <Button
+          type="button"
+          variant="outline"
+          className="h-11 self-start"
+          onClick={() => {
+            form.setParts([
+              { category: draft.category, digits: draft.digits },
+              { category: "", digits: "" },
+            ]);
+          }}
+        >
+          Split across categories
+        </Button>
+      </FieldSet>
+    );
+  }
+  const setPart = (
+    index: number,
+    patch: Partial<(typeof draft.parts)[number]>,
+  ) => {
+    form.setParts(
+      draft.parts.map((part, at) =>
+        at === index ? { ...part, ...patch } : part,
+      ),
+    );
+  };
+  const left = form.splitLeft;
+  return (
+    <FieldSet className="min-w-0 gap-3">
+      <FieldLegend variant="label">Split</FieldLegend>
+      <ul className="flex flex-col gap-3">
+        {draft.parts.map((part, index) => {
+          const number = String(index + 1);
+          return (
+            // Parts have no id of their own. They keep their place, so the index is a stable key.
+            <li key={index} className="flex flex-wrap items-center gap-2">
+              <NativeSelect
+                aria-label={`Part ${number}: category`}
+                value={part.category}
+                onChange={(event) => {
+                  setPart(index, { category: event.target.value });
+                }}
+                className="min-w-0 flex-1 basis-40 [&>select]:h-11 [&>select]:text-base"
+              >
+                <NativeSelectOption value="">
+                  Pick a category
+                </NativeSelectOption>
+                {form.categories.map((category) => (
+                  <NativeSelectOption key={category} value={category}>
+                    {category}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
+              <div className="flex flex-1 basis-36 items-center gap-1">
+                <Input
+                  aria-label={`Part ${number}: amount in rupees`}
+                  inputMode="numeric"
+                  autoComplete="off"
+                  value={
+                    part.digits === "" ? "" : formatDigits(Number(part.digits))
+                  }
+                  onChange={(event) => {
+                    setPart(index, {
+                      digits: event.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 11),
+                    });
+                  }}
+                  className="h-11 min-w-0 text-right text-base tabular-nums md:text-base"
+                />
+                {draft.parts.length > 2 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-lg"
+                    aria-label={`Remove part ${number}`}
+                    onClick={() => {
+                      form.setParts(
+                        draft.parts.filter((_, at) => at !== index),
+                      );
+                    }}
+                  >
+                    <X />
+                  </Button>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      <p aria-live="polite" className="text-sm font-medium">
+        {left === 0 ? (
+          "The parts add up to the amount."
+        ) : left > 0 ? (
+          <>
+            <Money value={left} /> left to share out
+          </>
+        ) : (
+          <>
+            <Money value={-left} /> more than the amount
+          </>
+        )}
+      </p>
+      {form.splitError !== null && <FieldError>{form.splitError}</FieldError>}
+      <div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          className="h-11"
+          onClick={() => {
+            form.setParts([
+              ...draft.parts,
+              { category: "", digits: left > 0 ? String(left) : "" },
+            ]);
+          }}
+        >
+          <Plus data-icon="inline-start" aria-hidden="true" />
+          Add a part
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          className="h-11"
+          onClick={() => {
+            const biggest = draft.parts.toSorted(
+              (one, two) => Number(two.digits) - Number(one.digits),
+            )[0];
+            form.setParts([]);
+            if (biggest !== undefined && biggest.category !== "") {
+              form.setCategory(biggest.category);
+            }
+          }}
+        >
+          {"Don't split"}
+        </Button>
+      </div>
+    </FieldSet>
   );
 }
 
@@ -343,23 +675,35 @@ const toOptions = (places: readonly Place[], debts: string): Option[] =>
     group: place.debt === null ? "Accounts" : debts,
   }));
 
-/** Everything but the amount: category, where the money came from and went, the day and a note. */
+/**
+ * Everything but the amount: category, where the money came from and went, the day, the name,
+ * and More details. A split entry's categories are in its split, so the category chips step aside.
+ */
 export function DetailFields({ form }: BodyProps) {
   const { draft } = form;
 
   return (
     <FieldGroup>
-      {draft.kind !== "transfer" && (
-        <ChipChoice
-          legend="Category"
-          options={form.categories.map((category) => ({
-            value: category,
-            label: category,
-          }))}
-          value={draft.category}
-          onValue={form.setCategory}
-          shown={5}
-        />
+      {form.split ? (
+        <FieldSet className="min-w-0 gap-2">
+          <FieldLegend variant="label">Category</FieldLegend>
+          <FieldDescription>
+            Split across {draft.parts.length} categories, under More details.
+          </FieldDescription>
+        </FieldSet>
+      ) : (
+        draft.kind !== "transfer" && (
+          <ChipChoice
+            legend="Category"
+            options={form.categories.map((category) => ({
+              value: category,
+              label: category,
+            }))}
+            value={draft.category}
+            onValue={form.setCategory}
+            shown={5}
+          />
+        )
       )}
       <ChipChoice
         legend={ACCOUNT_LABEL[draft.kind]}
@@ -386,7 +730,8 @@ export function DetailFields({ form }: BodyProps) {
         </ChipChoice>
       )}
       <DayChoice day={draft.day} onDay={form.setDay} />
-      <NoteField note={draft.note} onNote={form.setNote} />
+      <NameField name={draft.name} onName={form.setName} />
+      <MoreDetails form={form} />
     </FieldGroup>
   );
 }

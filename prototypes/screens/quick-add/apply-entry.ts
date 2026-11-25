@@ -3,10 +3,13 @@ import type { Debt } from "@proto/fixtures/debts";
 import type { CategorySpend, Entry } from "@proto/fixtures/entries";
 import type { Dashboard } from "@proto/screens/dashboard/scenarios";
 import type { Place } from "./places";
+import type { Draft } from "./scenarios";
 
 /** An entry saved in Quick add, with the accounts or debts it moved money between. */
 export interface SavedEntry {
   entry: Entry;
+  /** The form as it was saved, with what Home's list doesn't show: the note, tags and split. */
+  draft: Draft;
   /** The id of the account or credit card the money left, or the account it landed in for income. */
   account: string;
   /** The id of the account or debt moved money went to. Empty otherwise. */

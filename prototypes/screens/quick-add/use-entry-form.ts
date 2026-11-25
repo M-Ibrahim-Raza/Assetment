@@ -8,22 +8,29 @@ import { useProtoAction } from "@proto/kit/use-proto-action";
 import type { SavedEntry } from "./apply-entry";
 import { dayLabel } from "./days";
 import type { Place } from "./places";
-import type { Draft, QuickAdd } from "./scenarios";
+import type { Draft, DraftPart, QuickAdd } from "./scenarios";
 
 // What the user had typed when they closed the panel. It outlives the screen, so opening Add again
 // brings it back. Production would keep it in sessionStorage.
 let kept: Draft | null = null;
 
 const isDirty = (draft: Draft) =>
-  draft.digits !== "" || draft.note.trim() !== "";
+  draft.digits !== "" ||
+  draft.name.trim() !== "" ||
+  draft.note.trim() !== "" ||
+  draft.tags.length > 0 ||
+  draft.parts.length > 0;
 
 /** The name a usual gives the entry, such as "Careem". None when it is only the category's name. */
-const usualNote = (usual: Usual): string =>
+const usualName = (usual: Usual): string =>
   usual.title === usual.category ? "" : usual.title;
+
+/** Whole rupees from typed digits. Nothing typed is zero. */
+const rupees = (digits: string) => (digits === "" ? 0 : Number(digits));
 
 /**
  * The usual the form is set to, if any: the same kind, category and accounts. When two match, the
- * one whose name the note carries.
+ * one whose name the form carries.
  */
 export function currentUsual(
   draft: Draft,
@@ -37,7 +44,7 @@ export function currentUsual(
       usual.toAccount === draft.toAccount,
   );
   return (
-    same.find((usual) => usualNote(usual) === draft.note.trim()) ?? same[0]
+    same.find((usual) => usualName(usual) === draft.name.trim()) ?? same[0]
   );
 }
 
@@ -72,9 +79,9 @@ function linkKind(kind: EntryKind) {
 }
 
 /**
- * The draft switched to another kind. It keeps the amount, the day and the note. The category and
- * the second account follow the kind. A card can only be spent from, so another kind goes back to
- * the first account.
+ * The draft switched to another kind. It keeps the amount, the day, the name, the note and the
+ * tags. The category and the second account follow the kind. Only spent money splits. A card can
+ * only be spent from, so another kind goes back to the first account.
  */
 function withKind(
   draft: Draft,
@@ -93,6 +100,7 @@ function withKind(
     ...draft,
     kind: next,
     category: next === "transfer" ? "" : (categories[next][0] ?? ""),
+    parts: next === "expense" ? draft.parts : [],
     account,
     toAccount:
       next === "transfer"
@@ -103,28 +111,42 @@ function withKind(
 
 /**
  * The entry being typed, kept in memory, with what it does to the accounts and debts it touches.
+ * In "add" mode it is Quick add: the kind lives in the link, and what was typed waits for the
+ * next time when the panel closes. In "edit" mode it changes a saved entry: the draft is that
+ * entry, the link is left alone, and nothing is kept.
  */
 export function useEntryForm(
   quickAdd: QuickAdd,
   /** The accounts and debts as they stand, after anything saved in this visit. */
   places: readonly Place[],
   onSaved: (saved: SavedEntry) => void,
+  mode: "add" | "edit" = "add",
 ) {
+  const adding = mode === "add";
   const amountId = useId();
-  const linked = linkedKind(useSearchParams().get(KIND_PARAM));
+  const kindInLink = linkedKind(useSearchParams().get(KIND_PARAM));
+  const linked = adding ? kindInLink : null;
   // A draft the scenario typed wins. Otherwise a kept one comes back.
   const [restored, setRestored] = useState(
-    () => kept !== null && !isDirty(quickAdd.draft),
+    () => adding && kept !== null && !isDirty(quickAdd.draft),
   );
   // A kind the link names wins over the draft's.
   const [draft, setDraft] = useState(() => {
-    const start = isDirty(quickAdd.draft)
-      ? quickAdd.draft
-      : (kept ?? quickAdd.draft);
+    const start =
+      !adding || isDirty(quickAdd.draft)
+        ? quickAdd.draft
+        : (kept ?? quickAdd.draft);
     return linked === null
       ? start
       : withKind(start, linked, quickAdd.categories, places);
   });
+  // More details opens by itself when the entry already has any.
+  const [detailsOpen, setDetailsOpen] = useState(
+    () =>
+      draft.note.trim() !== "" ||
+      draft.tags.length > 0 ||
+      draft.parts.length > 0,
+  );
   // Errors wait for the first try, so they never show while the user is still typing.
   const [tried, setTried] = useState(false);
   const [failed, setFailed] = useState(quickAdd.failed);
@@ -141,6 +163,22 @@ export function useEntryForm(
 
   const amountError =
     tried && (amount === null || amount === 0) ? "Enter an amount." : null;
+
+  // A split's parts must add up to the amount, and each part needs a category and an amount.
+  const split = kind === "expense" && draft.parts.length > 0;
+  const partsTotal = draft.parts.reduce(
+    (total, part) => total + rupees(part.digits),
+    0,
+  );
+  const splitLeft = (amount ?? 0) - partsTotal;
+  const splitProblem = !split
+    ? null
+    : draft.parts.some((part) => part.category === "" || part.digits === "")
+      ? "Give each part a category and an amount."
+      : splitLeft !== 0
+        ? "The parts must add up to the amount."
+        : null;
+  const splitError = tried ? splitProblem : null;
 
   const accounts = places.filter((place) => place.debt === null);
   // Money is spent from an account or a credit card. It comes into an account, and moves from one.
@@ -165,10 +203,10 @@ export function useEntryForm(
     setDraft((current) => withKind(current, next, quickAdd.categories, places));
   };
 
-  // The link follows the kind: when it opens, and whenever it changes.
+  // In Quick add the link follows the kind: when it opens, and whenever it changes.
   useEffect(() => {
-    linkKind(kind);
-  }, [kind]);
+    if (adding) linkKind(kind);
+  }, [kind, adding]);
 
   /** Money can't move to the account it leaves. Picking that one swaps the two. */
   const setAccount = (account: string) => {
@@ -180,27 +218,28 @@ export function useEntryForm(
   };
 
   /**
-   * Fills the category and accounts from a usual. Its name goes in the note, so the entry is saved
-   * as "Careem" and not as "Transport", unless the user typed a note of their own.
+   * Fills the category and accounts from a usual. Its name goes in the Name field, so the entry is
+   * saved as "Careem" and not as "Transport", unless the user typed a name of their own.
    */
   const applyUsual = (usual: Usual) => {
-    const note = draft.note.trim();
-    const noteIsAUsuals =
-      note === "" || quickAdd.usuals.some((other) => usualNote(other) === note);
+    const name = draft.name.trim();
+    const nameIsAUsuals =
+      name === "" || quickAdd.usuals.some((other) => usualName(other) === name);
     update({
       kind: usual.kind,
       category: usual.category,
       account: usual.account,
       toAccount: usual.toAccount,
-      ...(noteIsAUsuals ? { note: usualNote(usual) } : {}),
+      ...(nameIsAUsuals ? { name: usualName(usual) } : {}),
     });
   };
 
   const save = useProtoAction((saved: SavedEntry) => {
     onSaved(saved);
+    if (!adding) return;
     kept = null;
     // Ready for the next one. The kind, category, accounts and day stay, for logging several in a row.
-    update({ digits: "", note: "" });
+    update({ digits: "", name: "", note: "", tags: [], parts: [] });
     setTried(false);
     setRestored(false);
   });
@@ -212,16 +251,21 @@ export function useEntryForm(
       document.getElementById(amountId)?.focus();
       return;
     }
+    if (splitProblem !== null) {
+      setDetailsOpen(true);
+      return;
+    }
     setFailed(false);
-    const note = draft.note.trim();
+    const name = draft.name.trim();
     const fallback =
       kind === "transfer"
         ? `To ${to?.name ?? "another account"}`
         : draft.category;
     save.run({
+      draft,
       entry: {
         id: crypto.randomUUID(),
-        title: note === "" ? fallback : note,
+        title: name === "" ? fallback : name,
         kind,
         amount,
         category: kind === "transfer" ? "Transfer" : draft.category,
@@ -240,6 +284,7 @@ export function useEntryForm(
    * then says so.
    */
   const keep = () => {
+    if (!adding) return;
     const dirty = isDirty(draft);
     kept = dirty ? draft : null;
     setRestored(dirty);
@@ -250,7 +295,14 @@ export function useEntryForm(
     kept = null;
     setDraft(
       withKind(
-        { ...quickAdd.draft, digits: "", note: "" },
+        {
+          ...quickAdd.draft,
+          digits: "",
+          name: "",
+          note: "",
+          tags: [],
+          parts: [],
+        },
         kind,
         quickAdd.categories,
         places,
@@ -279,9 +331,20 @@ export function useEntryForm(
     fromAfter,
     toAfter,
     amountError,
+    /** Whether this form is changing a saved entry. */
+    editing: !adding,
+    /** Spent money split across categories. */
+    split,
+    /** What is left to share out between the parts: zero when they add up. */
+    splitLeft,
+    splitError,
+    /** Tags already in use, offered under More details. */
+    knownTags: quickAdd.tags ?? [],
+    detailsOpen,
+    setDetailsOpen,
     restored,
     failed,
-    pending: save.pending,
+    pending: save.pending || quickAdd.saving === true,
     setKind,
     setAccount,
     setDigits: (digits: string) => {
@@ -296,8 +359,17 @@ export function useEntryForm(
     setDay: (day: string) => {
       update({ day });
     },
+    setName: (name: string) => {
+      update({ name });
+    },
     setNote: (note: string) => {
       update({ note });
+    },
+    setTags: (tags: readonly string[]) => {
+      update({ tags });
+    },
+    setParts: (parts: readonly DraftPart[]) => {
+      update({ parts });
     },
     applyUsual,
     submit,

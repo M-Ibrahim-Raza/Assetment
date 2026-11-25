@@ -37,9 +37,9 @@ export function RecentBlock({ entries }: { entries: readonly Entry[] }) {
             ))}
           </ul>
           <p className="text-sm">
-            {/* It lands on Spending's list of the month's entries, not its top. */}
+            {/* Every entry of every kind, as this list mixes them. */}
             <Link
-              href="/spending#entries"
+              href="/entries"
               className="font-semibold underline underline-offset-4"
             >
               See all entries

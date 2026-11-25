@@ -81,7 +81,21 @@ export interface Draft {
   toAccount: string;
   /** The day it happened, as an ISO date. */
   day: string;
+  /** The entry's name, such as Imtiaz Super Market. Empty takes the category's name. */
+  name: string;
+  /** A longer note, under More details. Optional. */
   note: string;
+  /** Under More details. */
+  tags: readonly string[];
+  /** Spent money across categories, under More details. Empty when it isn't split. */
+  parts: readonly DraftPart[];
+}
+
+/** One part of a split, as typed. */
+export interface DraftPart {
+  category: string;
+  /** Digits with no commas. Empty when nothing was typed. */
+  digits: string;
 }
 
 export interface QuickAdd {
@@ -97,6 +111,10 @@ export interface QuickAdd {
   draft: Draft;
   /** True when saving this draft just failed. The form opens with the error showing. */
   failed: boolean;
+  /** True while this draft is being saved, to show the waiting state. */
+  saving?: boolean;
+  /** Tags already in use, most used first, offered under More details. */
+  tags?: readonly string[];
 }
 
 /** The View's props. Loading and error are states the View shows, so they are props too. */
@@ -129,7 +147,10 @@ function blank(list: readonly Account[]): Draft {
     account: idOf(list, CASH),
     toAccount: "",
     day: TODAY,
+    name: "",
     note: "",
+    tags: [],
+    parts: [],
   };
 }
 
@@ -178,7 +199,10 @@ const heavy: QuickAdd = {
     account: idOf(thirty, UBL),
     toAccount: "",
     day: daysBefore(TODAY, 8),
-    note: "Fees for both children for the whole year, paid at the school office",
+    name: "Fees for both children for the whole year, paid at the school office",
+    note: "",
+    tags: [],
+    parts: [],
   },
   failed: false,
 };
@@ -224,7 +248,7 @@ export const scenarios = {
         digits: "3499",
         category: "Clothes",
         account: idOf(three, HBL_CARD),
-        note: "Daraz order",
+        name: "Daraz order",
       },
     },
   },
@@ -240,7 +264,7 @@ export const scenarios = {
         category: "",
         account: idOf(five, MEEZAN),
         toAccount: idOf(three, HBL_CARD),
-        note: "HBL card bill",
+        name: "HBL card bill",
       },
     },
   },

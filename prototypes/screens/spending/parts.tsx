@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowUp, Minus, Search, X } from "lucide-react";
+import { ArrowDown, ArrowUp, Minus, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -16,6 +16,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { AmountsContext, Money } from "@proto/components/amounts";
+import { FilterChip } from "@proto/components/filter-chip";
 import { ScreenLink } from "@proto/components/screen-link";
 import type { SpendEntry } from "@proto/fixtures/spending";
 import { formatLakhCrore, formatPkr } from "@proto/kit/format";
@@ -750,29 +751,6 @@ export function EntriesList({
         />
       )}
     </div>
-  );
-}
-
-function FilterChip({
-  label,
-  onRemove,
-}: {
-  label: string;
-  onRemove: () => void;
-}) {
-  return (
-    <span className="inline-flex max-w-full items-center gap-1 rounded-full bg-accent py-1 pr-1 pl-3 text-sm font-medium text-accent-foreground">
-      <span className="min-w-0 truncate">{label}</span>
-      <Button
-        variant="ghost"
-        size="icon-sm"
-        aria-label={`Remove filter: ${label}`}
-        onClick={onRemove}
-        className="rounded-full"
-      >
-        <X />
-      </Button>
-    </span>
   );
 }
 
