@@ -48,7 +48,7 @@ v1 will not have:
 
 - Budgets, spending limits or alerts
 - Tax or FBR wealth statement reports
-- Bank sync, or statement and CSV import
+- Bank sync
 - Shared or household accounts
 - Live prices (prices refresh daily)
 - Other markets, or a base currency other than PKR
